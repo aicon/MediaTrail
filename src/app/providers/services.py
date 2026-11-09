@@ -31,7 +31,11 @@ def get_redis_client():
         import fakeredis  # noqa: PLC0415
 
         return fakeredis.FakeRedis()
-    return Redis.from_url(settings.REDIS_URL)
+    return Redis.from_url(
+        settings.REDIS_URL,
+        socket_connect_timeout=5,
+        socket_timeout=5,
+    )
 
 
 redis_db = get_redis_client()

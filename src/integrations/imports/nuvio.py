@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 import requests
 from cryptography.fernet import InvalidToken
 from django.conf import settings
+from simple_history.utils import bulk_update_with_history
 
 import app
 from app.models import MediaTypes, Sources, Status
@@ -238,6 +239,7 @@ class NuvioImporter:
         self.client = client or NuvioClient(self.account)
         self.warnings = []
         self.created = {MediaTypes.MOVIE.value: 0, MediaTypes.EPISODE.value: 0}
+        self._pending_account_fields = set()
         self._imported = set(self.account.imported_ids)
         self._permanent = set(self.account.permanent_ids)
         self._imdb_map = dict(self.account.imdb_map)
@@ -268,16 +270,22 @@ class NuvioImporter:
 
     def _bootstrap(self):
         cursor = self.client.history_cursor()
-        for row in self.client.iter_history():
+        logger.info("Nuvio import started")
+        for index, row in enumerate(self.client.iter_history(), start=1):
             if not self._apply(row, operation="upsert", event_id=None):
+                self._flush_progress()
                 msg = (
                     "Nuvio import stopped before the history snapshot finished. "
                     "It will continue on the next run."
                 )
                 raise MediaImportError(msg)
+            if index % 25 == 0:
+                self._log_progress(index)
+        self._flush_progress()
         self.account.cursor = cursor
         self.account.bootstrapped = True
         self._save_account(["cursor", "bootstrapped"])
+        logger.info("Nuvio import history snapshot finished")
 
     def _delta(self):
         blocked = False
@@ -293,6 +301,7 @@ class NuvioImporter:
             if not blocked and self.account.bootstrapped:
                 self.account.cursor = int(event_id)
                 self._save_account(["cursor"])
+        self._flush_progress()
         if blocked:
             msg = "Nuvio import stopped on a failed record. It will continue on the next run."
             raise MediaImportError(msg)
@@ -324,6 +333,7 @@ class NuvioImporter:
         if record["operation"] != "upsert":
             return True
 
+        logger.info("Nuvio import %s: %s", record["kind"], record["title"])
         try:
             action = self._write(record)
         except services.ProviderAPIError as exc:
@@ -409,7 +419,7 @@ class NuvioImporter:
                 return "skip"
             existing.end_date = record["end_date"]
             existing._history_date = record["end_date"]
-            existing.save()
+            self._save_episode(existing)
             return "update"
 
         tv = self._tv(media_id, record["title"])
@@ -446,8 +456,36 @@ class NuvioImporter:
             notes="",
         )
         episode._history_date = record["end_date"]
-        episode.save()
+        self._save_episode(episode)
+        self._update_season_status(season, episode_number, len(episodes))
         return "create"
+
+    def _save_episode(self, episode):
+        """Store the episode without the per-row metadata reload in Episode.save."""
+        super(app.models.Episode, episode).save()
+
+    def _update_season_status(self, season, episode_number, episode_count):
+        """Mark a season from metadata already loaded for this episode."""
+        if not episode_count:
+            return
+        target = (
+            Status.COMPLETED.value
+            if episode_number == episode_count
+            else Status.IN_PROGRESS.value
+        )
+        if season.status == target:
+            return
+        season.status = target
+        bulk_update_with_history([season], app.models.Season, ["status"])
+
+    def _log_progress(self, index):
+        self._flush_progress()
+        logger.info(
+            "Nuvio import progress: %s rows, %s movies, %s episodes",
+            index,
+            self.created[MediaTypes.MOVIE.value],
+            self.created[MediaTypes.EPISODE.value],
+        )
 
     def _tv(self, media_id, title):
         existing = app.models.TV.objects.filter(
@@ -574,7 +612,13 @@ class NuvioImporter:
             return
         self._imported.add(nuvio_id)
         self.account.imported_ids = sorted(self._imported)
-        self._save_account(["imported_ids"])
+        self._pending_account_fields.add("imported_ids")
+
+    def _flush_progress(self):
+        if not self._pending_account_fields:
+            return
+        self._save_account(sorted(self._pending_account_fields))
+        self._pending_account_fields.clear()
 
     def _save_account(self, fields):
         self.account.save(update_fields=fields)

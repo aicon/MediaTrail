@@ -266,6 +266,8 @@ CACHES = {
         "KEY_PREFIX": KEY_PREFIX,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "SOCKET_CONNECT_TIMEOUT": 5,
+            "SOCKET_TIMEOUT": 5,
         },
     },
 }
