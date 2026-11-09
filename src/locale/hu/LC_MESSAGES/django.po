@@ -975,3 +975,33 @@ msgstr "2026. jan. 18."
 
 msgid "18 Jan, 2026"
 msgstr "18. jan. 2026."
+
+msgid "Import movies and episodes"
+msgstr "Filmek és epizódok importálása"
+
+msgid "Nuvio email"
+msgstr "Nuvio e-mail"
+
+msgid "Nuvio password"
+msgstr "Nuvio jelszó"
+
+msgid "Profile"
+msgstr "Profil"
+
+msgid "Nuvio email and password are required."
+msgstr "A Nuvio e-mail és a jelszó kötelező."
+
+msgid "Nuvio profile must be a positive number."
+msgstr "A Nuvio-profil csak pozitív szám lehet."
+
+msgid "The task to import media from Nuvio has been queued."
+msgstr "A Nuvio-import elindult."
+
+msgid "Invalid import time."
+msgstr "Érvénytelen importidő."
+
+msgid "The same import task is already scheduled."
+msgstr "Ez az import már be van ütemezve."
+
+msgid "%(source)s import task scheduled."
+msgstr "A(z) %(source)s import ütemezve."

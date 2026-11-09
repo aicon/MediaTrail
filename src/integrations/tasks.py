@@ -15,6 +15,7 @@ from integrations.imports import (
     imdb,
     kitsu,
     mal,
+    nuvio,
     simkl,
     steam,
     trakt,
@@ -83,6 +84,12 @@ def import_media(
     events.tasks.reload_calendar.delay()
 
     return format_import_message(imported_counts, warnings)
+
+
+@shared_task(name="Import from Nuvio")
+def import_nuvio(user_id, mode, username=None):
+    """Celery task for importing missing movies and episodes from Nuvio."""
+    return import_media(nuvio.importer, username or "", user_id, mode)
 
 
 @shared_task(name="Import from Trakt")

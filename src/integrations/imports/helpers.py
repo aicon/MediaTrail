@@ -10,6 +10,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 from simple_history.utils import bulk_create_with_history, bulk_update_with_history
 
@@ -256,7 +257,7 @@ def create_import_schedule(
             .time()
         )
     except ValueError:
-        messages.error(request, "Invalid import time.")
+        messages.error(request, _("Invalid import time."))
         return
 
     if frequency in HOUR_STEPS:
@@ -272,7 +273,7 @@ def create_import_schedule(
     if PeriodicTask.objects.filter(name=task_name).exists():
         messages.error(
             request,
-            "The same import task is already scheduled.",
+            _("The same import task is already scheduled."),
         )
         return
 
@@ -302,7 +303,7 @@ def create_import_schedule(
         kwargs=json.dumps(kwargs),
         start_time=timezone.now(),
     )
-    messages.success(request, f"{source} import task scheduled.")
+    messages.success(request, _("%(source)s import task scheduled.") % {"source": source})
 
 
 def join_with_commas_and(items):

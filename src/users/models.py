@@ -663,6 +663,7 @@ class User(AbstractUser):
     def get_import_tasks(self):
         """Return import tasks history and schedules for the user."""
         import_tasks = {
+            "nuvio": "Import from Nuvio",
             "trakt": "Import from Trakt",
             "simkl": "Import from SIMKL",
             "myanimelist": "Import from MyAnimeList",

@@ -13,16 +13,55 @@ from django.http import HttpResponse, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
 import users
 from app import helpers as app_helpers
 from integrations import exports, tasks
-from integrations.imports import anilist, helpers, simkl, trakt
+from integrations.imports import anilist, helpers, nuvio, simkl, trakt
 from integrations.webhooks import emby, jellyfin, plex
 
 logger = logging.getLogger(__name__)
+
+
+@require_POST
+def import_nuvio(request):
+    """Save encrypted Nuvio credentials and queue or schedule the import."""
+    email = request.POST.get("email", "").strip()
+    password = request.POST.get("password", "")
+    profile_raw = (request.POST.get("profile_id") or "1").strip()
+    if not email or not password:
+        messages.error(request, _("Nuvio email and password are required."))
+        return redirect("import_data")
+    if not profile_raw.isdigit() or int(profile_raw) < 1:
+        messages.error(request, _("Nuvio profile must be a positive number."))
+        return redirect("import_data")
+
+    nuvio.save_account(request.user, email, password, int(profile_raw))
+    mode = request.POST.get("mode", "new")
+    frequency = request.POST.get("frequency", "once")
+    if frequency == "once":
+        tasks.import_nuvio.delay(
+            user_id=request.user.id,
+            mode=mode,
+            username=email,
+        )
+        messages.info(
+            request,
+            _("The task to import media from Nuvio has been queued."),
+        )
+    else:
+        helpers.create_import_schedule(
+            email,
+            request,
+            mode,
+            frequency,
+            request.POST.get("time", ""),
+            "Nuvio",
+        )
+    return redirect("import_data")
 
 
 @require_POST

@@ -12,6 +12,10 @@ def get_attr(obj, attr):
 
 
 SOURCES_CONFIG = {
+    "nuvio": {
+        "name": "Nuvio",
+        "logo": static("img/nuvio-logo.svg"),
+    },
     "kitsu": {
         "name": "Kitsu",
         "logo": static("img/kitsu-logo.png"),

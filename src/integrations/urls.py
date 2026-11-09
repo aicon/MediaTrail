@@ -3,6 +3,7 @@ from django.urls import path
 from integrations import views
 
 urlpatterns = [
+    path("import/nuvio", views.import_nuvio, name="import_nuvio"),
     path("import/trakt-oauth", views.trakt_oauth, name="trakt_oauth"),
     path(
         "import/trakt/private",
