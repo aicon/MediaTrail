@@ -14,6 +14,7 @@ def export_vars(request):  # noqa: ARG001
         "TRACK_TIME": settings.TRACK_TIME,
         "MEDIATRAIL_SOURCE_URL": settings.MEDIATRAIL_SOURCE_URL,
         "MEDIATRAIL_SUPPORT_URL": settings.MEDIATRAIL_SUPPORT_URL,
+        "ADMIN_ENABLED": settings.ADMIN_ENABLED,
     }
 
 

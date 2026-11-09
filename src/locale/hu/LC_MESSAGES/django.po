@@ -49,6 +49,9 @@ msgstr "A MediaTrail karbantartóját támogatja."
 msgid "Settings"
 msgstr "Beállítások"
 
+msgid "Admin"
+msgstr "Admin"
+
 msgid "Logout"
 msgstr "Kijelentkezés"
 
