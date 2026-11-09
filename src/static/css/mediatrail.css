@@ -1,0 +1,45 @@
+.mt-sponsor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid #f0c14b;
+  border-radius: 0.55rem;
+  background: #e8b931;
+  color: #2a2110;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  box-shadow: 0 0 0 1px rgba(240, 193, 75, 0.35), 0 6px 16px rgba(232, 185, 49, 0.28);
+}
+
+.mt-sponsor:hover {
+  background: #f3c84a;
+  color: #2a2110;
+}
+
+.mt-sponsor svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex-shrink: 0;
+}
+
+.mt-sponsor-note {
+  margin: 0.45rem 0 0;
+  color: #d6d3cd;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.mt-sponsor-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}

@@ -16,7 +16,7 @@ Set `MEDIATRAIL_SOURCE_URL` to an `http` or `https` address of that exact source
 
 ## Support
 
-The left sidebar has a fixed **Buy me a coffee** button to [Ko-fi](https://ko-fi.com/aiconwg). It supports the MediaTrail maintainer. It does not support Yamtrack or its developers, and Yamtrack does not endorse MediaTrail.
+The left sidebar has a fixed **Buy me a coffee** button to [Ko-fi](https://ko-fi.com/aiconwg), directly under the divider. The caption is “Supports the MediaTrail maintainer.”
 
 ## API keys
 
@@ -24,7 +24,7 @@ Provider keys, including a Gemini API key, belong in the operator's own runtime 
 
 ## Run locally
 
-The first image is `ghcr.io/aicon/mediatrail:0.1.0` (`latest` is the same build). It is private, like the repository. Redis runs inside that image and keeps its data under the existing `db` volume.
+MediaTrail versions continue from 0.25.3 in small steps. This tree is `0.25.4`. The image tag is `ghcr.io/aicon/mediatrail:0.25.4` (`latest` tracks the current build). The repository and the image are private. Redis runs inside the image and keeps its data under the existing `db` volume.
 
 `docker-compose.local.yml` can still build this directory on the machine as `mediatrail:local`. It does not start a separate Redis container. Put secrets in the Compose environment or a local `.env` that is not baked into the image.
 

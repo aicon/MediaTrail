@@ -29,6 +29,9 @@
     <link rel="stylesheet"
           type="text/css"
           href="{% static 'css/now_watching.css' %}{% get_static_file_mtime 'css/now_watching.css' %}">
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'css/mediatrail.css' %}{% get_static_file_mtime 'css/mediatrail.css' %}">
 
     <script src="{% static 'js/libraries/htmx-2.0.4.min.js' %}"></script>
     <script defer src="{% static 'js/libraries/alpinejs-3.14.9.min.js' %}"></script>
@@ -190,7 +193,17 @@
 
           {% block sidebar_logout %}
             <div class="p-4 border-t border-[#2c3136] mt-auto">
-              <div class="space-y-2">
+              <a href="https://ko-fi.com/aiconwg"
+                 target="_blank"
+                 rel="noopener noreferrer"
+                 class="mt-sponsor">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill="currentColor" d="M4 19h12v2H2V5h2v14zm16.5-8.5c0-1.1-.9-2-2-2H18V6c0-1.1-.9-2-2-2H4v12h12v-2h2.5c1.1 0 2-.9 2-2v-2.5zM16 14H6V6h10v8zm2.5-2.5H18V10h.5v1.5z"/>
+                </svg>
+                <span>Buy me a coffee</span>
+              </a>
+              <p class="mt-sponsor-note">Supports the MediaTrail maintainer.</p>
+              <div class="mt-sponsor-links">
                 {% url 'account' as account_url %}
                 {% url 'notifications' as notifications_url %}
                 {% url 'sidebar' as sidebar_url %}
@@ -218,17 +231,6 @@
                     <span>Logout</span>
                   </button>
                 </form>
-
-                <a href="https://ko-fi.com/aiconwg"
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   class="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-[#f5c451] px-4 py-2.5 text-sm font-semibold text-[#3b2a05] transition-colors hover:bg-[#e6b63a]">
-                  <span aria-hidden="true">☕</span>
-                  <span>Buy me a coffee</span>
-                </a>
-                <p class="px-1 text-center text-[11px] leading-4 text-gray-500">
-                  Supports the MediaTrail maintainer, not Yamtrack.
-                </p>
               </div>
             </div>
           {% endblock sidebar_logout %}
