@@ -1,0 +1,201 @@
+from django.contrib.auth import get_user_model
+from django.db import IntegrityError
+from django.test import TestCase
+
+from app.models import Item, MediaTypes, Sources
+from lists.models import CustomList, CustomListItem
+
+
+class CustomListModelTest(TestCase):
+    """Test case for the CustomList model."""
+
+    def setUp(self):
+        """Set up test data for CustomList model."""
+        self.credentials = {"username": "test", "password": "12345"}
+        self.user = get_user_model().objects.create_user(**self.credentials)
+
+        self.collaborator_credentials = {
+            "username": "collaborator",
+            "password": "12345",
+        }
+        self.collaborator = get_user_model().objects.create_user(
+            **self.collaborator_credentials,
+        )
+
+        self.custom_list = CustomList.objects.create(
+            name="Test List",
+            description="Test Description",
+            owner=self.user,
+        )
+        self.custom_list.collaborators.add(self.collaborator)
+
+        self.item = Item.objects.create(
+            title="Test Item",
+            media_id="123",
+            media_type=MediaTypes.TV.value,
+            source=Sources.TMDB.value,
+        )
+
+        self.non_member_credentials = {
+            "username": "non_member",
+            "password": "12345",
+        }
+        self.non_member = get_user_model().objects.create_user(
+            **self.non_member_credentials,
+        )
+
+    def test_custom_list_creation(self):
+        """Test the creation of a CustomList instance."""
+        self.assertEqual(self.custom_list.name, "Test List")
+        self.assertEqual(self.custom_list.description, "Test Description")
+        self.assertEqual(self.custom_list.owner, self.user)
+
+    def test_custom_list_str_representation(self):
+        """Test the string representation of a CustomList."""
+        self.assertEqual(str(self.custom_list), "Test List")
+
+    def test_owner_permissions(self):
+        """Test owner permissions on custom list."""
+        self.assertTrue(self.custom_list.user_can_view(self.user))
+        self.assertTrue(self.custom_list.user_can_edit(self.user))
+        self.assertTrue(self.custom_list.user_can_delete(self.user))
+
+    def test_collaborator_permissions(self):
+        """Test collaborator permissions on custom list."""
+        self.assertTrue(self.custom_list.user_can_view(self.collaborator))
+        self.assertTrue(self.custom_list.user_can_edit(self.collaborator))
+        self.assertFalse(self.custom_list.user_can_delete(self.collaborator))
+
+    def test_non_member_permissions(self):
+        """Test non-member permissions on custom list."""
+        self.assertFalse(self.custom_list.user_can_view(self.non_member))
+        self.assertFalse(self.custom_list.user_can_edit(self.non_member))
+        self.assertFalse(self.custom_list.user_can_delete(self.non_member))
+
+    def test_duplicate_item_constraint(self):
+        """Test that an item cannot be added twice to the same list."""
+        CustomListItem.objects.create(
+            item=self.item,
+            custom_list=self.custom_list,
+        )
+
+        with self.assertRaises(IntegrityError):
+            CustomListItem.objects.create(
+                item=self.item,
+                custom_list=self.custom_list,
+            )
+
+    def test_list_item_id_is_sequential_per_list(self):
+        """Test list_item_id is assigned sequentially for each list."""
+        second_item = Item.objects.create(
+            title="Second Test Item",
+            media_id="456",
+            media_type=MediaTypes.TV.value,
+            source=Sources.TMDB.value,
+        )
+
+        first_list_item = CustomListItem.objects.create(
+            item=self.item,
+            custom_list=self.custom_list,
+        )
+        second_list_item = CustomListItem.objects.create(
+            item=second_item,
+            custom_list=self.custom_list,
+        )
+
+        self.assertEqual(first_list_item.list_item_id, 0)
+        self.assertEqual(second_list_item.list_item_id, 1)
+
+    def test_bulk_create_assigns_sequential_ids(self):
+        """Test bulk_create assigns list_item_id for custom list items."""
+        second_item = Item.objects.create(
+            title="Second Bulk Test Item",
+            media_id="789",
+            media_type=MediaTypes.TV.value,
+            source=Sources.TMDB.value,
+        )
+        third_item = Item.objects.create(
+            title="Third Bulk Test Item",
+            media_id="790",
+            media_type=MediaTypes.TV.value,
+            source=Sources.TMDB.value,
+        )
+
+        created_items = CustomListItem.objects.bulk_create(
+            [
+                CustomListItem(item=self.item, custom_list=self.custom_list),
+                CustomListItem(item=second_item, custom_list=self.custom_list),
+                CustomListItem(item=third_item, custom_list=self.custom_list),
+            ],
+        )
+
+        self.assertEqual(created_items[0].list_item_id, 0)
+        self.assertEqual(created_items[1].list_item_id, 1)
+        self.assertEqual(created_items[2].list_item_id, 2)
+
+    def test_delete_renumbers_following_list_item_ids(self):
+        """Test deleting an item closes list_item_id gaps preserving previous order."""
+        second_item = Item.objects.create(
+            title="Second Delete Test Item",
+            media_id="791",
+            media_type=MediaTypes.TV.value,
+            source=Sources.TMDB.value,
+        )
+        third_item = Item.objects.create(
+            title="Third Delete Test Item",
+            media_id="792",
+            media_type=MediaTypes.TV.value,
+            source=Sources.TMDB.value,
+        )
+
+        first_list_item = CustomListItem.objects.create(
+            item=self.item,
+            custom_list=self.custom_list,
+        )
+        second_list_item = CustomListItem.objects.create(
+            item=second_item,
+            custom_list=self.custom_list,
+        )
+        third_list_item = CustomListItem.objects.create(
+            item=third_item,
+            custom_list=self.custom_list,
+        )
+
+        second_list_item.delete()
+
+        first_list_item.refresh_from_db()
+        third_list_item.refresh_from_db()
+
+        self.assertEqual(first_list_item.list_item_id, 0)
+        self.assertEqual(third_list_item.list_item_id, 1)
+
+
+class CustomListManagerTest(TestCase):
+    """Test case for the CustomListManager."""
+
+    def setUp(self):
+        """Set up test data for CustomListManager tests."""
+        self.credentials = {"username": "test", "password": "12345"}
+        self.other_credentials = {"username": "other", "password": "12345"}
+        self.user = get_user_model().objects.create_user(**self.credentials)
+        self.other_user = get_user_model().objects.create_user(**self.other_credentials)
+        self.list1 = CustomList.objects.create(name="List 1", owner=self.user)
+        self.list2 = CustomList.objects.create(name="List 2", owner=self.other_user)
+        self.list2.collaborators.add(self.user)
+
+    def test_get_user_lists(self):
+        """Test the get_user_lists method of CustomListManager."""
+        user_lists = CustomList.objects.get_user_lists(self.user)
+        self.assertEqual(user_lists.count(), 2)
+        self.assertIn(self.list1, user_lists)
+        self.assertIn(self.list2, user_lists)
+
+    def test_get_user_lists_with_search(self):
+        """Test get_user_lists applies search on name and description."""
+        self.list1.description = "Track only anime"
+        self.list1.save(update_fields=["description"])
+
+        user_lists = CustomList.objects.get_user_lists(self.user, search="anime")
+
+        self.assertEqual(user_lists.count(), 1)
+        self.assertIn(self.list1, user_lists)

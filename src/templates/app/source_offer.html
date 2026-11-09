@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="scheme-dark bg-[#212529]">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Source code - MediaTrail</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  </head>
+  <body class="bg-[#212529] text-gray-100">
+    <main class="max-w-2xl mx-auto px-6 py-12 space-y-6">
+      <p class="text-sm text-gray-400">
+        <a class="text-indigo-400 hover:text-indigo-300" href="/">MediaTrail</a>
+      </p>
+      <h1 class="text-2xl font-semibold">Source code of this version</h1>
+      <p class="text-gray-300">
+        MediaTrail is an independent, unofficial fork of
+        <a class="text-indigo-400 hover:text-indigo-300"
+           href="https://github.com/FuzzyGrim/Yamtrack"
+           target="_blank"
+           rel="noopener noreferrer">Yamtrack</a>.
+        It is not affiliated with, endorsed by, or maintained by the Yamtrack project or its developers.
+      </p>
+      <p class="text-gray-300">
+        MediaTrail is free software under the GNU Affero General Public License, version 3.
+        The license text and the upstream copyright notices are kept in this tree.
+        <a class="text-indigo-400 hover:text-indigo-300"
+           href="https://github.com/FuzzyGrim/Yamtrack/blob/dev/LICENSE"
+           target="_blank"
+           rel="noopener noreferrer">AGPL-3.0</a>
+      </p>
+      {% if MEDIATRAIL_SOURCE_URL %}
+        <p>
+          <a class="inline-block rounded-md bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-500"
+             href="{{ MEDIATRAIL_SOURCE_URL }}"
+             target="_blank"
+             rel="noopener noreferrer">Corresponding source for the version you are using</a>
+        </p>
+      {% else %}
+        <p class="text-gray-300">
+          This copy does not yet publish a network address for its corresponding source.
+          Before anyone else uses this modified version over a network, the operator must
+          offer that exact source and set <span class="font-mono">MEDIATRAIL_SOURCE_URL</span>.
+          That duty is AGPL-3.0 section 13. Linking only to upstream Yamtrack is not enough,
+          because this running program is a modified version.
+        </p>
+      {% endif %}
+      <p class="text-gray-300">
+        <a class="text-indigo-400 hover:text-indigo-300"
+           href="https://ko-fi.com/aiconwg"
+           target="_blank"
+           rel="noopener noreferrer">Buy me a coffee</a>.
+        This supports the MediaTrail maintainer. It does not support Yamtrack or its developers,
+        and Yamtrack does not endorse MediaTrail.
+      </p>
+    </main>
+  </body>
+</html>

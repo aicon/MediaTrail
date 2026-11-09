@@ -1,0 +1,10 @@
+Szerintem érdemes külön projektként elindítani a mostani forkot, saját névvel és opcionális támogatói gombbal. A Yamtrack repo AGPL-3.0 licencű; ez engedi a módosítást és terjesztést, de a licencet és a szerzői jogi jelzéseket meg kell őrizni. Mivel webalkalmazásról van szó, a módosított verziót távolról használóknak jól láthatóan hozzáférést kell adni a futó változat forráskódjához. Yamtrack licenc, AGPL 13. pont
+
+Névötletek:
+- MediaTrail – tág, nem csak filmekre utal; szerintem ez a legerősebb.
+- Watchtrail – jól illik az élő lejátszás és a megtekintési előzmények követéséhez.
+- Trackwave – rövid, modernebb hangzású.
+- MediaLedger – az előzményekre és a nyilvántartásra helyezi a hangsúlyt.
+A README-ben és a láblécben szerepeljen, hogy független, nem hivatalos Yamtrack-fork, és legyen link az eredeti projektre. A támogatói gomb mehet, csak ne sugallja, hogy az upstream fejlesztője vagy a Yamtrack hivatalosan támogatja. A kódterjesztésnél a Gemini API-kulcsot pedig mindenki a saját beállításaiban adja meg; ne építsétek bele a képfájlba.
+
+Én a MediaTrail nevet választanám: elég önálló márkanév, és később a Nuvio-integráción túl is megállja a helyét.

@@ -1,0 +1,19 @@
+services:
+  mediatrail:
+    build: .
+    image: mediatrail:local
+    container_name: mediatrail
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Budapest
+      SECRET: change-me
+      # Redis is inside the MediaTrail image at 127.0.0.1:6379.
+      # Public archive of this exact running source. Required before other
+      # people use the app over a network (AGPL-3.0 section 13).
+      # MEDIATRAIL_SOURCE_URL: https://example.invalid/mediatrail-source
+      # Provider and Gemini keys stay in this runtime environment.
+      # Do not pass them as image build arguments.
+    volumes:
+      - ./db:/yamtrack/db
+    ports:
+      - "8000:8000"
