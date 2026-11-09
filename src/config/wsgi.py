@@ -1,4 +1,4 @@
-"""WSGI config for yamtrack project.
+"""WSGI config for MediaTrail.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

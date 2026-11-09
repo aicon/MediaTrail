@@ -1,4 +1,4 @@
-"""Django settings for Yamtrack project."""
+"""Django settings for MediaTrail."""
 
 import json
 import sys
@@ -368,7 +368,7 @@ LOGIN_REDIRECT_URL = "home"
 
 AUTH_USER_MODEL = "users.User"
 
-# Yamtrack settings
+# MediaTrail settings
 
 # For CSV imports
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
@@ -391,7 +391,7 @@ def _public_http_url(name):
 # Corresponding source of this modified program (AGPL-3.0 section 13).
 # Empty until a public archive of the running version exists.
 MEDIATRAIL_SOURCE_URL = _public_http_url("MEDIATRAIL_SOURCE_URL")
-# Optional link for the MediaTrail maintainer. Not a Yamtrack donation link.
+# Optional link for the MediaTrail maintainer.
 MEDIATRAIL_SUPPORT_URL = _public_http_url("MEDIATRAIL_SUPPORT_URL")
 
 ADMIN_ENABLED = config("ADMIN_ENABLED", default=False, cast=bool)

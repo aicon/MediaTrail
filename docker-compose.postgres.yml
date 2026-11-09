@@ -1,40 +1,30 @@
 services:
-  yamtrack:
-    container_name: yamtrack
-    image: ghcr.io/fuzzygrim/yamtrack
+  mediatrail:
+    image: ghcr.io/aicon/mediatrail:latest
+    container_name: mediatrail
     restart: unless-stopped
     depends_on:
       - db
-      - redis
     environment:
-      - TZ=Europe/Berlin
-      - SECRET=longstring
-      - REDIS_URL=redis://redis:6379
-      - DB_HOST=db
-      - DB_NAME=yamtrack
-      - DB_USER=yamtrack
-      - DB_PASSWORD=yamtrack
-      - DB_PORT=5432
+      TZ: Europe/Budapest
+      SECRET: replace-with-a-long-random-string
+      DB_HOST: db
+      DB_NAME: mediatrail
+      DB_USER: mediatrail
+      DB_PASSWORD: mediatrail
+      DB_PORT: 5432
+    volumes:
+      - ./db:/mediatrail/db
     ports:
       - "8000:8000"
 
   db:
     image: postgres:16-alpine
-    container_name: yamtrack-db
+    container_name: mediatrail-db
     environment:
-      - POSTGRES_DB=yamtrack
-      - POSTGRES_USER=yamtrack
-      - POSTGRES_PASSWORD=yamtrack
+      POSTGRES_DB: mediatrail
+      POSTGRES_USER: mediatrail
+      POSTGRES_PASSWORD: mediatrail
     volumes:
-      - ./db:/var/lib/postgresql/data
+      - ./postgres:/var/lib/postgresql/data
     restart: unless-stopped
-
-  redis:
-    container_name: yamtrack-redis
-    image: redis:8-alpine
-    restart: unless-stopped
-    volumes:
-      - redis_data:/data
-
-volumes:
-  redis_data:

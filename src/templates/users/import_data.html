@@ -8,7 +8,7 @@
 {% endblock title %}
 
 {% block settings_content %}
-  {% translate "Import from a MediaTrail backup" as yamtrack_once %}
+  {% translate "Import from a MediaTrail backup" as backup_once %}
   {% translate "Import games" as hltb_once %}
   {% translate "Import movies and TV shows from your ratings" as imdb_once %}
   {% translate "Import from GoodReads backup" as goodreads_once %}
@@ -73,7 +73,8 @@
         <h2 class="text-xl font-semibold">{% translate "Import Sources" %}</h2>
       </div>
       <p class="text-gray-400 mb-5 text-sm">
-        {% blocktranslate trimmed %}Some of these require additional configuration, check the <a href="https://github.com/FuzzyGrim/Yamtrack/wiki/Media-Import-Configuration" target="_blank" class="text-indigo-400 hover:text-indigo-300 underline">import configuration guide</a>.{% endblocktranslate %}
+        {% docs_url "imports" as import_guide %}
+        {% blocktranslate trimmed with url=import_guide %}Some sources need extra setup. See the <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="text-indigo-400 hover:text-indigo-300 underline">import guide</a>.{% endblocktranslate %}
       </p>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
@@ -301,18 +302,14 @@
           </form>
         </div>
 
-        {# Yamtrack #}
+        {# MediaTrail backup #}
         <div class="bg-[#39404b] p-4 rounded-lg">
           <div class="flex items-center justify-between mb-3">
             <div class="flex items-center">{% source_display "yamtrack" %}</div>
-            <a href="https://github.com/FuzzyGrim/Yamtrack/wiki/Media-Import-Configuration#yamtrack-csv-format"
-               target="_blank"
-               class="text-gray-400 hover:text-indigo-400 transition-colors p-1 rounded-md hover:bg-gray-600/50"
-               title="{% translate "View CSV format documentation" %}">{% include "app/icons/info.svg" with classes="w-4 h-4" %}</a>
           </div>
           <p class="text-sm text-gray-400 mb-3"
-             x-text="importFrequency === 'once' ? '{{ yamtrack_once|escapejs }}' : '{{ file_periodic|escapejs }}'">
-            {{ yamtrack_once }}
+             x-text="importFrequency === 'once' ? '{{ backup_once|escapejs }}' : '{{ file_periodic|escapejs }}'">
+            {{ backup_once }}
           </p>
           <form method="post"
                 action="{% url 'import_yamtrack' %}"
@@ -324,7 +321,7 @@
             <label class="flex items-center justify-center w-full px-4 py-2 text-sm rounded-md transition-colors"
                    :class="importFrequency === 'once' ? 'bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer' : 'bg-gray-600 text-gray-400 cursor-not-allowed'"
                    :disabled="importFrequency !== 'once'">
-              <input name="yamtrack_csv"
+              <input name="mediatrail_csv"
                      accept=".csv"
                      class="hidden"
                      type="file"

@@ -8,7 +8,7 @@ ENV UV_COMPILE_BYTECODE=1
 # Copy from cache instead of symlinking (cache is discarded with the builder)
 ENV UV_LINK_MODE=copy
 
-WORKDIR /yamtrack
+WORKDIR /mediatrail
 
 COPY ./pyproject.toml ./pyproject.toml
 COPY ./uv.lock ./uv.lock
@@ -17,7 +17,7 @@ COPY ./uv.lock ./uv.lock
 # branch's lockfile does not list them. Install them after the locked sync
 # so the docs-group git dependency is not resolved again.
 RUN uv sync --locked \
-    && uv pip install --python /yamtrack/.venv/bin/python \
+    && uv pip install --python /mediatrail/.venv/bin/python \
         "djangorestframework~=3.16.1" \
         "drf-spectacular~=0.28.0"
 
@@ -33,11 +33,11 @@ ARG VERSION=0.25.5
 # Set it as an environment variable
 ENV VERSION=$VERSION
 # Put the virtualenv on PATH so python/gunicorn/celery/supervisord resolve directly
-ENV PATH="/yamtrack/.venv/bin:$PATH"
+ENV PATH="/mediatrail/.venv/bin:$PATH"
 # Redis runs inside this image. Override only to point at an external Redis.
 ENV REDIS_URL=redis://127.0.0.1:6379
 
-WORKDIR /yamtrack
+WORKDIR /mediatrail
 
 COPY ./entrypoint.sh /entrypoint.sh
 COPY ./supervisord.conf /etc/supervisord.conf
@@ -54,7 +54,7 @@ RUN apk add --no-cache nginx redis shadow \
     && mkdir -p /var/lib/nginx/body
 
 # Copy the pre-built virtualenv from the builder stage
-COPY --from=builder /yamtrack/.venv /yamtrack/.venv
+COPY --from=builder /mediatrail/.venv /mediatrail/.venv
 
 # Django app
 COPY src ./

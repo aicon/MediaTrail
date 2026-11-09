@@ -14,6 +14,6 @@ services:
       # Provider and Gemini keys stay in this runtime environment.
       # Do not pass them as image build arguments.
     volumes:
-      - ./db:/yamtrack/db
+      - ./db:/mediatrail/db
     ports:
       - "8000:8000"

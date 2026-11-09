@@ -10,7 +10,7 @@ PGID=${PGID:-1000}
 groupmod -o -g "$PGID" abc
 usermod -o -u "$PUID" abc
 
-chown abc:abc /yamtrack
+chown abc:abc /mediatrail
 mkdir -p db/redis
 chown -R abc:abc db
 chown -R abc:abc staticfiles

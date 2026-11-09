@@ -1,8 +1,24 @@
 from django import template
 from django.templatetags.static import static
+from django.utils import translation
 from django.utils.html import format_html
 
+from users.languages import DOCS_LANGUAGES, DOCS_SITE
+
 register = template.Library()
+
+
+@register.simple_tag
+def docs_url(page=""):
+    """Return a manual URL for the active language, falling back to English."""
+    language = (translation.get_language() or "en").split("-")[0]
+    parts = [DOCS_SITE.rstrip("/")]
+    if language in DOCS_LANGUAGES:
+        parts.append(language)
+    page = (page or "").strip("/")
+    if page:
+        parts.append(page)
+    return "/".join(parts) + "/"
 
 
 @register.filter

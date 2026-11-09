@@ -811,8 +811,8 @@ msgstr "Meglévők felülírása"
 msgid "Import Sources"
 msgstr "Importforrások"
 
-msgid "Some of these require additional configuration, check the <a href=\"https://github.com/FuzzyGrim/Yamtrack/wiki/Media-Import-Configuration\" target=\"_blank\" class=\"text-indigo-400 hover:text-indigo-300 underline\">import configuration guide</a>."
-msgstr "Néhány forráshoz további beállítás kell. Részletek az <a href=\"https://github.com/FuzzyGrim/Yamtrack/wiki/Media-Import-Configuration\" target=\"_blank\" class=\"text-indigo-400 hover:text-indigo-300 underline\">importbeállítási útmutatóban</a>."
+msgid "Some sources need extra setup. See the <a href=\"%(url)s\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:text-indigo-300 underline\">import guide</a>."
+msgstr "Néhány forráshoz további beállítás kell. Részletek az <a href=\"%(url)s\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:text-indigo-300 underline\">import útmutatóban</a>."
 
 msgid "Import TV shows and movies"
 msgstr "Sorozatok és filmek importálása"
@@ -1387,3 +1387,66 @@ msgstr "Péntek"
 
 msgid "Saturday"
 msgstr "Szombat"
+
+msgid "No media was imported."
+msgstr "Nem történt import."
+
+msgid "Imported %(items)s."
+msgstr "%(items)s importálva."
+
+msgid "%(earlier)s and %(last)s"
+msgstr "%(earlier)s és %(last)s"
+
+msgid "%(count)s Movie"
+msgstr "%(count)s film"
+
+msgid "%(count)s Movies"
+msgstr "%(count)s film"
+
+msgid "%(count)s Episode"
+msgstr "%(count)s epizód"
+
+msgid "%(count)s Episodes"
+msgstr "%(count)s epizód"
+
+msgid "%(count)s TV Show"
+msgstr "%(count)s sorozat"
+
+msgid "%(count)s TV Shows"
+msgstr "%(count)s sorozat"
+
+msgid "%(count)s TV Season"
+msgstr "%(count)s évad"
+
+msgid "%(count)s TV Seasons"
+msgstr "%(count)s évad"
+
+msgid "%(count)s Anime"
+msgstr "%(count)s anime"
+
+msgid "%(count)s Manga"
+msgstr "%(count)s manga"
+
+msgid "%(count)s Game"
+msgstr "%(count)s játék"
+
+msgid "%(count)s Games"
+msgstr "%(count)s játék"
+
+msgid "%(count)s Book"
+msgstr "%(count)s könyv"
+
+msgid "%(count)s Books"
+msgstr "%(count)s könyv"
+
+msgid "%(count)s Comic"
+msgstr "%(count)s képregény"
+
+msgid "%(count)s Comics"
+msgstr "%(count)s képregény"
+
+msgid "%(count)s Boardgame"
+msgstr "%(count)s társasjáték"
+
+msgid "%(count)s Boardgames"
+msgstr "%(count)s társasjáték"

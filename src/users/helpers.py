@@ -9,6 +9,62 @@ from django.utils.translation import ngettext
 
 import integrations
 
+_COUNT_LABELS = (
+    "TV Seasons",
+    "TV Shows",
+    "TV Season",
+    "TV Show",
+    "Episodes",
+    "Episode",
+    "Movies",
+    "Movie",
+    "Boardgames",
+    "Boardgame",
+    "Comics",
+    "Comic",
+    "Books",
+    "Book",
+    "Games",
+    "Game",
+    "Anime",
+    "Manga",
+)
+
+
+def _translate_count_phrase(phrase):
+    """Translate a stored fragment such as ``1481 Movies``."""
+    count, _space, label = phrase.partition(" ")
+    if not count.isdigit() or label not in _COUNT_LABELS:
+        return phrase
+    return _("%(count)s " + label) % {"count": count}
+
+
+def _translate_import_items(text):
+    """Translate the list inside a stored import summary."""
+    if " and " not in text:
+        return _translate_count_phrase(text)
+    earlier, last = text.rsplit(" and ", 1)
+    earlier_text = ", ".join(
+        _translate_count_phrase(part.strip())
+        for part in earlier.split(",")
+        if part.strip()
+    )
+    return _("%(earlier)s and %(last)s") % {
+        "earlier": earlier_text,
+        "last": _translate_count_phrase(last.strip()),
+    }
+
+
+def translate_import_summary(summary):
+    """Translate an import result that was stored in English."""
+    if summary == "No media was imported.":
+        return _("No media was imported.")
+    prefix = "Imported "
+    if summary.startswith(prefix) and summary.endswith("."):
+        items = _translate_import_items(summary[len(prefix):-1])
+        return _("Imported %(items)s.") % {"items": items}
+    return summary
+
 
 def process_task_result(task):
     """Process task result based on status and format appropriately."""
@@ -29,13 +85,13 @@ def process_task_result(task):
         parts = result_json.split(integrations.tasks.ERROR_TITLE.strip())
         if len(parts) > 1:
             # We have both summary and errors
-            task.summary = parts[0].strip()
+            task.summary = translate_import_summary(parts[0].strip())
 
             # Keep errors as a single string with newlines
             task.errors = parts[1].strip()
         else:
             # Only summary, no errors
-            task.summary = result_json.strip()
+            task.summary = translate_import_summary(result_json.strip())
             task.errors = None
     elif task.status == "PENDING":
         task.summary = _("This task has been queued and is waiting to run.")

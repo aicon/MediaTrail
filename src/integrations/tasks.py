@@ -134,7 +134,7 @@ def import_kitsu(username, user_id, mode):
 
 @shared_task(name="Import from MediaTrail")
 def import_yamtrack(file, user_id, mode):
-    """Celery task for importing media data from Yamtrack."""
+    """Celery task for importing a MediaTrail CSV backup."""
     return import_media(yamtrack.importer, file, user_id, mode)
 
 

@@ -3,6 +3,7 @@
 {% load socialaccount %}
 {% load static %}
 {% load i18n %}
+{% load user_tags %}
 
 {% block title %}
   {% translate "About" %} - MediaTrail
@@ -38,11 +39,13 @@
             {% include "app/icons/external-link.svg" with classes="w-3 h-3 ml-1" %}
           </a>
 
-          {# Placeholder until MediaTrail documentation is published. #}
-          <a href="#"
+          <a href="{% docs_url %}"
+             target="_blank"
+             rel="noopener noreferrer"
              class="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 transition-colors">
             {% include "app/icons/book-open.svg" with classes="w-4 h-4" %}
             <span>{% translate "MediaTrail documentation" %}</span>
+            {% include "app/icons/external-link.svg" with classes="w-3 h-3 ml-1" %}
           </a>
 
           <a href="https://github.com/aicon/MediaTrail/issues"

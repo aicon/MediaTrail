@@ -391,22 +391,22 @@ def import_kitsu(request):
 
 @require_POST
 def import_yamtrack(request):
-    """View for importing anime and manga data from Yamtrack CSV."""
-    file = request.FILES.get("yamtrack_csv")
+    """View for importing a MediaTrail CSV backup."""
+    file = request.FILES.get("mediatrail_csv")
 
     if not file:
-        messages.error(request, "Yamtrack CSV file is required.")
+        messages.error(request, "MediaTrail CSV file is required.")
         return redirect("import_data")
 
     mode = request.POST["mode"]
     tasks.import_yamtrack.delay(
-        file=request.FILES["yamtrack_csv"],
+        file=request.FILES["mediatrail_csv"],
         user_id=request.user.id,
         mode=mode,
     )
     messages.info(
         request,
-        "The task to import media from Yamtrack CSV file has been queued.",
+        "The task to import media from a MediaTrail CSV file has been queued.",
     )
     return redirect("import_data")
 
@@ -510,7 +510,7 @@ def export_csv(request):
     response = StreamingHttpResponse(
         streaming_content=exports.generate_rows(request.user),
         content_type="text/csv",
-        headers={"Content-Disposition": f'attachment; filename="yamtrack_{now}.csv"'},
+        headers={"Content-Disposition": f'attachment; filename="mediatrail_{now}.csv"'},
     )
     logger.info("User %s started CSV export", request.user.username)
     return response

@@ -1,25 +1,12 @@
 services:
-  yamtrack:
-    container_name: yamtrack
-    image: ghcr.io/fuzzygrim/yamtrack
+  mediatrail:
+    image: ghcr.io/aicon/mediatrail:latest
+    container_name: mediatrail
     restart: unless-stopped
-    depends_on:
-      - redis
-    environment:
-      - TZ=Europe/Berlin
-      - SECRET=longstring
-      - REDIS_URL=redis://redis:6379
-    volumes:
-      - ./db:/yamtrack/db
     ports:
       - "8000:8000"
-
-  redis:
-    container_name: yamtrack-redis
-    image: redis:8-alpine
-    restart: unless-stopped
+    environment:
+      TZ: Europe/Budapest
+      SECRET: replace-with-a-long-random-string
     volumes:
-      - redis_data:/data
-
-volumes:
-  redis_data:
+      - ./db:/mediatrail/db
