@@ -15,6 +15,7 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 from django_celery_beat.models import PeriodicTask
 
 from app.models import Item, MediaTypes
+from integrations.imports import nuvio
 from app.providers import tmdb
 from users.forms import NotificationSettingsForm, PasswordChangeForm, UserUpdateForm
 from users.languages import LANGUAGE_CHOICES, LANGUAGE_CODES
@@ -305,7 +306,17 @@ def integrations(request):
 def import_data(request):
     """Render the import data settings page."""
     import_tasks = request.user.get_import_tasks()
-    return render(request, "users/import_data.html", {"import_tasks": import_tasks})
+    saved = nuvio.saved_login(request.user)
+    return render(
+        request,
+        "users/import_data.html",
+        {
+            "import_tasks": import_tasks,
+            "nuvio_email": saved["email"] if saved else "",
+            "nuvio_profile_id": saved["profile_id"] if saved else 1,
+            "nuvio_saved": saved is not None,
+        },
+    )
 
 
 @require_GET

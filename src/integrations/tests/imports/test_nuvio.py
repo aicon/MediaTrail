@@ -317,3 +317,28 @@ class NuvioImportTests(TestCase):
         self.assertNotIn("plain-password", self.account.password)
         self.assertEqual(self.account.profile_id, 2)
         queued.assert_called_once()
+
+    def test_blank_password_keeps_the_saved_login(self):
+        self.client.force_login(self.user)
+        nuvio.save_account(self.user, "person@example.com", "plain-password", 2)
+        with patch("integrations.tasks.import_nuvio.delay") as queued:
+            response = self.client.post(
+                reverse("import_nuvio"),
+                {
+                    "email": "person@example.com",
+                    "password": "",
+                    "profile_id": "2",
+                    "frequency": "once",
+                    "time": "15:00",
+                    "mode": "new",
+                },
+            )
+        self.assertEqual(response.status_code, 302)
+        self.account.refresh_from_db()
+        self.assertEqual(helpers.decrypt(self.account.password), "plain-password")
+        queued.assert_called_once()
+
+        page = self.client.get(reverse("import_data"))
+        self.assertContains(page, "person@example.com")
+        self.assertContains(page, 'value="2"')
+        self.assertNotContains(page, "plain-password")

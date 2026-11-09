@@ -31,6 +31,7 @@ def import_nuvio(request):
     """Save encrypted Nuvio credentials and queue or schedule the import."""
     email = request.POST.get("email", "").strip()
     password = request.POST.get("password", "")
+    email, password = nuvio.fill_saved_login(request.user, email, password)
     profile_raw = (request.POST.get("profile_id") or "1").strip()
     if not email or not password:
         messages.error(request, _("Nuvio email and password are required."))

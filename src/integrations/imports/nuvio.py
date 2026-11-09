@@ -49,6 +49,27 @@ def importer(_identifier, user, mode):
     return NuvioImporter(user, mode=mode).import_data()
 
 
+def saved_login(user):
+    """Return the stored email and profile. The password stays out of the page."""
+    try:
+        account = user.nuvio_account
+        email = helpers.decrypt(account.email)
+    except (NuvioAccount.DoesNotExist, InvalidToken):
+        return None
+    return {"email": email, "profile_id": account.profile_id}
+
+
+def fill_saved_login(user, email, password):
+    """Use the stored sign-in when the form leaves the password or email blank."""
+    try:
+        account = user.nuvio_account
+        stored_email = helpers.decrypt(account.email)
+        stored_password = helpers.decrypt(account.password)
+    except (NuvioAccount.DoesNotExist, InvalidToken):
+        return email, password
+    return email or stored_email, password or stored_password
+
+
 def save_account(user, email, password, profile_id):
     """Store encrypted Nuvio credentials. A different account restarts the cursor."""
     encrypted_email = helpers.encrypt(email)

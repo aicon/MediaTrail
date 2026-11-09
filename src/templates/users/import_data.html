@@ -91,22 +91,26 @@
             <div class="space-y-2">
               <input placeholder="{% translate "Nuvio email" %}"
                      name="email"
+                     value="{{ nuvio_email }}"
                      class="w-full py-2 px-3 bg-[#2a2f35] rounded-md text-white text-sm border border-gray-600 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                      type="email"
                      autocomplete="username"
                      required>
-              <input placeholder="{% translate "Nuvio password" %}"
+              <input placeholder="{% if nuvio_saved %}{% translate "Saved password" %}{% else %}{% translate "Nuvio password" %}{% endif %}"
                      name="password"
                      class="w-full py-2 px-3 bg-[#2a2f35] rounded-md text-white text-sm border border-gray-600 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                      type="password"
                      autocomplete="current-password"
-                     required>
+                     {% if not nuvio_saved %}required{% endif %}>
+              {% if nuvio_saved %}
+                <p class="text-xs text-gray-500">{% translate "Leave blank to keep the saved password." %}</p>
+              {% endif %}
               <label class="block text-xs text-gray-400" for="nuvio-profile">
                 {% translate "Profile" %}
               </label>
               <input id="nuvio-profile"
                      name="profile_id"
-                     value="1"
+                     value="{{ nuvio_profile_id }}"
                      class="w-full py-2 px-3 bg-[#2a2f35] rounded-md text-white text-sm border border-gray-600 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                      type="number"
                      min="1"

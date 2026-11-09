@@ -11,7 +11,7 @@ msgid "Home"
 msgstr "Kezdőlap"
 
 msgid "Create Custom"
-msgstr "Egyéni létrehozása"
+msgstr "Egyéni bejegyzés"
 
 msgid "Create Custom Entry"
 msgstr "Egyéni bejegyzés"
@@ -984,6 +984,12 @@ msgstr "Nuvio e-mail"
 
 msgid "Nuvio password"
 msgstr "Nuvio jelszó"
+
+msgid "Saved password"
+msgstr "Mentett jelszó"
+
+msgid "Leave blank to keep the saved password."
+msgstr "Üresen hagyva a mentett jelszó marad."
 
 msgid "Profile"
 msgstr "Profil"
