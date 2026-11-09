@@ -1851,3 +1851,211 @@ msgstr "játszma"
 
 msgid "plays"
 msgstr "játszma"
+
+msgid "Search Results"
+msgstr "Keresési találatok"
+
+msgid "Source:"
+msgstr "Forrás:"
+
+msgid "Grid view"
+msgstr "Rácsnézet"
+
+msgid "List view"
+msgstr "Listanézet"
+
+msgid "Page %(page)s of %(pages)s (%(total)s results)"
+msgstr "%(page)s. oldal / %(pages)s (%(total)s találat)"
+
+msgid "No results found"
+msgstr "Nincs találat"
+
+msgid "We couldn't find any matches for \"%(query)s\". Try checking your spelling or using different keywords."
+msgstr "Nincs találat erre: „%(query)s”. Ellenőrizd a helyesírást, vagy próbálj más szavakat."
+
+msgid "Marked as currently watching"
+msgstr "Nézés folyamatban"
+
+msgid "Marked as currently reading"
+msgstr "Olvasás folyamatban"
+
+msgid "Marked as currently playing"
+msgstr "Játék folyamatban"
+
+msgid "Marked as finished watching"
+msgstr "Megnézve"
+
+msgid "Marked as finished reading"
+msgstr "Elolvasva"
+
+msgid "Marked as finished playing"
+msgstr "Végigjátszva"
+
+msgid "Added to watching list"
+msgstr "Nézendők közé téve"
+
+msgid "Added to reading list"
+msgstr "Olvasandók közé téve"
+
+msgid "Added to playing list"
+msgstr "Játszandók közé téve"
+
+msgid "Marked as dropped"
+msgstr "Eldobva"
+
+msgid "Marked as paused watching"
+msgstr "Nézés szünetel"
+
+msgid "Marked as paused reading"
+msgstr "Olvasás szünetel"
+
+msgid "Marked as paused playing"
+msgstr "Játék szünetel"
+
+msgid "Currently watching"
+msgstr "Nézés folyamatban"
+
+msgid "Currently reading"
+msgstr "Olvasás folyamatban"
+
+msgid "Currently playing"
+msgstr "Játék folyamatban"
+
+msgid "Finished watching"
+msgstr "Megnézve"
+
+msgid "Finished reading"
+msgstr "Elolvasva"
+
+msgid "Finished playing"
+msgstr "Végigjátszva"
+
+msgid "Paused watching"
+msgstr "Nézés szünetel"
+
+msgid "Paused reading"
+msgstr "Olvasás szünetel"
+
+msgid "Paused playing"
+msgstr "Játék szünetel"
+
+msgid "Resumed watching"
+msgstr "Nézés folytatva"
+
+msgid "Resumed reading"
+msgstr "Olvasás folytatva"
+
+msgid "Resumed playing"
+msgstr "Játék folytatva"
+
+msgid "Stopped watching"
+msgstr "Nézés abbahagyva"
+
+msgid "Stopped reading"
+msgstr "Olvasás abbahagyva"
+
+msgid "Stopped playing"
+msgstr "Játék abbahagyva"
+
+msgid "Changed status from %(old)s to %(new)s"
+msgstr "Állapot: %(old)s → %(new)s"
+
+msgid "Rated %(score)s/10"
+msgstr "Értékelés: %(score)s/10"
+
+msgid "Changed rating from %(old)s to %(new)s"
+msgstr "Értékelés: %(old)s → %(new)s"
+
+msgid "Played for %(time)s"
+msgstr "Játékidő: %(time)s"
+
+msgid "Watched up to episode %(count)s"
+msgstr "Megnézve a(z) %(count)s. epizódig"
+
+msgid "Read up to chapter %(count)s"
+msgstr "Elolvasva a(z) %(count)s. fejezetig"
+
+msgid "Read up to page %(count)s"
+msgstr "Elolvasva a(z) %(count)s. oldalig"
+
+msgid "Read up to issue %(count)s"
+msgstr "Elolvasva a(z) %(count)s. számig"
+
+msgid "Played up to play %(count)s"
+msgstr "%(count)s. játszma"
+
+msgid "%(verb)s up to %(unit)s %(count)s"
+msgstr "%(verb)s, %(count)s %(unit)s"
+
+msgid "Progress set to %(count)s page"
+msgid_plural "Progress set to %(count)s pages"
+msgstr[0] "Haladás: %(count)s oldal"
+msgstr[1] "Haladás: %(count)s oldal"
+
+msgid "Progress set to %(count)s chapter"
+msgid_plural "Progress set to %(count)s chapters"
+msgstr[0] "Haladás: %(count)s fejezet"
+msgstr[1] "Haladás: %(count)s fejezet"
+
+msgid "Progress set to %(count)s episode"
+msgid_plural "Progress set to %(count)s episodes"
+msgstr[0] "Haladás: %(count)s epizód"
+msgstr[1] "Haladás: %(count)s epizód"
+
+msgid "Progress set to %(count)s issue"
+msgid_plural "Progress set to %(count)s issues"
+msgstr[0] "Haladás: %(count)s szám"
+msgstr[1] "Haladás: %(count)s szám"
+
+msgid "Progress set to %(count)s play"
+msgid_plural "Progress set to %(count)s plays"
+msgstr[0] "Haladás: %(count)s játszma"
+msgstr[1] "Haladás: %(count)s játszma"
+
+msgid "Added %(time)s of playtime"
+msgstr "Játékidő +%(time)s"
+
+msgid "Removed %(time)s of playtime"
+msgstr "Játékidő −%(time)s"
+
+msgid "Started on %(date)s"
+msgstr "Kezdés: %(date)s"
+
+msgid "Finished on %(date)s"
+msgstr "Befejezve: %(date)s"
+
+msgid "Started without date"
+msgstr "Kezdés dátum nélkül"
+
+msgid "Finished without date"
+msgstr "Befejezés dátum nélkül"
+
+msgid "Removed start date"
+msgstr "Kezdő dátum törölve"
+
+msgid "Removed end date"
+msgstr "Záró dátum törölve"
+
+msgid "Ended on %(date)s"
+msgstr "Befejezve: %(date)s"
+
+msgid "Start date changed to %(date)s"
+msgstr "Kezdés módosítva: %(date)s"
+
+msgid "End date changed to %(date)s"
+msgstr "Befejezés módosítva: %(date)s"
+
+msgid "Added notes"
+msgstr "Jegyzet hozzáadva"
+
+msgid "Removed notes"
+msgstr "Jegyzet törölve"
+
+msgid "Updated notes"
+msgstr "Jegyzet módosítva"
+
+msgid "Set %(field)s to %(value)s"
+msgstr "%(field)s beállítva: %(value)s"
+
+msgid "Updated %(field)s from %(old)s to %(new)s"
+msgstr "%(field)s: %(old)s → %(new)s"
