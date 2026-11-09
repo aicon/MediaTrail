@@ -7,6 +7,8 @@ from django.urls import reverse
 from django.utils import formats, timezone
 from django.utils.dateparse import parse_date
 from django.utils.html import format_html
+from django.utils.translation import gettext as _
+from django.utils.translation import pgettext
 from unidecode import unidecode
 
 from app import config, helpers
@@ -173,6 +175,138 @@ def media_type_readable_plural(media_type):
 def media_status_readable(media_status):
     """Return the readable media status."""
     return Status(media_status).label
+
+
+def _detail_labels():
+    """Sidebar labels on the media page. Unknown keys stay as stored."""
+    return {
+        "format": _("Format"),
+        "release_date": _("Release Date"),
+        "status": _("Status"),
+        "runtime": _("Runtime"),
+        "studios": _("Studios"),
+        "country": _("Country"),
+        "languages": _("Languages"),
+        "first_air_date": _("First air date"),
+        "last_air_date": _("Last air date"),
+        "seasons": _("Seasons"),
+        "episodes": _("Episodes"),
+        "total_runtime": _("Total runtime"),
+        "physical_format": _("Physical format"),
+        "number_of_pages": _("Number of pages"),
+        "publish_date": _("Publish date"),
+        "author": _("Author"),
+        "authors": _("Authors"),
+        "publishers": _("Publishers"),
+        "publisher": _("Publisher"),
+        "isbn": _("ISBN"),
+        "year": _("Year"),
+        "status_in_country_of_origin": _("Status in country of origin"),
+        "latest_chapter_translated": _("Latest chapter translated"),
+        "players": _("Players"),
+        "playtime": _("Play time"),
+        "min_age": _("Minimum age"),
+        "designers": _("Designers"),
+        "themes": _("Themes"),
+        "platforms": _("Platforms"),
+        "companies": _("Companies"),
+        "start_date": _("Start Date"),
+        "end_date": _("End Date"),
+        "season": _("Season"),
+        "broadcast": _("Broadcast"),
+        "source": _("Source"),
+        "number_of_chapters": _("Number of chapters"),
+        "issues_count": _("Issues"),
+        "last_issue_name": _("Last issue"),
+        "last_issue_number": _("Last issue number"),
+        "people": _("People"),
+        "last_updated": _("Last updated"),
+    }
+
+
+def _detail_values():
+    """Closed set of provider words shown as details, not titles or names."""
+    return {
+        "Movie": _("Movie"),
+        "TV": pgettext("format", "TV"),
+        "Unknown": _("Unknown"),
+        "Released": _("Released"),
+        "Rumored": _("Rumored"),
+        "Planned": _("Planned"),
+        "In Production": _("In Production"),
+        "Post Production": _("Post Production"),
+        "Canceled": _("Canceled"),
+        "Returning Series": _("Returning Series"),
+        "Ended": _("Ended"),
+        "Pilot": _("Pilot"),
+    }
+
+
+def _related_labels():
+    """Section names we chose. A provider title, such as a collection, stays."""
+    return {
+        "seasons": _("Seasons"),
+        "recommendations": _("Recommendations"),
+        "dlcs": _("DLCs"),
+        "collection": _("Collection"),
+        "other_editions": _("Other editions"),
+        "related_manga": _("Related manga"),
+        "related_anime": _("Related anime"),
+        "parent_game": _("Parent game"),
+        "remasters": _("Remasters"),
+        "remakes": _("Remakes"),
+        "expansions": _("Expansions"),
+        "standalone_expansions": _("Standalone expansions"),
+        "expanded_games": _("Expanded games"),
+    }
+
+
+@register.filter
+def detail_label(key):
+    """Translate a known details key. Anything else keeps its stored words."""
+    if not isinstance(key, str):
+        return key
+    return _detail_labels().get(key, key.replace("_", " "))
+
+
+@register.filter
+def detail_value(value):
+    """Translate a known details value. Titles, names, and dates pass through."""
+    if not isinstance(value, str):
+        return value
+    return _detail_values().get(value, value)
+
+
+@register.filter
+def related_label(name):
+    """Translate a known related section. Collection titles stay as stored."""
+    if not isinstance(name, str):
+        return name
+    label = _related_labels().get(name)
+    if label:
+        return label
+    return name.replace("_", " ").title()
+
+
+@register.simple_tag
+def progress_unit(media_type, count):
+    """Return the progress noun for a count, without an English plural suffix."""
+    unit = config.get_unit(media_type, short=False)
+    if not unit:
+        return ""
+    try:
+        number = int(count)
+    except (TypeError, ValueError):
+        number = 0
+    words = {
+        "Episode": (_("episode"), _("episodes")),
+        "Chapter": (_("chapter"), _("chapters")),
+        "Page": (_("page"), _("pages")),
+        "Issue": (_("issue"), _("issues")),
+        "Play": (_("play"), _("plays")),
+    }
+    singular, plural = words.get(unit, (unit, f"{unit}s"))
+    return singular if number == 1 else plural
 
 
 @register.filter

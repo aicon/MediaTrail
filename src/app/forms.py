@@ -2,6 +2,7 @@ import math
 
 from django import forms
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
 from app import config
 from app.models import (
@@ -229,9 +230,26 @@ class MediaForm(forms.ModelForm):
             if settings.TRACK_TIME
             else forms.DateInput(attrs={"type": "date"}),
             "notes": forms.Textarea(
-                attrs={"placeholder": "Add any notes or comments...", "rows": "5"},
+                attrs={"placeholder": _("Add any notes or comments..."), "rows": "5"},
             ),
         }
+
+    def __init__(self, *args, **kwargs):
+        """Use the catalog for the labels shown on the media page."""
+        super().__init__(*args, **kwargs)
+        labels = {
+            "score": _("Score"),
+            "status": _("Status"),
+            "start_date": _("Start Date"),
+            "end_date": _("End Date"),
+            "notes": _("Notes"),
+        }
+        for name, label in labels.items():
+            if name in self.fields:
+                self.fields[name].label = label
+        progress = self.fields.get("progress")
+        if progress is not None and progress.label == "Progress":
+            progress.label = _("Progress")
 
 
 class MangaForm(MediaForm):

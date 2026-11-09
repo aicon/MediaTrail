@@ -1,4 +1,5 @@
 {% load app_tags %}
+{% load i18n %}
 
 {# Track Episode Modal #}
 <div x-show="trackOpen"
@@ -10,7 +11,7 @@
 
       {# Modal Header #}
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-white">Track Episode</h2>
+        <h2 class="text-xl font-bold text-white">{% translate "Track Episode" %}</h2>
         <button class="text-gray-400 hover:text-white transition-colors cursor-pointer"
                 @click="trackOpen = false">{% include "app/icons/x.svg" with classes="w-5 h-5" %}</button>
       </div>
@@ -23,15 +24,11 @@
                src="{{ episode.image }}">
           <div>
             <h3 class="text-lg font-semibold mb-1 line-clamp-1">{{ episode_title }}</h3>
-            <p class="text-sm text-gray-400">Episode {{ episode.episode_number }}</p>
+            <p class="text-sm text-gray-400">{% blocktranslate with number=episode.episode_number %}Episode {{ number }}{% endblocktranslate %}</p>
             {% if episode.history %}
-              {% if episode.history|length == 1 %}
-                <p class="text-sm text-gray-400 mt-1">Watched once</p>
-              {% else %}
-                <p class="text-sm text-gray-400 mt-1">Watched {{ episode.history|length }} times</p>
-              {% endif %}
+              <p class="text-sm text-gray-400 mt-1">{% blocktranslate count counter=episode.history|length %}Watched {{ counter }} time{% plural %}Watched {{ counter }} times{% endblocktranslate %}</p>
             {% else %}
-              <p class="text-sm text-gray-400 mt-1">Not watched yet</p>
+              <p class="text-sm text-gray-400 mt-1">{% translate "Not watched yet" %}</p>
             {% endif %}
           </div>
         </div>
@@ -40,7 +37,7 @@
       {# Episode history list (if watched previously) #}
       {% if episode.history %}
         <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-300 mb-3">Previous Watches</label>
+          <label class="block text-sm font-medium text-gray-300 mb-3">{% translate "Previous Watches" %}</label>
           <div class="max-h-[200px] overflow-y-auto space-y-2">
             {% for entry in episode.history %}
               <div class="flex items-center justify-between bg-[#343a40] rounded-md p-3 border border-gray-600">
@@ -48,7 +45,7 @@
                   {% if entry.end_date %}
                     {{ entry.end_date|datetime_format:request.user }}
                   {% else %}
-                    No date provided
+                    {% translate "No date provided" %}
                   {% endif %}
                 </div>
                 <form method="post"
@@ -58,7 +55,7 @@
                   <input type="hidden" name="media_type" value="episode">
                   <button type="submit"
                           class="text-red-400 hover:text-red-300 transition-colors text-sm px-2 py-1 hover:bg-red-600/20 rounded-md cursor-pointer">
-                    Delete
+                    {% translate "Delete" %}
                   </button>
                 </form>
               </div>
@@ -89,7 +86,7 @@
                name="episode_number"
                value="{{ episode.episode_number }}">
 
-        <label class="block text-sm font-medium text-gray-300 mb-2">Watch Date</label>
+        <label class="block text-sm font-medium text-gray-300 mb-2">{% translate "Watch Date" %}</label>
 
         {# Watch Date Input with Inline Clear Button #}
         <div class="relative">
@@ -110,7 +107,7 @@
             {# Main Button #}
             <button type="submit"
                     class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-l-md transition duration-300 cursor-pointer font-medium"
-                    title="Add watched entry with current settings">Add watch</button>
+                    title="{% translate "Add watched entry with current settings" %}">{% translate "Add watch" %}</button>
 
             {# Dropdown Toggle #}
             <button type="button"
@@ -136,15 +133,15 @@
               <button type="button"
                       @click="inputDateTime = '{% if TRACK_TIME %}{% now "Y-m-d\TH:i" %}{% else %}{% now "Y-m-d" %}{% endif %}'; dropdownOpen = false"
                       class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-indigo-600 hover:text-white transition-colors cursor-pointer"
-                      title="Fills in the current date and time">Fill in current time</button>
+                      title="{% translate "Fills in the current date and time" %}">{% translate "Fill in current time" %}</button>
 
               {% if episode.runtime_minutes %}
                 {# Option B - Finish Time #}
                 <button type="button"
                         @click="inputDateTime = '{{ finish_datetime|escapejs }}'; dropdownOpen = false"
                         class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-indigo-600 hover:text-white transition-colors cursor-pointer"
-                        title="Fills in the date and time the episode will be finished if started now">
-                  Fill in end time
+                        title="{% translate "Fills in the date and time the episode will be finished if started now" %}">
+                  {% translate "Fill in end time" %}
                 </button>
               {% endif %}
 
@@ -153,7 +150,7 @@
                 <button type="button"
                         @click="inputDateTime = '{% if TRACK_TIME %}{{ episode.air_date|escapejs }}T{% now "H:i" %}{% else %}{{ episode.air_date|escapejs }}{% endif %}'; dropdownOpen = false"
                         class="w-full text-left px-4 py-3 text-sm text-gray-200 hover:bg-indigo-600 hover:text-white transition-colors cursor-pointer"
-                        title="Fills in the air date of the episode, if available">Fill in air date</button>
+                        title="{% translate "Fills in the air date of the episode, if available" %}">{% translate "Fill in air date" %}</button>
               {% endif %}
             </div>
 

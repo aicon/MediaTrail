@@ -1450,3 +1450,404 @@ msgstr "%(count)s társasjáték"
 
 msgid "%(count)s Boardgames"
 msgstr "%(count)s társasjáték"
+
+msgid "Show less"
+msgstr "Kevesebb"
+
+msgid "Read more"
+msgstr "Bővebben"
+
+msgid "More tracking options"
+msgstr "További követés"
+
+msgid "Add new entry"
+msgstr "Új bejegyzés"
+
+msgid "%(counter)s Episode"
+msgid_plural "%(counter)s Episodes"
+msgstr[0] "%(counter)s epizód"
+msgstr[1] "%(counter)s epizód"
+
+msgid "%(source)s score"
+msgstr "%(source)s pont"
+
+msgid "%(votes)s vote"
+msgid_plural "%(votes)s votes"
+msgstr[0] "%(votes)s szavazat"
+msgstr[1] "%(votes)s szavazat"
+
+msgid "Your score"
+msgstr "Saját pont"
+
+msgid "Click to edit"
+msgstr "Szerkesztés"
+
+msgid "Your History"
+msgstr "Előzményeid"
+
+msgid "Started:"
+msgstr "Kezdés:"
+
+msgid "Ended:"
+msgstr "Befejezés:"
+
+msgid "Progress:"
+msgstr "Haladás:"
+
+msgid "Your notes"
+msgstr "Jegyzeted"
+
+msgid "Actions"
+msgstr "Műveletek"
+
+msgid "Add to lists"
+msgstr "Listához adás"
+
+msgid "Activity history"
+msgstr "Aktivitás"
+
+msgid "Sync metadata with provider"
+msgstr "Adatok frissítése a szolgáltatótól"
+
+msgid "Sync metadata"
+msgstr "Adatok frissítése"
+
+msgid "Details"
+msgstr "Részletek"
+
+msgid "Provider"
+msgstr "Forrás"
+
+msgid "No details available"
+msgstr "Nincs adat"
+
+msgid "Cast"
+msgstr "Szereplők"
+
+msgid "View all"
+msgstr "Összes"
+
+msgid "%(counter)s cast member"
+msgid_plural "%(counter)s cast members"
+msgstr[0] "%(counter)s szereplő"
+msgstr[1] "%(counter)s szereplő"
+
+msgid "Repeats (%(counter)s)"
+msgid_plural "Repeats (%(counter)s)"
+msgstr[0] "Ismétlések (%(counter)s)"
+msgstr[1] "Ismétlések (%(counter)s)"
+
+msgid "Edit entry"
+msgstr "Szerkesztés"
+
+msgid "Started %(date)s"
+msgstr "Kezdés: %(date)s"
+
+msgid "Finished %(date)s"
+msgstr "Befejezve: %(date)s"
+
+msgid "Episode %(number)s"
+msgstr "%(number)s. epizód"
+
+msgid "Unknown air date"
+msgstr "Ismeretlen adásnap"
+
+msgid "Track Episode"
+msgstr "Epizód követése"
+
+msgid "Last watched:"
+msgstr "Utoljára megnézve:"
+
+msgid "No date provided"
+msgstr "Nincs dátum"
+
+msgid "Watched %(counter)s time"
+msgid_plural "Watched %(counter)s times"
+msgstr[0] "%(counter)s alkalommal megnézve"
+msgstr[1] "%(counter)s alkalommal megnézve"
+
+msgid "Streaming"
+msgstr "Hol nézhető"
+
+msgid "Watch provider region is not configured. Set a region or disable this feature in the <a href=\"%(url)s\" class=\"text-indigo-400 hover:text-indigo-300 hover:underline\">preferences</a>."
+msgstr "A régió nincs beállítva. Állíts be régiót, vagy kapcsold ki a funkciót a <a href=\"%(url)s\" class=\"text-indigo-400 hover:text-indigo-300 hover:underline\">beállításokban</a>."
+
+msgid "Time to Beat"
+msgstr "Végigjátszási idő"
+
+msgid "Main Story"
+msgstr "Fő sztori"
+
+msgid "Main + Extra"
+msgstr "Fő sztori + extrák"
+
+msgid "Completionist"
+msgstr "Teljes végigjátszás"
+
+msgid "Overview"
+msgstr "Áttekintés"
+
+msgid "Repeats"
+msgstr "Ismétlések"
+
+msgid "Open TMDB page for %(name)s"
+msgstr "%(name)s TMDB-oldala"
+
+msgid "Update"
+msgstr "Mentés"
+
+msgid "Add"
+msgstr "Hozzáadás"
+
+msgid "You haven't started tracking it yet."
+msgstr "Még nem követed."
+
+msgid "Instance #%(number)s"
+msgstr "%(number)s. bejegyzés"
+
+msgid "You haven't created any lists yet."
+msgstr "Még nincs listád."
+
+msgid "Remove"
+msgstr "Eltávolítás"
+
+msgid "Not watched yet"
+msgstr "Még nincs megnézve"
+
+msgid "Previous Watches"
+msgstr "Korábbi megtekintések"
+
+msgid "Watch Date"
+msgstr "Megnézés dátuma"
+
+msgid "Add watched entry with current settings"
+msgstr "Megtekintés hozzáadása a mostani beállítással"
+
+msgid "Add watch"
+msgstr "Megnézve"
+
+msgid "Fills in the current date and time"
+msgstr "A mostani dátumot és időt írja be"
+
+msgid "Fill in current time"
+msgstr "Mostani idő"
+
+msgid "Fills in the date and time the episode will be finished if started now"
+msgstr "A befejezés idejét írja be, ha most indul"
+
+msgid "Fill in end time"
+msgstr "Befejezés ideje"
+
+msgid "Fills in the air date of the episode, if available"
+msgstr "Az epizód adásnapját írja be"
+
+msgid "Fill in air date"
+msgstr "Adásnap"
+
+msgid "Format"
+msgstr "Formátum"
+
+msgid "Runtime"
+msgstr "Hossz"
+
+msgid "Studios"
+msgstr "Stúdiók"
+
+msgid "Country"
+msgstr "Ország"
+
+msgid "Languages"
+msgstr "Nyelvek"
+
+msgid "First air date"
+msgstr "Első adás"
+
+msgid "Last air date"
+msgstr "Utolsó adás"
+
+msgid "Seasons"
+msgstr "Évadok"
+
+msgid "Total runtime"
+msgstr "Teljes hossz"
+
+msgid "Physical format"
+msgstr "Kiadás"
+
+msgid "Number of pages"
+msgstr "Oldalszám"
+
+msgid "Publish date"
+msgstr "Kiadás dátuma"
+
+msgid "Author"
+msgstr "Szerző"
+
+msgid "Authors"
+msgstr "Szerzők"
+
+msgid "Publishers"
+msgstr "Kiadók"
+
+msgid "Publisher"
+msgstr "Kiadó"
+
+msgid "ISBN"
+msgstr "ISBN"
+
+msgid "Year"
+msgstr "Év"
+
+msgid "Status in country of origin"
+msgstr "Állapot a származási országban"
+
+msgid "Latest chapter translated"
+msgstr "Utolsó lefordított fejezet"
+
+msgid "Players"
+msgstr "Játékosok"
+
+msgid "Play time"
+msgstr "Játékidő"
+
+msgid "Minimum age"
+msgstr "Korhatár"
+
+msgid "Designers"
+msgstr "Tervezők"
+
+msgid "Themes"
+msgstr "Témák"
+
+msgid "Platforms"
+msgstr "Platformok"
+
+msgid "Companies"
+msgstr "Cégek"
+
+msgid "Season"
+msgstr "Évad"
+
+msgid "Broadcast"
+msgstr "Adás"
+
+msgid "Source"
+msgstr "Forrás"
+
+msgid "Number of chapters"
+msgstr "Fejezetek száma"
+
+msgid "Issues"
+msgstr "Számok"
+
+msgid "Last issue"
+msgstr "Utolsó szám"
+
+msgid "Last issue number"
+msgstr "Utolsó szám sorszáma"
+
+msgid "People"
+msgstr "Alkotók"
+
+msgid "Last updated"
+msgstr "Utolsó frissítés"
+
+msgctxt "format"
+msgid "TV"
+msgstr "Sorozat"
+
+msgid "Unknown"
+msgstr "Ismeretlen"
+
+msgid "Released"
+msgstr "Megjelent"
+
+msgid "Rumored"
+msgstr "Pletyka"
+
+msgid "Planned"
+msgstr "Tervezett"
+
+msgid "In Production"
+msgstr "Gyártás alatt"
+
+msgid "Post Production"
+msgstr "Utómunka"
+
+msgid "Canceled"
+msgstr "Törölve"
+
+msgid "Returning Series"
+msgstr "Folytatódik"
+
+msgid "Ended"
+msgstr "Lezárult"
+
+msgid "Pilot"
+msgstr "Pilot"
+
+msgid "Recommendations"
+msgstr "Ajánlások"
+
+msgid "DLCs"
+msgstr "DLC-k"
+
+msgid "Collection"
+msgstr "Gyűjtemény"
+
+msgid "Other editions"
+msgstr "Más kiadások"
+
+msgid "Related manga"
+msgstr "Kapcsolódó manga"
+
+msgid "Related anime"
+msgstr "Kapcsolódó anime"
+
+msgid "Parent game"
+msgstr "Alapjáték"
+
+msgid "Remasters"
+msgstr "Remasterek"
+
+msgid "Remakes"
+msgstr "Remake-ek"
+
+msgid "Expansions"
+msgstr "Kiegészítők"
+
+msgid "Standalone expansions"
+msgstr "Önálló kiegészítők"
+
+msgid "Expanded games"
+msgstr "Bővített játékok"
+
+msgid "episode"
+msgstr "epizód"
+
+msgid "episodes"
+msgstr "epizód"
+
+msgid "chapter"
+msgstr "fejezet"
+
+msgid "chapters"
+msgstr "fejezet"
+
+msgid "page"
+msgstr "oldal"
+
+msgid "pages"
+msgstr "oldal"
+
+msgid "issue"
+msgstr "szám"
+
+msgid "issues"
+msgstr "szám"
+
+msgid "play"
+msgstr "játszma"
+
+msgid "plays"
+msgstr "játszma"
