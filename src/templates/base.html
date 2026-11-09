@@ -327,27 +327,6 @@
       </div>
     {% endblock body %}
 
-    <footer class="border-t border-[#2c3136] bg-[#1a1d20] px-4 py-3 text-xs leading-5 text-gray-400">
-      <p>
-        <span class="text-gray-200">MediaTrail</span>
-        {% translate "is an independent, unofficial fork of" %}
-        <a class="text-indigo-400 hover:text-indigo-300"
-           href="https://github.com/FuzzyGrim/Yamtrack"
-           target="_blank"
-           rel="noopener noreferrer">Yamtrack</a>.
-        {% translate "It is not affiliated with, endorsed by, or maintained by the Yamtrack project." %}
-      </p>
-      <p class="mt-1">
-        <a class="font-medium text-indigo-400 hover:text-indigo-300"
-           href="{% url 'source_offer' %}">{% translate "Source code of this version" %}</a>
-        <span aria-hidden="true"> · </span>
-        <a class="text-indigo-400 hover:text-indigo-300"
-           href="https://github.com/aicon/MediaTrail/blob/main/LICENSE"
-           target="_blank"
-           rel="noopener noreferrer">AGPL-3.0</a>
-      </p>
-    </footer>
-
     <div class="fixed top-24 right-0 left-0 {% block messages_sidebar_offset %}lg:left-64{% endblock messages_sidebar_offset %} z-50 flex justify-center pointer-events-none">
       <div id="messages-list"
            class="w-full max-w-xl px-4 space-y-2 pointer-events-auto">

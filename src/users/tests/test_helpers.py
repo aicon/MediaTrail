@@ -187,6 +187,32 @@ class HelpersTest(TestCase):
         self.assertEqual(next_run_info["next_run"], expected_next_run)
         self.assertEqual(next_run_info["frequency"], "Every 2 days")
 
+    @patch("django.utils.timezone.now")
+    def test_get_next_run_info_every_3_hours(self, mock_now):
+        """Test getting next run info for a clock-aligned 3-hour task."""
+        current_time = datetime(2025, 2, 6, 4, 10, tzinfo=zoneinfo.ZoneInfo("UTC"))
+        mock_now.return_value = current_time
+
+        crontab = CrontabSchedule.objects.create(
+            minute="19",
+            hour="2,5,8,11,14,17,20,23",
+            day_of_week="*",
+            day_of_month="*",
+            month_of_year="*",
+            timezone="UTC",
+        )
+        periodic_task = PeriodicTask.objects.create(
+            name="Every 3 Hours Import",
+            task="import_task",
+            crontab=crontab,
+        )
+
+        next_run_info = helpers.get_next_run_info(periodic_task)
+
+        expected_next_run = datetime(2025, 2, 6, 5, 19, tzinfo=zoneinfo.ZoneInfo("UTC"))
+        self.assertEqual(next_run_info["next_run"], expected_next_run)
+        self.assertEqual(next_run_info["frequency"], "Every 3 hours")
+
     def test_get_next_run_info_custom_cron(self):
         """Test getting next run info for custom cron schedule."""
         crontab = CrontabSchedule.objects.create(

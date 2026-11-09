@@ -8,9 +8,9 @@ from django.core.cache import cache
 from django.db import IntegrityError
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-from django.template.defaultfilters import pluralize
 from django.utils import translation
 from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django_celery_beat.models import PeriodicTask
 
@@ -42,7 +42,7 @@ def account(request):
 
             if user_form.is_valid():
                 user_form.save()
-                messages.success(request, "Your profile has been updated!")
+                messages.success(request, _("Your profile has been updated!"))
                 logger.info(
                     "Successful profile change for user: %s",
                     request.user.username,
@@ -67,7 +67,7 @@ def account(request):
                     request,
                     user,
                 )
-                messages.success(request, "Your password has been updated!")
+                messages.success(request, _("Your password has been updated!"))
                 logger.info(
                     "Successful password change for user: %s",
                     request.user.username,
@@ -94,7 +94,7 @@ def notifications(request):
         form = NotificationSettingsForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
-            messages.success(request, "Notification settings updated successfully!")
+            messages.success(request, _("Notification settings updated successfully!"))
         else:
             for errors in form.errors.values():
                 for error in errors:
@@ -193,7 +193,7 @@ def test_notification(request):
             if url.strip()
         ]
         if not notification_urls:
-            messages.error(request, "No notification URLs configured.")
+            messages.error(request, _("No notification URLs configured."))
             return redirect("notifications")
 
         for url in notification_urls:
@@ -201,17 +201,16 @@ def test_notification(request):
 
         # Send test notification
         result = apobj.notify(
-            title="MediaTrail Test Notification",
-            body=(
-                "This is a test notification from MediaTrail. "
-                "If you're seeing this, your notifications are working correctly!"
+            title=_("MediaTrail Test Notification"),
+            body=_(
+                "This is a test notification from MediaTrail. If you're seeing this, your notifications are working correctly!",
             ),
         )
 
         if result:
-            messages.success(request, "Test notification sent successfully!")
+            messages.success(request, _("Test notification sent successfully!"))
         else:
-            messages.error(request, "Failed to send test notification.")
+            messages.error(request, _("Failed to send test notification."))
     except Exception:
         logger.exception("Error sending notification")
 
@@ -242,7 +241,7 @@ def preferences(request):
 
     # Prevent demo users from updating preferences
     if request.user.is_demo:
-        messages.error(request, "This section is view-only for demo accounts.")
+        messages.error(request, _("This section is view-only for demo accounts."))
         return redirect("preferences")
 
     # Process form submission
@@ -337,9 +336,9 @@ def delete_import_schedule(request):
             kwargs__contains=f'"user_id": {request.user.id}',
         )
         task.delete()
-        messages.success(request, "Import schedule deleted.")
+        messages.success(request, _("Import schedule deleted."))
     except PeriodicTask.DoesNotExist:
-        messages.error(request, "Import schedule not found.")
+        messages.error(request, _("Import schedule not found."))
     return redirect("import_data")
 
 
@@ -349,7 +348,7 @@ def regenerate_token(request):
     while True:
         try:
             request.user.regenerate_token()
-            messages.success(request, "Token regenerated successfully.")
+            messages.success(request, _("Token regenerated successfully."))
             break
         except IntegrityError:
             continue
@@ -374,7 +373,7 @@ def update_plex_usernames(request):
     if cleaned_usernames != request.user.plex_usernames:
         request.user.plex_usernames = cleaned_usernames
         request.user.save(update_fields=["plex_usernames"])
-        messages.success(request, "Plex usernames updated successfully")
+        messages.success(request, _("Plex usernames updated successfully"))
 
     return redirect("integrations")
 
@@ -394,7 +393,7 @@ def update_jellyfin_webhook_events(request):
             "jellyfin_mark_unplayed_enabled",
         ],
     )
-    messages.success(request, "Jellyfin webhook settings updated successfully")
+    messages.success(request, _("Jellyfin webhook settings updated successfully"))
 
     return redirect("integrations")
 
@@ -402,11 +401,16 @@ def update_jellyfin_webhook_events(request):
 @require_POST
 def clear_search_cache(request):
     """Clear all cached search entries."""
-    deleted = cache.delete_pattern("search_*")
+    deleted = cache.delete_pattern("search_*") or 0
 
     messages.success(
         request,
-        f"Successfully cleared {deleted} search entr{pluralize(deleted, 'y,ies')}",
+        ngettext(
+            "Successfully cleared %(count)s search entry",
+            "Successfully cleared %(count)s search entries",
+            deleted,
+        )
+        % {"count": deleted},
     )
     logger.info(
         "Successfully cleared %s search entries",

@@ -171,3 +171,22 @@ class HelpersTest(TestCase):
 
         schedule = CrontabSchedule.objects.first()
         self.assertEqual(schedule.day_of_week, "*/2")
+
+    def test_create_import_schedule_every_3_hours(self):
+        """Hourly repeats are clock-aligned and do not use the chosen clock time."""
+        request = Mock()
+        request.user = self.user
+
+        helpers.create_import_schedule(
+            "testuser",
+            request,
+            "new",
+            "3h",
+            "14:30",
+            "TestSource",
+        )
+
+        schedule = CrontabSchedule.objects.first()
+        self.assertEqual(schedule.hour, "2,5,8,11,14,17,20,23")
+        self.assertEqual(str(schedule.minute), "30")
+        self.assertEqual(schedule.day_of_week, "*")

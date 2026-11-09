@@ -437,3 +437,541 @@ msgstr "játszik"
 msgctxt "past"
 msgid "played"
 msgstr "játszott"
+
+msgid "Profile Information"
+msgstr "Profiladatok"
+
+msgid "Username"
+msgstr "Felhasználónév"
+
+msgid "Profile visibility"
+msgstr "Profil láthatósága"
+
+msgid "Private profile"
+msgstr "Privát profil"
+
+msgid "Hide your profile and media lists from anonymous visitors."
+msgstr "A profil és a médialisták elrejtése a be nem jelentkezett látogatók elől."
+
+msgid "Save Changes"
+msgstr "Módosítások mentése"
+
+msgid "Change Password"
+msgstr "Jelszócsere"
+
+msgid "Current Password"
+msgstr "Jelenlegi jelszó"
+
+msgid "New Password"
+msgstr "Új jelszó"
+
+msgid "Confirm New Password"
+msgstr "Új jelszó megerősítése"
+
+msgid "Update Password"
+msgstr "Jelszó mentése"
+
+msgid "Third-Party Connections"
+msgstr "Külső kapcsolatok"
+
+msgid "Manage your connected third-party accounts for easier sign-in."
+msgstr "A csatlakoztatott külső fiókok kezelése az egyszerűbb bejelentkezéshez."
+
+msgid "Manage Account Connections"
+msgstr "Fiókkapcsolatok kezelése"
+
+msgid "Your profile has been updated!"
+msgstr "A profil mentve."
+
+msgid "Your password has been updated!"
+msgstr "A jelszó mentve."
+
+msgid "Changing the username is not allowed for the demo account."
+msgstr "A demófiók felhasználónevét nem lehet módosítani."
+
+msgid "Changing the password is not allowed for the demo account."
+msgstr "A demófiók jelszavát nem lehet módosítani."
+
+msgid "Configure how you want to receive notifications about your media."
+msgstr "Állítsd be, hogyan kapsz értesítést a médiáidról."
+
+msgid "Apprise URLs"
+msgstr "Apprise URL-ek"
+
+msgid "<a href=\"https://github.com/caronc/apprise\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">Apprise</a> is a notification service that supports <a href=\"https://github.com/caronc/apprise/wiki\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">many platforms</a>, including:"
+msgstr "<a href=\"https://github.com/caronc/apprise\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">Az Apprise</a> értesítési szolgáltatás, amely <a href=\"https://github.com/caronc/apprise/wiki\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">sok platformot</a> támogat, többek között:"
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "And many more..."
+msgstr "és még sok más..."
+
+msgid "Enter one URL per line. Example:"
+msgstr "Soronként egy URL. Példa:"
+
+msgid "Enter each Apprise URL on a separate line to send notifications to multiple services."
+msgstr "Minden Apprise URL külön sorba kerül, így több szolgáltatás is kaphat értesítést."
+
+msgid "Notification Settings"
+msgstr "Értesítési beállítások"
+
+msgid "Enable Daily Digest"
+msgstr "Napi összefoglaló"
+
+msgid "Receive a single notification each day with all media scheduled to release that day"
+msgstr "Naponta egy értesítés az aznapi megjelenésekről."
+
+msgid "Receive notifications for recently released media"
+msgstr "Értesítés a nemrég megjelent médiáról"
+
+msgid "Get notified when new episodes, chapters, or other media are released"
+msgstr "Értesítés új epizód, fejezet vagy más média megjelenésekor."
+
+msgid "Test Notifications"
+msgstr "Tesztértesítés"
+
+msgid "Save Settings"
+msgstr "Beállítások mentése"
+
+msgid "Excluded Media Items"
+msgstr "Kizárt média"
+
+msgid "Exclude specific media items from notifications:"
+msgstr "Egyes médiaelemek kizárása az értesítésekből:"
+
+msgid "Search for media to exclude..."
+msgstr "Keresés a kizáráshoz..."
+
+msgid "Currently Excluded:"
+msgstr "Jelenleg kizárva:"
+
+msgid "No media items excluded yet"
+msgstr "Még nincs kizárt média"
+
+msgid "Exclude"
+msgstr "Kizárás"
+
+msgid "No matching items found"
+msgstr "Nincs találat"
+
+msgid "Notification settings updated successfully!"
+msgstr "Az értesítési beállítások mentve."
+
+msgid "'%(url)s' is not a valid Apprise URL."
+msgstr "„%(url)s” nem érvényes Apprise URL."
+
+msgid "No notification URLs configured."
+msgstr "Nincs megadva értesítési URL."
+
+msgid "MediaTrail Test Notification"
+msgstr "MediaTrail tesztértesítés"
+
+msgid "This is a test notification from MediaTrail. If you're seeing this, your notifications are working correctly!"
+msgstr "Ez egy tesztértesítés a MediaTrailből. Ha ezt látod, az értesítések működnek."
+
+msgid "Test notification sent successfully!"
+msgstr "A tesztértesítés elküldve."
+
+msgid "Failed to send test notification."
+msgstr "A tesztértesítés küldése nem sikerült."
+
+msgid "Token"
+msgstr "Token"
+
+msgid "This token is used to authenticate webhook requests from your media servers."
+msgstr "Ez a token hitelesíti a médiaszerverek webhook-kéréseit."
+
+msgid "Copy"
+msgstr "Másolás"
+
+msgid "Regenerating will invalidate the previous token"
+msgstr "Az újragenerálás érvényteleníti a korábbi tokent."
+
+msgid "Regenerate"
+msgstr "Újragenerálás"
+
+msgid "Media Servers"
+msgstr "Médiaszerverek"
+
+msgid "Connect your media servers to automatically track your watching progress."
+msgstr "Csatlakoztasd a médiaszervereket, hogy a nézési előrehaladás automatikusan követhető legyen."
+
+msgid "Integration services"
+msgstr "Integrációs szolgáltatások"
+
+msgid "Connect Jellyfin to automatically track your watching progress."
+msgstr "A Jellyfin csatlakoztatása a nézési előrehaladás automatikus követéséhez."
+
+msgid "Webhook Events"
+msgstr "Webhook-események"
+
+msgid "Play and Stop events are always processed. Enable these to sync manual watched changes from the unofficial Webhooks plugin."
+msgstr "A Play és a Stop események mindig feldolgozásra kerülnek. Ezekkel a nem hivatalos Webhooks bővítmény kézi megtekintési változásai is szinkronizálhatók."
+
+msgid "Process MarkPlayed events"
+msgstr "MarkPlayed események feldolgozása"
+
+msgid "Mark media as watched when it is manually marked played in Jellyfin."
+msgstr "A média megtekintett lesz, ha a Jellyfinben kézzel lejátszottnak jelölöd."
+
+msgid "Process MarkUnplayed events"
+msgstr "MarkUnplayed események feldolgozása"
+
+msgid "Remove watched progress when it is manually marked unplayed in Jellyfin. This event can delete media from MediaTrail."
+msgstr "A megtekintési előrehaladás törlődik, ha a Jellyfinben kézzel lejátszatlanra állítod. Ez az esemény médiát törölhet a MediaTrailből."
+
+msgid "Official Webhook Plugin"
+msgstr "Hivatalos Webhook-bővítmény"
+
+msgid "You will need to have TMDB and TVDB as metadata providers in Jellyfin."
+msgstr "A Jellyfinben a TMDB és a TVDB legyen metaadat-szolgáltató."
+
+msgid "Install the Webhook plugin from the 'Jellyfin Stable' repo via your server's Plugin Catalog."
+msgstr "Telepítsd a Webhook bővítményt a „Jellyfin Stable” tárolóból a szerver bővítménykatalógusában."
+
+msgid "Restart your server, then configure the plugin:"
+msgstr "Indítsd újra a szervert, majd állítsd be a bővítményt:"
+
+msgid "Click on the \"Add Generic Destination\" button to create a new webhook."
+msgstr "Az „Add Generic Destination” gombbal hozz létre új webhookot."
+
+msgid "Name: MediaTrail"
+msgstr "Név: MediaTrail"
+
+msgid "Notification Type: Playback Start and Playback Stop"
+msgstr "Értesítés típusa: Playback Start és Playback Stop"
+
+msgid "User Filter: Your Jellyfin User"
+msgstr "Felhasználószűrő: a saját Jellyfin-felhasználód"
+
+msgid "Finally, under the \"Template\" section, paste the following code."
+msgstr "Végül a „Template” résznél illeszd be az alábbi kódot."
+
+msgid "Unofficial Webhooks Plugin"
+msgstr "Nem hivatalos Webhooks-bővítmény"
+
+msgid "Add this repository <a href=\"https://raw.githubusercontent.com/shemanaev/jellyfin-plugin-repo/master/manifest.json\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">link</a> to your \"Plugins Catalog\" in Jellyfin settings."
+msgstr "Add hozzá ezt a tárolót <a href=\"https://raw.githubusercontent.com/shemanaev/jellyfin-plugin-repo/master/manifest.json\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">ezen a linken</a> a Jellyfin „Plugins Catalog” beállításához."
+
+msgid "From your \"Plugins Catalog\", install the <a href=\"https://github.com/shemanaev/jellyfin-plugin-webhooks\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">Unofficial Webhooks plugin</a>."
+msgstr "A „Plugins Catalog” listából telepítsd a <a href=\"https://github.com/shemanaev/jellyfin-plugin-webhooks\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">nem hivatalos Webhooks bővítményt</a>."
+
+msgid "Payload format: Default"
+msgstr "Payload formátum: Default"
+
+msgid "Listen to events only for: Your Jellyfin User"
+msgstr "Események csak ettől a felhasználótól: a saját Jellyfin-felhasználód"
+
+msgid "Events: Play, Stop, MarkPlayed and MarkUnplayed"
+msgstr "Események: Play, Stop, MarkPlayed és MarkUnplayed"
+
+msgid "Connect Plex to automatically track your watching progress."
+msgstr "A Plex csatlakoztatása a nézési előrehaladás automatikus követéséhez."
+
+msgid "Plex Usernames"
+msgstr "Plex-felhasználónevek"
+
+msgid "This username (or several, comma separated) will be used to filter which events are sent to your webhook."
+msgstr "Ez a felhasználónév, vagy több vesszővel elválasztva, szűri, hogy mely események érkeznek a webhookra."
+
+msgid "Setup Instructions"
+msgstr "Beállítási lépések"
+
+msgid "You will need to have a PlexPass in order to have webhooks enabled"
+msgstr "A webhookokhoz PlexPass szükséges."
+
+msgid "Go to Settings > Server > Network and enable Webhooks"
+msgstr "A Beállítások > Szerver > Hálózat menüben kapcsold be a webhookokat."
+
+msgid "In Plex settings, go to <a href=\"https://app.plex.tv/desktop/#!/settings/webhooks\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">Webhooks</a>."
+msgstr "A Plex beállításaiban nyisd meg a <a href=\"https://app.plex.tv/desktop/#!/settings/webhooks\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">Webhookok</a> oldalt."
+
+msgid "In the Webhooks section, click on \"Add Webhook\" and enter the following URL:"
+msgstr "A Webhooks résznél kattints az „Add Webhook” gombra, és add meg ezt az URL-t:"
+
+msgid "Connect Emby to automatically track your watching progress."
+msgstr "Az Emby csatlakoztatása a nézési előrehaladás automatikus követéséhez."
+
+msgid "In Emby, go to Settings > Notifications"
+msgstr "Az Embyben nyisd meg a Beállítások > Értesítések menüt."
+
+msgid "In the Notifications section, click on \"Add Notification\""
+msgstr "Az Értesítések résznél kattints az „Add Notification” gombra."
+
+msgid "In the Notification settings:"
+msgstr "Az értesítés beállításainál:"
+
+msgid "Request content type: multipart/form-data"
+msgstr "Kérés tartalomtípusa: multipart/form-data"
+
+msgid "Events: Play and Stop"
+msgstr "Események: Play és Stop"
+
+msgid "Limit user events to: Your Emby User"
+msgstr "Felhasználói események korlátozása: a saját Emby-felhasználód"
+
+msgid "\"Limit library events to\" and \"Limit devices events to\" are optional"
+msgstr "A „Limit library events to” és a „Limit devices events to” nem kötelező."
+
+msgid "Token regenerated successfully."
+msgstr "A token újragenerálva."
+
+msgid "Plex usernames updated successfully"
+msgstr "A Plex-felhasználónevek mentve."
+
+msgid "Jellyfin webhook settings updated successfully"
+msgstr "A Jellyfin webhook-beállítások mentve."
+
+msgid "Back up your data or export it for use with other services."
+msgstr "Mentsd az adataidat, vagy exportáld más szolgáltatásokhoz."
+
+msgid "Your export will include all your media items."
+msgstr "Az export az összes médiaelemet tartalmazza."
+
+msgid "Export as CSV"
+msgstr "Exportálás CSV-ként"
+
+msgid "Clear Search Cache"
+msgstr "Keresési gyorsítótár törlése"
+
+msgid "MediaTrail stores your search results in a cache to speed up performance and reduce API calls."
+msgstr "A MediaTrail a keresési találatokat gyorsítótárba teszi, hogy gyorsabb legyen, és kevesebb API-hívás kelljen."
+
+msgid "Normally, these cached results expire automatically after 24 hours. If your search results appear outdated, you can clear the cache manually."
+msgstr "A gyorsítótár általában 24 óra után magától lejár. Ha a találatok elavultnak tűnnek, kézzel is törölhető."
+
+msgid "Your next search may be slightly slower as fresh data is retrieved."
+msgstr "A következő keresés kicsit lassabb lehet, amíg friss adat érkezik."
+
+msgid "Successfully cleared %(count)s search entry"
+msgid_plural "Successfully cleared %(count)s search entries"
+msgstr[0] "%(count)s keresési találat törölve."
+msgstr[1] "%(count)s keresési találat törölve."
+
+msgid "This section is view-only for demo accounts."
+msgstr "Demófiókkal ez a rész csak megtekinthető."
+
+msgid "Import Settings"
+msgstr "Importbeállítások"
+
+msgid "Configure your import preferences."
+msgstr "Az import beállításai."
+
+msgid "Import Frequency"
+msgstr "Import gyakorisága"
+
+msgid "One Time Import"
+msgstr "Egyszeri import"
+
+msgid "Every hour"
+msgstr "Óránként"
+
+msgid "Every %(count)s hour"
+msgid_plural "Every %(count)s hours"
+msgstr[0] "%(count)s óránként"
+msgstr[1] "%(count)s óránként"
+
+msgid "Every 3 hours"
+msgstr "3 óránként"
+
+msgid "Every 6 hours"
+msgstr "6 óránként"
+
+msgid "Every 12 hours"
+msgstr "12 óránként"
+
+msgid "Every Day"
+msgstr "Naponta"
+
+msgid "Every 2 Days"
+msgstr "2 naponta"
+
+msgid "Every 2 days"
+msgstr "2 naponta"
+
+msgid "Import Time"
+msgstr "Import ideje"
+
+msgid "Import Mode"
+msgstr "Import módja"
+
+msgid "Only Sync New Items"
+msgstr "Csak az új elemek"
+
+msgid "Sync New Items and Overwrite Existing"
+msgstr "Új elemek és a meglévők felülírása"
+
+msgid "Only New Items"
+msgstr "Csak új elemek"
+
+msgid "Overwrite Existing"
+msgstr "Meglévők felülírása"
+
+msgid "Import Sources"
+msgstr "Importforrások"
+
+msgid "Some of these require additional configuration, check the <a href=\"https://github.com/FuzzyGrim/Yamtrack/wiki/Media-Import-Configuration\" target=\"_blank\" class=\"text-indigo-400 hover:text-indigo-300 underline\">import configuration guide</a>."
+msgstr "Néhány forráshoz további beállítás kell. Részletek az <a href=\"https://github.com/FuzzyGrim/Yamtrack/wiki/Media-Import-Configuration\" target=\"_blank\" class=\"text-indigo-400 hover:text-indigo-300 underline\">importbeállítási útmutatóban</a>."
+
+msgid "Import TV shows and movies"
+msgstr "Sorozatok és filmek importálása"
+
+msgid "Import private profile (requires authentication)"
+msgstr "Privát profil importálása (bejelentkezés szükséges)"
+
+msgid "Public Trakt username"
+msgstr "Nyilvános Trakt-felhasználónév"
+
+msgid "Import"
+msgstr "Importálás"
+
+msgid "Connect with Trakt & Import"
+msgstr "Csatlakozás a Trakthoz és importálás"
+
+msgid "Import TV shows, movies and anime"
+msgstr "Sorozatok, filmek és animék importálása"
+
+msgid "Connect with Simkl & Import"
+msgstr "Csatlakozás a Simklhez és importálás"
+
+msgid "Import anime and manga"
+msgstr "Animék és mangák importálása"
+
+msgid "MAL username"
+msgstr "MAL-felhasználónév"
+
+msgid "Public AniList username"
+msgstr "Nyilvános AniList-felhasználónév"
+
+msgid "Connect with AniList & Import"
+msgstr "Csatlakozás az AniListhez és importálás"
+
+msgid "Kitsu user ID"
+msgstr "Kitsu-felhasználóazonosító"
+
+msgid "Find it on your Kitsu profile URL:"
+msgstr "A Kitsu-profil URL-jében található:"
+
+msgid "View CSV format documentation"
+msgstr "CSV-formátum dokumentációja"
+
+msgid "Import from a MediaTrail backup"
+msgstr "Importálás MediaTrail-mentésből"
+
+msgid "File uploads are not available for periodic imports"
+msgstr "Időzített importnál nem lehet fájlt feltölteni"
+
+msgid "Select CSV File"
+msgstr "CSV-fájl kiválasztása"
+
+msgid "Import games"
+msgstr "Játékok importálása"
+
+msgid "Import games from your Steam library"
+msgstr "Játékok importálása a Steam-könyvtárból"
+
+msgid "Steam 64-bit ID"
+msgstr "Steam 64 bites azonosító"
+
+msgid "Find it on your Steam account details page under your username."
+msgstr "A Steam-fiók adatai között, a felhasználónév alatt található."
+
+msgid "Your profile must be public if the API key you are using is not linked to the steamid you are requesting."
+msgstr "A profilnak nyilvánosnak kell lennie, ha a használt API-kulcs nem ahhoz a Steam-azonosítóhoz tartozik."
+
+msgid "Import movies and TV shows from your ratings"
+msgstr "Filmek és sorozatok importálása az értékeléseidből"
+
+msgid "Import from GoodReads backup"
+msgstr "Importálás Goodreads-mentésből"
+
+msgid "Active Periodic Imports"
+msgstr "Aktív időzített importok"
+
+msgid "Automated imports that run on a schedule. These will continue to sync your media until disabled."
+msgstr "Ütemezett importok. A kikapcsolásig folyamatosan szinkronizálják a médiáidat."
+
+msgid "Username:"
+msgstr "Felhasználónév:"
+
+msgid "Mode:"
+msgstr "Mód:"
+
+msgid "Last Import:"
+msgstr "Utolsó import:"
+
+msgid "Next Import:"
+msgstr "Következő import:"
+
+msgid "No periodic imports configured"
+msgstr "Nincs időzített import"
+
+msgid "Set up an import that repeats by the hour, every day, or every 2 days to see it here"
+msgstr "Állíts be óránkénti, napi vagy kétnapos importot, és itt jelenik meg."
+
+msgid "Import History"
+msgstr "Importelőzmények"
+
+msgid "Showing import activity from the last 7 days."
+msgstr "Az elmúlt 7 nap importjai."
+
+msgid "Finished"
+msgstr "Befejezve"
+
+msgid "Success"
+msgstr "Sikeres"
+
+msgid "Started"
+msgstr "Elindítva"
+
+msgid "Failed"
+msgstr "Sikertelen"
+
+msgid "Pending"
+msgstr "Várakozik"
+
+msgid "Show failed items"
+msgstr "Sikertelen elemek mutatása"
+
+msgid "Hide failed items"
+msgstr "Sikertelen elemek elrejtése"
+
+msgid "Show traceback"
+msgstr "Hibaüzenet mutatása"
+
+msgid "Hide traceback"
+msgstr "Hibaüzenet elrejtése"
+
+msgid "No imports in the last 7 days"
+msgstr "Az elmúlt 7 napban nem volt import"
+
+msgid "Import your media from any source to see the history here"
+msgstr "Importálj médiát bármely forrásból, és itt látszik az előzmény."
+
+msgid "Import schedule deleted."
+msgstr "Az importütemezés törölve."
+
+msgid "Import schedule not found."
+msgstr "Az importütemezés nem található."
+
+msgid "Unexpected error occurred while processing the task."
+msgstr "Váratlan hiba történt a feladat feldolgozása közben."
+
+msgid "This task is currently running."
+msgstr "Ez a feladat most fut."
+
+msgid "This task has been queued and is waiting to run."
+msgstr "A feladat sorban áll, és a futásra vár."
+
+msgid "Cron: %(expression)s"
+msgstr "Ütemezés: %(expression)s"
+
+msgid "Disabled"
+msgstr "Kikapcsolva"
+
+msgid "Jan 18, 2026"
+msgstr "2026. jan. 18."
+
+msgid "18 Jan, 2026"
+msgstr "18. jan. 2026."

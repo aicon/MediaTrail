@@ -18,6 +18,15 @@ from app.models import MediaTypes
 
 logger = logging.getLogger(__name__)
 
+# Repeats anchored to the chosen clock time. 14:19 every 3 hours is
+# 14:19, 17:19, 20:19, and so on.
+HOUR_STEPS = {
+    "1h": 1,
+    "3h": 3,
+    "6h": 6,
+    "12h": 12,
+}
+
 
 class MediaImportError(Exception):
     """Custom exception for import errors."""
@@ -219,6 +228,14 @@ def bulk_update_media(bulk_media_list, fields_by_media_type, user):
         )
 
 
+def hour_field_for_step(start_hour, step):
+    """Return the crontab hour field for a step anchored at start_hour."""
+    if step == 1:
+        return "*"
+    hours = sorted((start_hour + step * index) % 24 for index in range(24 // step))
+    return ",".join(str(hour) for hour in hours)
+
+
 def create_import_schedule(
     username,
     request,
@@ -242,6 +259,15 @@ def create_import_schedule(
         messages.error(request, "Invalid import time.")
         return
 
+    if frequency in HOUR_STEPS:
+        hour = hour_field_for_step(import_time.hour, HOUR_STEPS[frequency])
+        minute = import_time.minute
+        day_of_week = "*"
+    else:
+        hour = import_time.hour
+        minute = import_time.minute
+        day_of_week = "*" if frequency == "daily" else "*/2"
+
     task_name = f"Import from {source} for {username} at {import_time} {frequency}"
     if PeriodicTask.objects.filter(name=task_name).exists():
         messages.error(
@@ -251,9 +277,9 @@ def create_import_schedule(
         return
 
     crontab, _ = CrontabSchedule.objects.get_or_create(
-        hour=import_time.hour,
-        minute=import_time.minute,
-        day_of_week="*" if frequency == "daily" else "*/2",
+        hour=hour,
+        minute=minute,
+        day_of_week=day_of_week,
         timezone=timezone.get_default_timezone(),
     )
 

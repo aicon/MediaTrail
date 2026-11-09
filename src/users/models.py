@@ -98,11 +98,11 @@ class QuickWatchDateChoices(models.TextChoices):
 class DateFormatChoices(models.TextChoices):
     """Choices for date format display."""
 
-    ISO = "Y-m-d", "2026-01-18 (ISO)"
-    EUROPEAN = "d/m/Y", "18/01/2026 (EU)"
-    US = "m/d/Y", "01/18/2026 (US)"
-    LONG = "M j, Y", "Jan 18, 2026"
-    LONG_EU = "j M, Y", "18 Jan, 2026"
+    ISO = "Y-m-d", _("2026-01-18 (ISO)")
+    EUROPEAN = "d/m/Y", _("18/01/2026 (EU)")
+    US = "m/d/Y", _("01/18/2026 (US)")
+    LONG = "M j, Y", _("Jan 18, 2026")
+    LONG_EU = "j M, Y", _("18 Jan, 2026")
 
 
 class TimeFormatChoices(models.TextChoices):

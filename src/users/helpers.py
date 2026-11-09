@@ -4,6 +4,8 @@ from datetime import datetime
 
 import croniter
 from django.utils import timezone
+from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 
 import integrations
 
@@ -16,10 +18,10 @@ def process_task_result(task):
             task.summary = result_json["exc_message"][0]
             task.errors = task.traceback
         else:
-            task.summary = "Unexpected error occurred while processing the task."
+            task.summary = _("Unexpected error occurred while processing the task.")
             task.errors = task.traceback
     elif task.status == "STARTED":
-        task.summary = "This task is currently running."
+        task.summary = _("This task is currently running.")
         task.errors = None
     elif task.status == "SUCCESS":
         result_json = json.loads(task.result)
@@ -36,10 +38,47 @@ def process_task_result(task):
             task.summary = result_json.strip()
             task.errors = None
     elif task.status == "PENDING":
-        task.summary = "This task has been queued and is waiting to run."
+        task.summary = _("This task has been queued and is waiting to run.")
         task.errors = None
 
     return task
+
+
+def _every_n_hours(step):
+    """Return a translated label such as “Every 3 hours”."""
+    count = int(step)
+    return ngettext(
+        "Every %(count)s hour",
+        "Every %(count)s hours",
+        count,
+    ) % {"count": count}
+
+
+def _hour_frequency_label(hour_field, day_of_week):
+    """Return a label when the crontab repeats every 1, 3, 6, or 12 hours."""
+    if day_of_week != "*":
+        return None
+    hour = str(hour_field)
+    if hour in {"*", "*/1"}:
+        return _("Every hour")
+    if hour.startswith("*/"):
+        step_text = hour[2:]
+        if step_text in {"3", "6", "12"}:
+            return _every_n_hours(step_text)
+        return None
+    if "," not in hour:
+        return None
+    try:
+        hours = sorted({int(part) for part in hour.split(",") if part != ""})
+    except ValueError:
+        return None
+    if len(hours) < 2:
+        return None
+    gaps = [(hours[(index + 1) % len(hours)] - hours[index]) % 24 for index in range(len(hours))]
+    step = gaps[0]
+    if len(set(gaps)) == 1 and step in {3, 6, 12} and len(hours) == 24 // step:
+        return _every_n_hours(step)
+    return None
 
 
 def get_next_run_info(periodic_task):
@@ -53,7 +92,7 @@ def get_next_run_info(periodic_task):
     except json.JSONDecodeError:
         mode = "new"
 
-    mode = "Only New Items" if mode == "new" else "Overwrite Existing"
+    mode = _("Only New Items") if mode == "new" else _("Overwrite Existing")
 
     cron = periodic_task.crontab
     tz = zoneinfo.ZoneInfo(str(cron.timezone))
@@ -67,13 +106,15 @@ def get_next_run_info(periodic_task):
     cron_iter = croniter.croniter(cron_expr, now)
     next_run = cron_iter.get_next(datetime)
 
-    # Determine frequency
-    if cron.day_of_week == "*":
-        frequency = "Every Day"
+    hour_frequency = _hour_frequency_label(cron.hour, cron.day_of_week)
+    if hour_frequency:
+        frequency = hour_frequency
+    elif cron.day_of_week == "*":
+        frequency = _("Every Day")
     elif cron.day_of_week == "*/2":
-        frequency = "Every 2 days"
+        frequency = _("Every 2 days")
     else:
-        frequency = f"Cron: {cron_expr}"
+        frequency = _("Cron: %(expression)s") % {"expression": cron_expr}
 
     return {
         "next_run": next_run,
