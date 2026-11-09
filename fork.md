@@ -1,6 +1,6 @@
 # Notes from the Yamtrack fork this tree was copied from
 
-MediaTrail versions continue from 0.25.3 in small steps. The current version is `0.25.5`. The notes below describe the earlier Yamtrack packaging (`0.25.3-fork.1`). They are not the MediaTrail version.
+MediaTrail versions continue from 0.25.3 in small steps. The current version is `0.25.6`. The notes below describe the earlier Yamtrack packaging (`0.25.3-fork.1`). They are not the MediaTrail version.
 
 # Yamtrack fork `0.25.3-fork.1`
 
