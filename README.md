@@ -8,7 +8,7 @@ The program is the Yamtrack fork that was already in this workspace, including t
 
 ## License
 
-Yamtrack is licensed under the GNU Affero General Public License v3.0. MediaTrail keeps that license and the copyright notices. The license text is [`LICENSE`](LICENSE). Modifications in this tree are under the same license.
+MediaTrail is licensed under the GNU Affero General Public License v3.0. The license text is [`LICENSE`](https://github.com/aicon/MediaTrail/blob/main/LICENSE) in this repository, and it is the unchanged GNU text. Yamtrack's copyright notices are kept. MediaTrail's own copyright notice is in [`NOTICE`](NOTICE). Modifications in this tree stay under the same license.
 
 Because this is a modified network program, AGPL-3.0 section 13 requires a prominent offer of the corresponding source of the version that is actually running. Upstream Yamtrack's repository is the original program. It is not a substitute for the source of this modified version.
 
@@ -24,7 +24,7 @@ Provider keys, including a Gemini API key, belong in the operator's own runtime 
 
 ## Run locally
 
-MediaTrail versions continue from 0.25.3 in small steps. This tree is `0.25.4`. The image tag is `ghcr.io/aicon/mediatrail:0.25.4` (`latest` tracks the current build). The repository and the image are private. Redis runs inside the image and keeps its data under the existing `db` volume.
+MediaTrail versions continue from 0.25.3 in small steps. This tree is `0.25.5`. The image tag is `ghcr.io/aicon/mediatrail:0.25.5` (`latest` tracks the current build). The repository and the image are private. Redis runs inside the image and keeps its data under the existing `db` volume.
 
 `docker-compose.local.yml` can still build this directory on the machine as `mediatrail:local`. It does not start a separate Redis container. Put secrets in the Compose environment or a local `.env` that is not baked into the image.
 

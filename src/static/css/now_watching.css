@@ -67,9 +67,10 @@
   z-index: 3;
   top: 0.55rem;
   right: 0.55rem;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   width: 1.75rem;
   height: 1.75rem;
   padding: 0;
@@ -77,9 +78,18 @@
   border-radius: 0.35rem;
   background: rgba(0, 0, 0, 0.45);
   color: #fff;
-  font-size: 1.25rem;
-  line-height: 1;
+  line-height: 0;
   cursor: pointer;
+}
+
+.nw-dismiss-icon {
+  display: block;
+  width: 0.8rem;
+  height: 0.8rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
 }
 
 .nw-dismiss:hover {
