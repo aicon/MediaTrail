@@ -24,7 +24,7 @@ Provider keys, including a Gemini API key, belong in the operator's own runtime 
 
 ## Run locally
 
-MediaTrail versions continue from 0.25.3 in small steps. This tree is `0.25.5`. The image tag is `ghcr.io/aicon/mediatrail:0.25.5` (`latest` tracks the current build). The repository and the image are private. Redis runs inside the image and keeps its data under the existing `db` volume.
+MediaTrail versions continue from 0.25.3 in small steps. The stable release is `0.25.5`. Day-to-day work is on the `dev` branch, which publishes `ghcr.io/aicon/mediatrail:dev`. A stable image is published only from a `v*` release tag, as `ghcr.io/aicon/mediatrail:<version>` and `latest`. The repository and the image are private. Redis runs inside the image and keeps its data under the existing `db` volume.
 
 `docker-compose.local.yml` can still build this directory on the machine as `mediatrail:local`. It does not start a separate Redis container. Put secrets in the Compose environment or a local `.env` that is not baked into the image.
 
