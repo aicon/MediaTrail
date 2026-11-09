@@ -152,13 +152,21 @@ def media_type_readable(media_type):
 @register.filter
 def media_type_readable_plural(media_type):
     """Return the readable media type in plural form."""
-    singular = MediaTypes(media_type).label
+    from django.utils.translation import gettext as _
 
-    # Special cases that don't change in plural form
-    if singular.lower() in [MediaTypes.ANIME.value, MediaTypes.MANGA.value]:
-        return singular
-
-    return f"{singular}s"
+    plurals = {
+        MediaTypes.TV.value: _("TV Shows"),
+        MediaTypes.SEASON.value: _("TV Seasons"),
+        MediaTypes.EPISODE.value: _("Episodes"),
+        MediaTypes.MOVIE.value: _("Movies"),
+        MediaTypes.ANIME.value: _("Anime"),
+        MediaTypes.MANGA.value: _("Manga"),
+        MediaTypes.GAME.value: _("Games"),
+        MediaTypes.BOOK.value: _("Books"),
+        MediaTypes.COMIC.value: _("Comics"),
+        MediaTypes.BOARDGAME.value: _("Boardgames"),
+    }
+    return plurals.get(media_type, MediaTypes(media_type).label)
 
 
 @register.filter

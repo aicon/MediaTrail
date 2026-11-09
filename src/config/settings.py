@@ -174,6 +174,16 @@ if YAMTRACK_AUTO_LOGIN_USERNAME:
     # This allows auto-login if the user is not already authenticated.
     MIDDLEWARE.insert(_index + 1, "app.middleware.AutoLoginMiddleware")
 
+_language_anchor = (
+    "app.middleware.AutoLoginMiddleware"
+    if "app.middleware.AutoLoginMiddleware" in MIDDLEWARE
+    else "django.contrib.auth.middleware.AuthenticationMiddleware"
+)
+MIDDLEWARE.insert(
+    MIDDLEWARE.index(_language_anchor) + 1,
+    "users.middleware.UserLanguageMiddleware",
+)
+
 ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
@@ -185,6 +195,7 @@ TEMPLATES = [
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
+                "django.template.context_processors.i18n",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "django.template.context_processors.media",
@@ -316,7 +327,14 @@ LOGGING = {
 # Internationalization
 # https://docs.djangoproject.com/en/stable/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "en"
+
+LANGUAGES = [
+    ("en", "English"),
+    ("hu", "Magyar"),
+]
+
+LOCALE_PATHS = [BASE_DIR / "locale"]
 
 TIME_ZONE = config("TZ", default="UTC")
 

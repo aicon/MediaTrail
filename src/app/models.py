@@ -21,6 +21,8 @@ from django.db.models import (
 )
 from django.db.models.functions import RowNumber
 from django.utils import timezone
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy as _lazy
 from model_utils import FieldTracker
 from model_utils.fields import MonitorField
 from simple_history.models import HistoricalRecords
@@ -52,16 +54,16 @@ class Sources(models.TextChoices):
 class MediaTypes(models.TextChoices):
     """Choices for the media type of the item."""
 
-    TV = "tv", "TV Show"
-    SEASON = "season", "TV Season"
-    EPISODE = "episode", "Episode"
-    MOVIE = "movie", "Movie"
-    ANIME = "anime", "Anime"
-    MANGA = "manga", "Manga"
-    GAME = "game", "Game"
-    BOOK = "book", "Book"
-    COMIC = "comic", "Comic"
-    BOARDGAME = "boardgame", "Boardgame"
+    TV = "tv", _lazy("TV Show")
+    SEASON = "season", _lazy("TV Season")
+    EPISODE = "episode", _lazy("Episode")
+    MOVIE = "movie", _lazy("Movie")
+    ANIME = "anime", _lazy("Anime")
+    MANGA = "manga", _lazy("Manga")
+    GAME = "game", _lazy("Game")
+    BOOK = "book", _lazy("Book")
+    COMIC = "comic", _lazy("Comic")
+    BOARDGAME = "boardgame", _lazy("Boardgame")
 
 
 class Item(CalendarTriggerMixin, models.Model):
@@ -870,11 +872,11 @@ class MediaManager(models.Manager):
 class Status(models.TextChoices):
     """Choices for item status."""
 
-    COMPLETED = "Completed", "Completed"
-    IN_PROGRESS = "In progress", "In Progress"
-    PLANNING = "Planning", "Planning"
-    PAUSED = "Paused", "Paused"
-    DROPPED = "Dropped", "Dropped"
+    COMPLETED = "Completed", _lazy("Completed")
+    IN_PROGRESS = "In progress", _lazy("In Progress")
+    PLANNING = "Planning", _lazy("Planning")
+    PAUSED = "Paused", _lazy("Paused")
+    DROPPED = "Dropped", _lazy("Dropped")
 
 
 class UserMessageLevel(models.TextChoices):
@@ -2167,12 +2169,18 @@ class LivePlayback(models.Model):
         delta = timezone.now() - self.created_at
         seconds = max(0, int(delta.total_seconds()))
         if seconds < 60:
-            return f"Started {seconds}s ago"
+            return _("Started %(seconds)ss ago") % {"seconds": seconds}
         minutes, rem_s = divmod(seconds, 60)
         if minutes < 60:
-            return f"Started {minutes}m {rem_s}s ago"
+            return _("Started %(minutes)sm %(seconds)ss ago") % {
+                "minutes": minutes,
+                "seconds": rem_s,
+            }
         hours, rem_m = divmod(minutes, 60)
-        return f"Started {hours}h {rem_m}m ago"
+        return _("Started %(hours)sh %(minutes)sm ago") % {
+            "hours": hours,
+            "minutes": rem_m,
+        }
 
     @property
     def is_stale(self):

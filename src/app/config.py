@@ -1,5 +1,6 @@
 from django.urls import reverse
 from django.utils.http import urlencode
+from django.utils.translation import pgettext
 
 from app.models import MediaTypes, Sources, Status
 
@@ -300,7 +301,8 @@ def get_unicode_icon(media_type):
 def get_verb(media_type, past_tense):
     """Get the verb (present or past tense)."""
     verbs = get_property(media_type, "verb")
-    return verbs[1] if past_tense else verbs[0]
+    word = verbs[1] if past_tense else verbs[0]
+    return pgettext("past" if past_tense else "present", word)
 
 
 def get_text_color(media_type):

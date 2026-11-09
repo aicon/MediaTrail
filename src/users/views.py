@@ -9,12 +9,15 @@ from django.db import IntegrityError
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.defaultfilters import pluralize
+from django.utils import translation
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django_celery_beat.models import PeriodicTask
 
 from app.models import Item, MediaTypes
 from app.providers import tmdb
 from users.forms import NotificationSettingsForm, PasswordChangeForm, UserUpdateForm
+from users.languages import LANGUAGE_CHOICES, LANGUAGE_CODES
 from users.models import (
     WATCH_PROVIDER_REGION_UNSET,
     DateFormatChoices,
@@ -233,6 +236,7 @@ def preferences(request):
                 "time_format_choices": TimeFormatChoices.choices,
                 "week_start_day_choices": WeekStartDayChoices.choices,
                 "watch_provider_choices": watch_provider_regions,
+                "language_choices": LANGUAGE_CHOICES,
             },
         )
 
@@ -242,6 +246,11 @@ def preferences(request):
         return redirect("preferences")
 
     # Process form submission
+    language = request.POST.get("language", "")
+    if language in LANGUAGE_CODES:
+        request.user.language = language
+        translation.activate(language)
+
     request.user.clickable_media_cards = "clickable_media_cards" in request.POST
     request.user.obfuscate_unseen_episodes = "obfuscate_unseen_episodes" in request.POST
     request.user.quick_watch_date = request.POST.get(
@@ -282,7 +291,7 @@ def preferences(request):
 
     # Save changes and redirect
     request.user.save()
-    messages.success(request, "Settings updated.")
+    messages.success(request, _("Settings updated."))
 
     return redirect("preferences")
 

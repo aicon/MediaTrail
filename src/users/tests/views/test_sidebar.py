@@ -35,6 +35,31 @@ class SidebarViewTests(TestCase):
         self.assertIn(MediaTypes.TV.value, response.context["media_types"])
         self.assertIn(MediaTypes.MOVIE.value, response.context["media_types"])
         self.assertNotIn(MediaTypes.EPISODE.value, response.context["media_types"])
+        self.assertContains(response, 'name="language"')
+        self.assertContains(response, "Magyar")
+
+    def test_language_preference_switches_the_interface(self):
+        """Hungarian preference translates the preferences page."""
+        response = self.client.post(
+            reverse("preferences"),
+            {
+                "language": "hu",
+                "media_types_checkboxes": [MediaTypes.TV.value],
+            },
+        )
+        self.assertRedirects(response, reverse("preferences"))
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.language, "hu")
+
+        page = self.client.get(reverse("preferences"))
+        self.assertContains(page, "Nyelv")
+        self.assertContains(page, "Beállítások")
+
+    def test_unknown_language_is_ignored(self):
+        """A language outside the supported set does not replace English."""
+        self.client.post(reverse("preferences"), {"language": "de"})
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.language, "en")
 
     def test_sidebar_post_update_preferences(self):
         """Test POST request to update preferences."""

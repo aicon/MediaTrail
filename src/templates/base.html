@@ -1,8 +1,9 @@
 {% load static %}
 {% load app_tags %}
+{% load i18n %}
 
 <!DOCTYPE html>
-<html lang="en" class="scheme-dark bg-[#212529]">
+<html lang="{{ LANGUAGE_CODE|default:'en' }}" class="scheme-dark bg-[#212529]">
   <head>
     {# Required meta tags #}
     <meta charset="UTF-8">
@@ -96,7 +97,7 @@
                       {% include "app/icons/house.svg" with classes="w-5 h-5" %}
 
                     {% endif %}
-                    <span>Home</span>
+                    <span>{% translate "Home" %}</span>
                   </a>
                 </li>
 
@@ -138,7 +139,7 @@
                         {% include "app/icons/circle-plus.svg" with classes="w-5 h-5" %}
 
                       {% endif %}
-                      <span>Create Custom</span>
+                      <span>{% translate "Create Custom" %}</span>
                     </a>
                   </li>
 
@@ -153,7 +154,7 @@
                         {% include "app/icons/bars-pyramid.svg" with classes="w-5 h-5" %}
 
                       {% endif %}
-                      <span>Statistics</span>
+                      <span>{% translate "Statistics" %}</span>
                     </a>
                   </li>
 
@@ -168,7 +169,7 @@
                         {% include "app/icons/folder-plus.svg" with classes="w-5 h-5" %}
 
                       {% endif %}
-                      <span>Lists</span>
+                      <span>{% translate "Lists" %}</span>
                     </a>
                   </li>
 
@@ -183,7 +184,7 @@
                         {% include "app/icons/calendar.svg" with classes="w-5 h-5" %}
 
                       {% endif %}
-                      <span>Calendar</span>
+                      <span>{% translate "Calendar" %}</span>
                     </a>
                   </li>
                 </ul>
@@ -200,9 +201,9 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path fill="currentColor" d="M4 19h12v2H2V5h2v14zm16.5-8.5c0-1.1-.9-2-2-2H18V6c0-1.1-.9-2-2-2H4v12h12v-2h2.5c1.1 0 2-.9 2-2v-2.5zM16 14H6V6h10v8zm2.5-2.5H18V10h.5v1.5z"/>
                 </svg>
-                <span>Buy me a coffee</span>
+                <span>{% translate "Buy me a coffee" %}</span>
               </a>
-              <p class="mt-sponsor-note">Supports the MediaTrail maintainer.</p>
+              <p class="mt-sponsor-note">{% translate "Supports the MediaTrail maintainer." %}</p>
               <div class="mt-sponsor-links">
                 {% url 'account' as account_url %}
                 {% url 'notifications' as notifications_url %}
@@ -219,7 +220,7 @@
                     {% include "app/icons/settings.svg" with classes="w-5 h-5" %}
 
                   {% endif %}
-                  <span>Settings</span>
+                  <span>{% translate "Settings" %}</span>
                 </a>
 
                 <form method="post" action="{% url 'account_logout' %}" class="w-full">
@@ -228,7 +229,7 @@
                           class="w-full flex items-center space-x-3 px-4 py-2 rounded-md text-gray-400 hover:bg-[#23272b] hover:text-white transition-colors duration-200 text-sm cursor-pointer">
                     {% include "app/icons/logout.svg" with classes="w-5 h-5" %}
 
-                    <span>Logout</span>
+                    <span>{% translate "Logout" %}</span>
                   </button>
                 </form>
               </div>
@@ -264,7 +265,7 @@
                   <div class="relative w-full max-w-2xl">
                     <form method="get"
                           action="{% url 'search' %}"
-                          x-data=" { isOpen: false, selectedType: { display: '{{ search_type|media_type_readable_plural }}', value: '{{ search_type }}' }, mediaTypes: {% get_search_media_types user as search_types %}{{ search_types }}, getPlaceholder() { return `Search ${this.selectedType.display.toLowerCase()}...` } }">
+                          x-data=" { isOpen: false, selectedType: { display: '{{ search_type|media_type_readable_plural }}', value: '{{ search_type }}' }, mediaTypes: {% get_search_media_types user as search_types %}{{ search_types }}, getPlaceholder() { return `{% translate "Search" as search_label %}{{ search_label|escapejs }} ${this.selectedType.display.toLowerCase()}...` } }">
                       <div class="flex">
                         <div class="relative grow">
                           {# Search input #}
@@ -329,16 +330,16 @@
     <footer class="border-t border-[#2c3136] bg-[#1a1d20] px-4 py-3 text-xs leading-5 text-gray-400">
       <p>
         <span class="text-gray-200">MediaTrail</span>
-        is an independent, unofficial fork of
+        {% translate "is an independent, unofficial fork of" %}
         <a class="text-indigo-400 hover:text-indigo-300"
            href="https://github.com/FuzzyGrim/Yamtrack"
            target="_blank"
            rel="noopener noreferrer">Yamtrack</a>.
-        It is not affiliated with, endorsed by, or maintained by the Yamtrack project.
+        {% translate "It is not affiliated with, endorsed by, or maintained by the Yamtrack project." %}
       </p>
       <p class="mt-1">
         <a class="font-medium text-indigo-400 hover:text-indigo-300"
-           href="{% url 'source_offer' %}">Source code of this version</a>
+           href="{% url 'source_offer' %}">{% translate "Source code of this version" %}</a>
         <span aria-hidden="true"> · </span>
         <a class="text-indigo-400 hover:text-indigo-300"
            href="https://github.com/aicon/MediaTrail/blob/main/LICENSE"

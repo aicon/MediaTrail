@@ -1,4 +1,5 @@
 {% load app_tags %}
+{% load i18n %}
 
 {# Always wrapped so HTMX can poll even when empty (strip can reappear). #}
 <div id="now-watching-strip"
@@ -29,7 +30,7 @@
                 hx-target="#now-watching-strip"
                 hx-swap="outerHTML"
                 title="Dismiss Now Watching"
-                aria-label="Dismiss Now Watching">
+                aria-label="{% translate "Dismiss Now Watching" %}">
           <svg class="nw-dismiss-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
             <path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/>
           </svg>
@@ -79,13 +80,13 @@
             {% if now_watching.percent_watched is not None %}
               <div>
                 <div class="nw-percent">{{ now_watching.percent_watched }}%</div>
-                <div class="nw-watched-label">Watched</div>
+                <div class="nw-watched-label">{% translate "Watched" %}</div>
               </div>
             {% endif %}
             {% if now_watching.remaining_short %}
               <div class="nw-remaining">
                 {{ now_watching.remaining_short }}
-                <span class="nw-left-label">Left</span>
+                <span class="nw-left-label">{% translate "Left" %}</span>
               </div>
             {% endif %}
           </div>

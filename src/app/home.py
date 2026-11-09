@@ -1,5 +1,6 @@
 from django.urls import reverse
 from django.utils.text import slugify
+from django.utils.translation import gettext as _
 
 from app.models import BasicMedia, LivePlaybackStatus, MediaTypes, Status
 from app.playback_operations import (
@@ -71,9 +72,9 @@ def get_now_watching_context(user):
         "started_ago": playback.started_ago_label,
         "is_watching": playback.status == LivePlaybackStatus.WATCHING,
         "status_label": (
-            "Now Watching"
+            _("Now Watching")
             if playback.status == LivePlaybackStatus.WATCHING
-            else "Paused"
+            else _("Paused")
         ),
         "is_episode": is_episode,
         "source": item.source,

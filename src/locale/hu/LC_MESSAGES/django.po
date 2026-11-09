@@ -1,0 +1,439 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: MediaTrail\n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Home"
+msgstr "Kezdőlap"
+
+msgid "Create Custom"
+msgstr "Egyéni létrehozása"
+
+msgid "Create Custom Entry"
+msgstr "Egyéni bejegyzés"
+
+msgid "Add a custom media entry to your collection if it's not available in the database."
+msgstr "Egyéni bejegyzés, ha a média nincs az adatbázisban."
+
+msgid "Statistics"
+msgstr "Statisztika"
+
+msgid "Track your media consumption habits"
+msgstr "A médiafogyasztási szokásaid követése"
+
+msgid "Lists"
+msgstr "Listák"
+
+msgid "Organize and share your media lists"
+msgstr "Média listák rendezése és megosztása"
+
+msgid "New List"
+msgstr "Új lista"
+
+msgid "Calendar"
+msgstr "Naptár"
+
+msgid "Track upcoming releases from your list."
+msgstr "A listádon szereplő közelgő megjelenések."
+
+msgid "Buy me a coffee"
+msgstr "Hívj meg egy kávéra"
+
+msgid "Supports the MediaTrail maintainer."
+msgstr "A MediaTrail karbantartóját támogatja."
+
+msgid "Settings"
+msgstr "Beállítások"
+
+msgid "Logout"
+msgstr "Kijelentkezés"
+
+msgid "Search"
+msgstr "Keresés"
+
+msgid "is an independent, unofficial fork of"
+msgstr "független, nem hivatalos változata a"
+
+msgid "It is not affiliated with, endorsed by, or maintained by the Yamtrack project."
+msgstr "Nem áll kapcsolatban a Yamtrack projekttel, azt nem támogatja, és nem is tartja karban."
+
+msgid "Source code of this version"
+msgstr "Ennek a verziónak a forráskódja"
+
+msgid "Configure your account and preferences"
+msgstr "Fiók és beállítások"
+
+msgid "Account"
+msgstr "Fiók"
+
+msgid "Preferences"
+msgstr "Beállítások"
+
+msgid "Notifications"
+msgstr "Értesítések"
+
+msgid "Integrations"
+msgstr "Integrációk"
+
+msgid "Import Data"
+msgstr "Adatimport"
+
+msgid "Export Data"
+msgstr "Adatexport"
+
+msgid "Advanced"
+msgstr "Haladó"
+
+msgid "About"
+msgstr "Névjegy"
+
+msgid "Customize the look and behavior of the application."
+msgstr "A felület megjelenése és működése."
+
+msgid "Language"
+msgstr "Nyelv"
+
+msgid "Choose the language of the interface. English is used when a translation is missing."
+msgstr "A felület nyelve. Ha egy szövegnek nincs fordítása, angolul jelenik meg."
+
+msgid "Hide Hover Overlay on Touch Devices"
+msgstr "Lebegő réteg elrejtése érintőképernyőn"
+
+msgid "Hide the media card hover overlay with action buttons on touch devices for a cleaner mobile experience. On desktop, the overlay will still appear when you hover your mouse over media cards."
+msgstr "Érintőképernyőn elrejti a kártya lebegő gombjait. Asztali gépen az egér fölé húzásakor a réteg megmarad."
+
+msgid "Obfuscate Unseen Episodes"
+msgstr "Nem látott epizódok elhomályosítása"
+
+msgid "When enabled, unseen episode images and descriptions will be blurred."
+msgstr "A még nem látott epizódok képe és leírása elhomályosodik."
+
+msgid "Bulk Completion Date"
+msgstr "Tömeges befejezés dátuma"
+
+msgid "When marking a TV show or season as completed, its episodes will be marked as completed with this date."
+msgstr "Ha egy sorozatot vagy évadot befejezettnek jelölsz, az epizódok ezt a dátumot kapják."
+
+msgid "Show progress bar on media items"
+msgstr "Haladássáv a médián"
+
+msgid "Display a progress bar on media items. Items which don't have max progress will be using a dotted line."
+msgstr "Haladássáv a médiakártyákon. Ha nincs ismert maximum, a sáv pontozott."
+
+msgid "Hide completed media in recommendations"
+msgstr "Befejezett média elrejtése az ajánlásokból"
+
+msgid "Hide media you've already completed from the recommendations section on detail pages."
+msgstr "A részletes oldal ajánlásaiból kiveszi a már befejezett médiát."
+
+msgid "Hide zero ratings"
+msgstr "Nulla értékelés elrejtése"
+
+msgid "Hide the rating badge from media cards when the rating is zero."
+msgstr "Nulla értékelésnél nem jelenik meg az értékelés jelvénye."
+
+msgid "Date Format"
+msgstr "Dátumformátum"
+
+msgid "Choose how dates are displayed throughout the application."
+msgstr "A dátumok megjelenése az alkalmazásban."
+
+msgid "Time Format"
+msgstr "Időformátum"
+
+msgid "Choose between 12-hour or 24-hour clock display."
+msgstr "12 vagy 24 órás megjelenítés."
+
+msgid "Week Start Day"
+msgstr "A hét első napja"
+
+msgid "Choose which day the week starts on for calendars and statistics."
+msgstr "A naptár és a statisztika hetének első napja."
+
+msgid "Watch provider region"
+msgstr "Szolgáltató régiója"
+
+msgid "Choose the region to show watch providers for. Setting this to disabled will hide the box from the media page."
+msgstr "Melyik régió streaming szolgáltatói jelenjenek meg. Kikapcsolva a doboz eltűnik a médiaoldalról."
+
+msgid "Media Types"
+msgstr "Médiatípusok"
+
+msgid "Media Type"
+msgstr "Médiatípus"
+
+msgid "Control which media types are visible throughout the app (sidebar, search, calendar, notifications)."
+msgstr "Mely médiatípusok látszanak az oldalsávban, a keresőben, a naptárban és az értesítéseknél."
+
+msgid "Save Preferences"
+msgstr "Beállítások mentése"
+
+msgid "Settings updated."
+msgstr "Beállítások mentve."
+
+msgid "Hide unreleased"
+msgstr "Meg nem jelentek elrejtése"
+
+msgid "Upcoming"
+msgstr "Közelgő"
+
+msgid "Recent"
+msgstr "Legutóbbi"
+
+msgid "Completion"
+msgstr "Befejezés"
+
+msgid "Episodes Left"
+msgstr "Hátralévő epizódok"
+
+msgid "Title"
+msgstr "Cím"
+
+msgid "Rating"
+msgstr "Értékelés"
+
+msgid "Progress"
+msgstr "Haladás"
+
+msgid "Start Date"
+msgstr "Kezdő dátum"
+
+msgid "End Date"
+msgstr "Záró dátum"
+
+msgid "All"
+msgstr "Mind"
+
+msgid "Completed"
+msgstr "Befejezett"
+
+msgid "In Progress"
+msgstr "Folyamatban"
+
+msgid "Planning"
+msgstr "Tervezett"
+
+msgid "Paused"
+msgstr "Szünetel"
+
+msgid "Dropped"
+msgstr "Eldobva"
+
+msgid "Grid"
+msgstr "Rács"
+
+msgid "Table"
+msgstr "Táblázat"
+
+msgid "List"
+msgstr "Lista"
+
+msgid "Last Item Added"
+msgstr "Utoljára hozzáadott"
+
+msgid "Name"
+msgstr "Név"
+
+msgid "Items Count"
+msgstr "Elemek száma"
+
+msgid "Newest First"
+msgstr "Legújabb elöl"
+
+msgid "Date Added"
+msgstr "Hozzáadás dátuma"
+
+msgid "Current Date"
+msgstr "Mai dátum"
+
+msgid "Release Date"
+msgstr "Megjelenés dátuma"
+
+msgid "No Date"
+msgstr "Nincs dátum"
+
+msgid "14:30 (24-hour)"
+msgstr "14:30 (24 órás)"
+
+msgid "2:30 PM (12-hour)"
+msgstr "2:30 PM (12 órás)"
+
+msgid "Monday"
+msgstr "Hétfő"
+
+msgid "Sunday"
+msgstr "Vasárnap"
+
+msgid "TV Show"
+msgstr "Sorozat"
+
+msgid "TV Shows"
+msgstr "Sorozatok"
+
+msgid "TV Season"
+msgstr "Évad"
+
+msgid "TV Seasons"
+msgstr "Évadok"
+
+msgid "Episode"
+msgstr "Epizód"
+
+msgid "Episodes"
+msgstr "Epizódok"
+
+msgid "Movie"
+msgstr "Film"
+
+msgid "Movies"
+msgstr "Filmek"
+
+msgid "Anime"
+msgstr "Anime"
+
+msgid "Manga"
+msgstr "Manga"
+
+msgid "Game"
+msgstr "Játék"
+
+msgid "Games"
+msgstr "Játékok"
+
+msgid "Book"
+msgstr "Könyv"
+
+msgid "Books"
+msgstr "Könyvek"
+
+msgid "Comic"
+msgstr "Képregény"
+
+msgid "Comics"
+msgstr "Képregények"
+
+msgid "Boardgame"
+msgstr "Társasjáték"
+
+msgid "Boardgames"
+msgstr "Társasjátékok"
+
+msgid "Now Watching"
+msgstr "Most nézi"
+
+msgid "Watched"
+msgstr "Megnézve"
+
+msgid "Left"
+msgstr "Hátra"
+
+msgid "Dismiss Now Watching"
+msgstr "Most nézi bezárása"
+
+msgid "Started %(seconds)ss ago"
+msgstr "Elindítva %(seconds)s mp-e"
+
+msgid "Started %(minutes)sm %(seconds)ss ago"
+msgstr "Elindítva %(minutes)s p %(seconds)s mp-e"
+
+msgid "Started %(hours)sh %(minutes)sm ago"
+msgstr "Elindítva %(hours)s ó %(minutes)s p-e"
+
+msgid "Nothing is actively moving right now"
+msgstr "Most nincs folyamatban semmi"
+
+msgid "Your planning shelf is still empty"
+msgstr "A tervezett lista még üres"
+
+msgid "Start a title and mark it as in progress to see quick updates and release reminders here."
+msgstr "Indíts el egy címet, és jelöld folyamatban lévőnek, hogy itt lásd a frissítéseket."
+
+msgid "Add a few titles to planning to see them here."
+msgstr "Tegyél címeket a tervezettek közé, és itt fognak megjelenni."
+
+msgid "Browse media"
+msgstr "Média böngészése"
+
+msgid "Load all (%(total)s)"
+msgstr "Összes betöltése (%(total)s)"
+
+msgid "%(counter)s item"
+msgid_plural "%(counter)s items"
+msgstr[0] "%(counter)s elem"
+msgstr[1] "%(counter)s elem"
+
+msgid "Add to tracker"
+msgstr "Hozzáadás a követőhöz"
+
+msgid "Add to custom lists"
+msgstr "Hozzáadás egyéni listához"
+
+msgid "View your activity history"
+msgstr "Aktivitás előzményei"
+
+msgid "About MediaTrail"
+msgstr "A MediaTrail névjegye"
+
+msgid "Description"
+msgstr "Leírás"
+
+msgid "MediaTrail is an independent, unofficial fork of Yamtrack, a self-hosted media tracker. It is not affiliated with, endorsed by, or maintained by the Yamtrack project or its developers."
+msgstr "A MediaTrail a Yamtrack független, nem hivatalos változata, saját üzemeltetésű médiakövető. Nem áll kapcsolatban a Yamtrack projekttel, azt nem támogatja, és nem is tartja karban."
+
+msgid "Links"
+msgstr "Linkek"
+
+msgid "Source code"
+msgstr "Forráskód"
+
+msgid "MediaTrail documentation"
+msgstr "MediaTrail dokumentáció"
+
+msgid "Bug Reports"
+msgstr "Hibajelentések"
+
+msgid "License"
+msgstr "Licenc"
+
+msgid "MediaTrail is licensed under the"
+msgstr "A MediaTrail a következő licenc alatt áll:"
+
+msgid "Attribution"
+msgstr "Forrásmegjelölés"
+
+msgid "Original Yamtrack project"
+msgstr "Eredeti Yamtrack projekt"
+
+msgid "Movie and TV streaming providers from"
+msgstr "Film- és sorozatszolgáltatók innen:"
+
+msgid "Version:"
+msgstr "Verzió:"
+
+msgctxt "present"
+msgid "watch"
+msgstr "néz"
+
+msgctxt "past"
+msgid "watched"
+msgstr "megnézett"
+
+msgctxt "present"
+msgid "read"
+msgstr "olvas"
+
+msgctxt "past"
+msgid "read"
+msgstr "olvasott"
+
+msgctxt "present"
+msgid "play"
+msgstr "játszik"
+
+msgctxt "past"
+msgid "played"
+msgstr "játszott"
