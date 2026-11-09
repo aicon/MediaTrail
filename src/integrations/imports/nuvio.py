@@ -248,8 +248,7 @@ class NuvioImporter:
         """Read history, then later changes, and store the cursor when it is safe."""
         try:
             self.client.assert_profile()
-            if not self.account.bootstrapped:
-                self._bootstrap()
+            self._replay_history()
             self._delta()
         except NuvioError as exc:
             if exc.status in {401, 403}:
@@ -268,7 +267,8 @@ class NuvioImporter:
         }
         return counts, "\n".join(self.warnings)
 
-    def _bootstrap(self):
+    def _replay_history(self):
+        """Check the full watch history and add anything missing locally."""
         cursor = self.client.history_cursor()
         logger.info("Nuvio import started")
         for index, row in enumerate(self.client.iter_history(), start=1):
@@ -285,7 +285,7 @@ class NuvioImporter:
         self.account.cursor = cursor
         self.account.bootstrapped = True
         self._save_account(["cursor", "bootstrapped"])
-        logger.info("Nuvio import history snapshot finished")
+        logger.info("Nuvio import history checked")
 
     def _delta(self):
         blocked = False
@@ -312,12 +312,14 @@ class NuvioImporter:
         try:
             record = record_from_nuvio(row, operation=operation, event_id=event_id)
         except RecordError as exc:
+            nuvio_id = _nuvio_id(row, event_id)
+            if nuvio_id and nuvio_id in self._imported:
+                return True
             logger.info("skip unsupported Nuvio record: %s", exc)
+            self._remember(nuvio_id)
             return True
 
         nuvio_id = record["nuvio_id"]
-        if nuvio_id and nuvio_id in self._imported:
-            return True
         if nuvio_id and nuvio_id in self._permanent:
             return True
         if record["source"] == "imdb" and record["operation"] == "upsert":
@@ -333,7 +335,6 @@ class NuvioImporter:
         if record["operation"] != "upsert":
             return True
 
-        logger.info("Nuvio import %s: %s", record["kind"], record["title"])
         try:
             action = self._write(record)
         except services.ProviderAPIError as exc:
@@ -353,6 +354,12 @@ class NuvioImporter:
             return True
         self._remember(nuvio_id)
         if action in {"create", "update"}:
+            logger.info(
+                "Nuvio import %s %s: %s",
+                action,
+                record["kind"],
+                record["title"],
+            )
             self.created[record["kind"]] += 1
         return True
 

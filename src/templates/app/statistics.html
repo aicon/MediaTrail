@@ -17,7 +17,7 @@
     <button @click="toggleDropdown()"
             class="flex items-center gap-2 px-4 py-2.5 bg-[#2a2f35] hover:bg-[#343a40] rounded-lg transition-all duration-200 border border-gray-700 shadow-sm cursor-pointer">
       {% include "app/icons/calendar.svg" with classes="w-5 h-5 text-indigo-400" %}
-      <span class="font-medium" x-text="selectedRange"></span>
+      <span class="font-medium" x-text="labelFor(selectedRange)"></span>
       <div class="w-4 h-4 ml-1 transition-transform duration-200"
            :class="{'rotate-180': isOpen}">{% include "app/icons/chevron-down.svg" %}</div>
     </button>
@@ -33,10 +33,10 @@
       <div class="flex border-b border-gray-700">
         <button @click="activeTab = 'predefined'"
                 :class="{'text-white border-b-2 border-indigo-500': activeTab === 'predefined', 'text-gray-400 hover:text-gray-200': activeTab !== 'predefined'}"
-                class="flex-1 py-3 text-sm font-medium transition-colors cursor-pointer">Predefined Ranges</button>
+                class="flex-1 py-3 text-sm font-medium transition-colors cursor-pointer">{% translate "Predefined Ranges" %}</button>
         <button @click="activeTab = 'custom'"
                 :class="{'text-white border-b-2 border-indigo-500': activeTab === 'custom', 'text-gray-400 hover:text-gray-200': activeTab !== 'custom'}"
-                class="flex-1 py-3 text-sm font-medium transition-colors cursor-pointer">Custom Range</button>
+                class="flex-1 py-3 text-sm font-medium transition-colors cursor-pointer">{% translate "Custom Range" %}</button>
       </div>
 
       <!-- Predefined Ranges Tab -->
@@ -47,7 +47,7 @@
             <button @click="selectPredefinedRange(range.name)"
                     :class="{'bg-indigo-600 text-white': selectedRange === range.name, 'hover:bg-[#39404b] text-gray-200': selectedRange !== range.name}"
                     class="flex items-center justify-between p-3 rounded-md text-left text-sm transition-all cursor-pointer">
-              <span x-text="range.name"></span>
+              <span x-text="labelFor(range.name)"></span>
               <div x-show="selectedRange === range.name">{% include "app/icons/checkmark.svg" with classes="w-4 h-4" %}</div>
             </button>
           </template>
@@ -59,14 +59,14 @@
         <div class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium mb-2 text-gray-300">Start Date</label>
+              <label class="block text-sm font-medium mb-2 text-gray-300">{% translate "Start Date" %}</label>
               <input x-model="startDate"
                      @change="updateDateRange()"
                      class="w-full p-2.5 bg-[#39404b] rounded-md text-white border border-gray-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm scheme-dark"
                      type="date">
             </div>
             <div>
-              <label class="block text-sm font-medium mb-2 text-gray-300">End Date</label>
+              <label class="block text-sm font-medium mb-2 text-gray-300">{% translate "End Date" %}</label>
               <input x-model="endDate"
                      @change="updateDateRange()"
                      class="w-full p-2.5 bg-[#39404b] rounded-md text-white border border-gray-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm scheme-dark"
@@ -77,12 +77,12 @@
           <div class="flex justify-end gap-2 pt-2">
             <button @click="isOpen = false"
                     class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm rounded-md transition-colors cursor-pointer">
-              Cancel
+              {% translate "Cancel" %}
             </button>
             <button @click="applyCustomRange()"
                     class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded-md transition-colors cursor-pointer flex items-center gap-2">
               {% include "app/icons/checkmark.svg" with classes="w-4 h-4" %}
-              Apply Range
+              {% translate "Apply Range" %}
             </button>
           </div>
         </div>
@@ -98,7 +98,7 @@
           {% include "app/icons/states/completed.svg" with classes="w-8 h-8 text-indigo-400" %}
         </div>
         <div>
-          <h3 class="text-sm font-medium text-gray-400">Completed Items</h3>
+          <h3 class="text-sm font-medium text-gray-400">{% translate "Completed Items" %}</h3>
           {% if media_count.total %}
             <p class="text-2xl font-bold">
               {{ status_distribution.total_completed }} <span class="text-gray-500 text-lg">/ {{ media_count.total }}</span>
@@ -113,7 +113,7 @@
           {% include "app/icons/ribbon.svg" with classes="w-8 h-8 text-yellow-400" %}
         </div>
         <div>
-          <h3 class="text-sm font-medium text-gray-400">Average Rating</h3>
+          <h3 class="text-sm font-medium text-gray-400">{% translate "Average Rating" %}</h3>
           {% if score_distribution.total_scored %}
             <p class="text-2xl font-bold">
               {{ score_distribution.average_score }} <span class="text-gray-500 text-lg">/ 10</span>
@@ -128,10 +128,10 @@
           {% include "app/icons/calendar.svg" with classes="w-8 h-8 text-emerald-400" %}
         </div>
         <div>
-          <h3 class="text-sm font-medium text-gray-400">Most Active Day</h3>
+          <h3 class="text-sm font-medium text-gray-400">{% translate "Most Active Day" %}</h3>
           {% if activity_data.stats.most_active_day %}
-            <p class="text-2xl font-bold">{{ activity_data.stats.most_active_day }}</p>
-            <p class="text-sm text-gray-500">{{ activity_data.stats.most_active_day_percentage }}% of activity</p>
+            <p class="text-2xl font-bold">{% translate activity_data.stats.most_active_day %}</p>
+            <p class="text-sm text-gray-500">{% blocktranslate with percent=activity_data.stats.most_active_day_percentage %}{{ percent }}% of activity{% endblocktranslate %}</p>
           {% else %}
             <p class="text-2xl font-bold text-gray-500">--</p>
           {% endif %}
@@ -142,12 +142,12 @@
           {% include "app/icons/flame.svg" with classes="w-8 h-8 text-red-400" %}
         </div>
         <div>
-          <h3 class="text-sm font-medium text-gray-400">Current Streak</h3>
+          <h3 class="text-sm font-medium text-gray-400">{% translate "Current Streak" %}</h3>
           {% if activity_data.stats.most_active_day %}
             <p class="text-2xl font-bold">
-              {{ activity_data.stats.current_streak }} day{{ activity_data.stats.current_streak|pluralize }}
+              {% blocktranslate count counter=activity_data.stats.current_streak %}{{ counter }} day{% plural %}{{ counter }} days{% endblocktranslate %}
               <p class="text-sm text-gray-500">
-                Longest: {{ activity_data.stats.longest_streak }} day{{ activity_data.stats.longest_streak|pluralize }}
+                {% blocktranslate count counter=activity_data.stats.longest_streak %}Longest: {{ counter }} day{% plural %}Longest: {{ counter }} days{% endblocktranslate %}
               </p>
             </p>
           {% else %}
@@ -159,7 +159,7 @@
 
     <!-- Activity History Section -->
     <div class="bg-[#2a2f35] rounded-lg p-6 max-w-[calc(100svw-4rem)]">
-      <h2 class="text-xl font-semibold mb-4 text-center">Activity History</h2>
+      <h2 class="text-xl font-semibold mb-4 text-center">{% translate "Activity History" %}</h2>
       <div class="overflow-x-auto flex flex-col justify-center"
            x-data="{ graphTooWide: false }"
            x-init="$nextTick(() => { const graphWidth = $refs.graphContainer.scrollWidth; const parentWidth = $el.clientWidth; graphTooWide = graphWidth > parentWidth; })"
@@ -170,7 +170,7 @@
           <div class="flex mb-2 pl-[36.68px]">
             {% for month, week_count in activity_data.months %}
               <div class="text-xs text-gray-400"
-                   style="width: calc({{ week_count }} * 1rem + ({{ week_count }} * 0.25rem))">{{ month }}</div>
+                   style="width: calc({{ week_count }} * 1rem + ({{ week_count }} * 0.25rem))">{% translate month %}</div>
             {% endfor %}
           </div>
 
@@ -182,7 +182,7 @@
                 {% if forloop.counter|divisibleby:2 %}
                   <div class="h-4"></div>
                 {% else %}
-                  <div class="h-4 flex items-center">{{ label }}</div>
+                  <div class="h-4 flex items-center">{% translate label %}</div>
                 {% endif %}
               {% endfor %}
             </div>
@@ -193,7 +193,7 @@
                 <div class="flex flex-col gap-1">
                   {% for day in week %}
                     <div class="w-4 h-4 rounded-sm transition-colors duration-200 hover:ring-2 hover:ring-white {% if day.level == 0 %}bg-[#2f353e]{% elif day.level == 1 %}bg-indigo-700{% elif day.level == 2 %}bg-indigo-600{% elif day.level == 3 %}bg-indigo-500{% elif day.level == 4 %}bg-indigo-400{% endif %}"
-                         title="{{ day.date }}: {{ day.count }} activit{{ day.count|pluralize:"y,ies" }}"></div>
+                         title="{% blocktranslate count counter=day.count with date=day.date %}{{ date }}: {{ counter }} activity{% plural %}{{ date }}: {{ counter }} activities{% endblocktranslate %}"></div>
                   {% endfor %}
                 </div>
               {% endfor %}
@@ -204,13 +204,13 @@
         <!-- Legend -->
         <div class="flex items-center gap-2 pl-6 text-xs text-gray-400"
              :class="graphTooWide ? 'mb-5 mt-2' : 'mt-4'">
-          <span>Less</span>
+          <span>{% translate "Less" %}</span>
           <div class="w-4 h-4 rounded-sm bg-[#2f353e]"></div>
           <div class="w-4 h-4 rounded-sm bg-indigo-700"></div>
           <div class="w-4 h-4 rounded-sm bg-indigo-600"></div>
           <div class="w-4 h-4 rounded-sm bg-indigo-500"></div>
           <div class="w-4 h-4 rounded-sm bg-indigo-400"></div>
-          <span>More</span>
+          <span>{% translate "More" %}</span>
         </div>
       </div>
     </div>
@@ -218,7 +218,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <!-- Media Type Distribution Section -->
       <div class="bg-[#2a2f35] rounded-lg p-6">
-        <h2 class="text-xl font-semibold mb-4">Media Type Distribution</h2>
+        <h2 class="text-xl font-semibold mb-4">{% translate "Media Type Distribution" %}</h2>
 
         {% if media_type_distribution.labels %}
           <div class="h-80 flex justify-center items-center">
@@ -229,15 +229,15 @@
             <div class="bg-[#39404b] rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
               {% include "app/icons/piechart.svg" with classes="w-8 h-8 text-gray-400" %}
             </div>
-            <h3 class="text-lg font-medium mb-2">No media types to display</h3>
-            <p class="text-gray-400 text-center max-w-md">Add different types of media to see their distribution.</p>
+            <h3 class="text-lg font-medium mb-2">{% translate "No media types to display" %}</h3>
+            <p class="text-gray-400 text-center max-w-md">{% translate "Add different types of media to see their distribution." %}</p>
           </div>
         {% endif %}
       </div>
 
       <!-- Status Distribution Section -->
       <div class="bg-[#2a2f35] rounded-lg p-6">
-        <h2 class="text-xl font-semibold mb-4">Status Distribution</h2>
+        <h2 class="text-xl font-semibold mb-4">{% translate "Status Distribution" %}</h2>
 
         {% if status_pie_chart_data.labels %}
           <div class="h-80 flex justify-center items-center">
@@ -248,15 +248,15 @@
             <div class="bg-[#39404b] rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
               {% include "app/icons/bars-increasing.svg" with classes="w-8 h-8 text-gray-400" %}
             </div>
-            <h3 class="text-lg font-medium mb-2">No status data to display</h3>
-            <p class="text-gray-400 text-center max-w-md">Track media items with different statuses to see their distribution.</p>
+            <h3 class="text-lg font-medium mb-2">{% translate "No status data to display" %}</h3>
+            <p class="text-gray-400 text-center max-w-md">{% translate "Track media items with different statuses to see their distribution." %}</p>
           </div>
         {% endif %}
       </div>
 
       <!-- Status Distribution by Media Type Section -->
       <div class="bg-[#2a2f35] rounded-lg p-6">
-        <h2 class="text-xl font-semibold mb-4">Status Distribution by Media Type</h2>
+        <h2 class="text-xl font-semibold mb-4">{% translate "Status Distribution by Media Type" %}</h2>
 
         {% if media_type_distribution.labels %}
           <div class="h-80 flex justify-center items-center">
@@ -267,9 +267,9 @@
             <div class="bg-[#39404b] rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
               {% include "app/icons/bars-pyramid.svg" with classes="w-8 h-8 text-gray-400" %}
             </div>
-            <h3 class="text-lg font-medium mb-2">No data available</h3>
+            <h3 class="text-lg font-medium mb-2">{% translate "No data available" %}</h3>
             <p class="text-gray-400 text-center max-w-md">
-              Add media items with different statuses to see their distribution by type.
+              {% translate "Add media items with different statuses to see their distribution by type." %}
             </p>
           </div>
         {% endif %}
@@ -277,7 +277,7 @@
 
       <!-- Score Distribution by Media Type Section -->
       <div class="bg-[#2a2f35] rounded-lg p-6">
-        <h2 class="text-xl font-semibold mb-4">Score Distribution by Media Type</h2>
+        <h2 class="text-xl font-semibold mb-4">{% translate "Score Distribution by Media Type" %}</h2>
 
         {% if score_distribution.total_scored %}
           <div class="h-80 flex justify-center items-center">
@@ -288,8 +288,8 @@
             <div class="bg-[#39404b] rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
               {% include "app/icons/ribbon.svg" with classes="w-8 h-8 text-gray-400" %}
             </div>
-            <h3 class="text-lg font-medium mb-2">No ratings yet</h3>
-            <p class="text-gray-400 text-center max-w-md">Rate your media items to see score distribution statistics.</p>
+            <h3 class="text-lg font-medium mb-2">{% translate "No ratings yet" %}</h3>
+            <p class="text-gray-400 text-center max-w-md">{% translate "Rate your media items to see score distribution statistics." %}</p>
           </div>
         {% endif %}
       </div>
@@ -297,7 +297,7 @@
 
     <!-- Top Rated Media Section -->
     <div class="bg-[#2a2f35] rounded-lg p-6">
-      <h2 class="text-xl font-semibold mb-4">Top Rated Media</h2>
+      <h2 class="text-xl font-semibold mb-4">{% translate "Top Rated Media" %}</h2>
 
       {% if top_rated %}
         <div class="media-grid">
@@ -310,15 +310,15 @@
           <div class="bg-[#39404b] rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
             {% include "app/icons/ribbon.svg" with classes="w-8 h-8 text-gray-400" %}
           </div>
-          <h3 class="text-lg font-medium mb-2">No ratings yet</h3>
-          <p class="text-gray-400 text-center max-w-md">Rate your media items to see score distribution statistics.</p>
+          <h3 class="text-lg font-medium mb-2">{% translate "No ratings yet" %}</h3>
+          <p class="text-gray-400 text-center max-w-md">{% translate "Rate your media items to see score distribution statistics." %}</p>
         </div>
       {% endif %}
     </div>
 
     <!-- Media Timeline Section -->
     <div class="bg-[#2a2f35] rounded-lg p-6 max-w-[calc(100svw-4rem)]">
-      <h2 class="text-xl font-semibold mb-6 md:mb-10">Media Timeline</h2>
+      <h2 class="text-xl font-semibold mb-6 md:mb-10">{% translate "Media Timeline" %}</h2>
 
       {% if timeline %}
         <div class="relative flex justify-center">
@@ -329,7 +329,7 @@
               <div class="relative">
 
                 <h3 class="text-lg font-medium text-center md:hidden md:text-left md:absolute md:top-0 md:left-1/2 md:transform md:translate-y-0 md:-translate-x-1/2 md:whitespace-nowrap">
-                  {{ month_year }}
+                  {% with month=month_year|slice:":-5" year=month_year|slice:"-4:" %}{% translate month %} {{ year }}{% endwith %}
                 </h3>
 
                 <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10 hidden md:block">
@@ -339,13 +339,13 @@
                       {# to the left #}
                       <div class="h-px w-40 bg-indigo-500/50 transform -translate-x-full"></div>
                       <div class="absolute -top-7 right-46 whitespace-nowrap">
-                        <h3 class="text-lg font-medium">{{ month_year }}</h3>
+                        <h3 class="text-lg font-medium">{% with month=month_year|slice:":-5" year=month_year|slice:"-4:" %}{% translate month %} {{ year }}{% endwith %}</h3>
                       </div>
                     {% else %}
                       {# to the right #}
                       <div class="h-px w-40 bg-indigo-500/50"></div>
                       <div class="absolute -top-7 left-4 whitespace-nowrap">
-                        <h3 class="text-lg font-medium">{{ month_year }}</h3>
+                        <h3 class="text-lg font-medium">{% with month=month_year|slice:":-5" year=month_year|slice:"-4:" %}{% translate month %} {{ year }}{% endwith %}</h3>
                       </div>
                     {% endif %}
                   </div>
@@ -394,8 +394,8 @@
           <div class="bg-[#39404b] rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
             {% include "app/icons/clock.svg" with classes="w-8 h-8 text-gray-400" %}
           </div>
-          <h3 class="text-lg font-medium mb-2">Your timeline is empty</h3>
-          <p class="text-gray-400 text-center max-w-md">Consume media items to see them appear on your timeline.</p>
+          <h3 class="text-lg font-medium mb-2">{% translate "Your timeline is empty" %}</h3>
+          <p class="text-gray-400 text-center max-w-md">{% translate "Consume media items to see them appear on your timeline." %}</p>
         </div>
       {% endif %}
     </div>
@@ -405,6 +405,32 @@
 
 {% block js %}
   {{ date_format_values|json_script:"date_format_values" }}
+  {% translate "Today" as range_today %}
+  {% translate "Yesterday" as range_yesterday %}
+  {% translate "This Week" as range_this_week %}
+  {% translate "Last 7 Days" as range_last_7 %}
+  {% translate "This Month" as range_this_month %}
+  {% translate "Last 30 Days" as range_last_30 %}
+  {% translate "Last 90 Days" as range_last_90 %}
+  {% translate "This Year" as range_this_year %}
+  {% translate "Last 6 Months" as range_last_6 %}
+  {% translate "Last 12 Months" as range_last_12 %}
+  {% translate "All Time" as range_all_time %}
+  <script>
+    window.dateRangeLabels = {
+      "Today": "{{ range_today|escapejs }}",
+      "Yesterday": "{{ range_yesterday|escapejs }}",
+      "This Week": "{{ range_this_week|escapejs }}",
+      "Last 7 Days": "{{ range_last_7|escapejs }}",
+      "This Month": "{{ range_this_month|escapejs }}",
+      "Last 30 Days": "{{ range_last_30|escapejs }}",
+      "Last 90 Days": "{{ range_last_90|escapejs }}",
+      "This Year": "{{ range_this_year|escapejs }}",
+      "Last 6 Months": "{{ range_last_6|escapejs }}",
+      "Last 12 Months": "{{ range_last_12|escapejs }}",
+      "All Time": "{{ range_all_time|escapejs }}",
+    };
+  </script>
   <script src="{% static 'js/date-range.js' %}{% get_static_file_mtime 'js/date-range.js' %}"
           data-date-format="{{ user.date_format }}"></script>
 

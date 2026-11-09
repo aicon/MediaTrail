@@ -13,6 +13,7 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest, JsonRespo
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from django.utils.dateparse import parse_date
 from django.utils.timezone import datetime
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
@@ -990,6 +991,9 @@ def statistics(request):
     )
     score_distribution, top_rated = stats.get_score_distribution(user_media)
     status_distribution = stats.get_status_distribution(user_media)
+    status_labels = dict(Status.choices)
+    for dataset in status_distribution["datasets"]:
+        dataset["label"] = str(status_labels.get(dataset["label"], dataset["label"]))
     status_pie_chart_data = stats.get_status_pie_chart_data(
         status_distribution,
     )

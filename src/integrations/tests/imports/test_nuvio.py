@@ -241,6 +241,23 @@ class NuvioImportTests(TestCase):
         )
         self.assertEqual(Episode.objects.count(), 1)
 
+    def test_removed_episode_is_imported_again(self):
+        history = [
+            _history(
+                "tmdb:1396",
+                "series",
+                "Breaking Bad",
+                season=1,
+                episode=1,
+                nuvio_id="e1",
+            ),
+        ]
+        self._run(FakeNuvio(history))
+        Episode.objects.all().delete()
+        counts, _warnings = self._run(FakeNuvio(history))
+        self.assertEqual(counts[MediaTypes.EPISODE.value], 1)
+        self.assertEqual(Episode.objects.count(), 1)
+
     def test_delete_does_not_remove_media(self):
         self._run(FakeNuvio([_history("tmdb:550", "movie", "Fight Club", nuvio_id="m1")]))
         self._run(

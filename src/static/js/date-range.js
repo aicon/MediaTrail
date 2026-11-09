@@ -38,6 +38,11 @@ function dateRangePicker() {
       }
     },
 
+    labelFor(name) {
+      const labels = window.dateRangeLabels || {};
+      return labels[name] || name;
+    },
+
     toggleDropdown() {
       this.isOpen = !this.isOpen;
     },

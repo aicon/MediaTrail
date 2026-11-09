@@ -11,6 +11,10 @@
 {% endblock title %}
 
 {% block content %}
+  {% translate "Last Item Added" as sort_last_item %}
+  {% translate "Name" as sort_name %}
+  {% translate "Newest First" as sort_newest %}
+  {% translate "Items Count" as sort_count %}
   <div x-data="{ showModal: false }">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
       <div>
@@ -34,7 +38,7 @@
       </form>
 
       <div class="relative flex-1">
-        <input placeholder="Search lists..."
+        <input placeholder="{% translate "Search lists..." %}"
                class="w-full py-2 pl-10 pr-4 bg-[#39404b] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#4a9eff] appearance-none"
                type="text"
                x-model="query"
@@ -57,7 +61,7 @@
                 type="button">
           {% include "app/icons/arrows-up-down.svg" with classes="w-4 h-4" %}
           <span class="text-sm"
-                x-text="sort === 'last_item_added' ? 'Last Item Added' : (sort === 'name' ? 'Name' : (sort === 'newest_first' ? 'Newest First' : 'Items Count'))"></span>
+                x-text="sort === 'last_item_added' ? '{{ sort_last_item|escapejs }}' : (sort === 'name' ? '{{ sort_name|escapejs }}' : (sort === 'newest_first' ? '{{ sort_newest|escapejs }}' : '{{ sort_count|escapejs }}'))"></span>
           {% include "app/icons/chevron-down.svg" with classes="w-4 h-4" %}
         </button>
 
@@ -96,11 +100,11 @@
           <div class="bg-[#39404b] rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
             {% include "app/icons/list-add.svg" with classes="w-8 h-8 text-gray-400" %}
           </div>
-          <h3 class="text-xl font-semibold mb-2">No Lists Created Yet</h3>
-          <p class="text-gray-400 mb-6">Create custom lists to organize your media collection and share with friends.</p>
+          <h3 class="text-xl font-semibold mb-2">{% translate "No Lists Created Yet" %}</h3>
+          <p class="text-gray-400 mb-6">{% translate "Create custom lists to organize your media collection and share with friends." %}</p>
           <button @click="showModal = true"
                   class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors cursor-pointer">
-            Create Your First List
+            {% translate "Create Your First List" %}
           </button>
         </div>
       </div>

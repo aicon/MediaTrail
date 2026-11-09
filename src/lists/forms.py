@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext as _
 from django_select2 import forms as s2forms
 
 from lists.models import CustomList
@@ -22,8 +23,17 @@ class CustomListForm(forms.ModelForm):
             "collaborators": CollaboratorsWidget(
                 attrs={
                     "data-minimum-input-length": 1,
-                    "data-placeholder": "Search users to add...",
                     "data-allow-clear": "false",
                 },
             ),
         }
+
+    def __init__(self, *args, **kwargs):
+        """Use the active language for labels and the collaborator search."""
+        super().__init__(*args, **kwargs)
+        self.fields["name"].label = _("Name")
+        self.fields["description"].label = _("Description")
+        self.fields["collaborators"].label = _("Collaborators")
+        self.fields["collaborators"].widget.attrs["data-placeholder"] = _(
+            "Search users to add...",
+        )

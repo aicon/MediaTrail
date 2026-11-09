@@ -1005,3 +1005,379 @@ msgstr "Ez az import már be van ütemezve."
 
 msgid "%(source)s import task scheduled."
 msgstr "A(z) %(source)s import ütemezve."
+
+msgid "Search %(media_type)s in your list..."
+msgstr "%(media_type)s keresése a listádban..."
+
+msgid "Search %(media_type)s in %(username)s's list..."
+msgstr "%(media_type)s keresése %(username)s listájában..."
+
+msgid "Enter title"
+msgstr "Add meg a címet"
+
+msgid "Parent TV Show"
+msgstr "Szülő sorozat"
+
+msgid "Search for a TV show..."
+msgstr "Sorozat keresése..."
+
+msgid "Season Number"
+msgstr "Évad száma"
+
+msgid "Parent Season"
+msgstr "Szülő évad"
+
+msgid "Search for a season..."
+msgstr "Évad keresése..."
+
+msgid "Episode Number"
+msgstr "Epizód száma"
+
+msgid "Image URL"
+msgstr "Kép URL"
+
+msgid "Enter image URL"
+msgstr "Add meg a kép URL-jét"
+
+msgid "Score"
+msgstr "Pontszám"
+
+msgid "Status"
+msgstr "Állapot"
+
+msgid "Notes"
+msgstr "Jegyzet"
+
+msgid "Add any notes or comments..."
+msgstr "Jegyzet vagy megjegyzés..."
+
+msgid "Create Entry"
+msgstr "Bejegyzés létrehozása"
+
+msgid "Progress (Episodes)"
+msgstr "Haladás (epizód)"
+
+msgid "Progress (Chapters)"
+msgstr "Haladás (fejezet)"
+
+msgid "Progress (Play Time)"
+msgstr "Haladás (játékidő)"
+
+msgid "Progress (Pages)"
+msgstr "Haladás (oldal)"
+
+msgid "Please select a parent TV show from the dropdown"
+msgstr "Válassz szülő sorozatot a listából"
+
+msgid "Please select a parent Season from the dropdown"
+msgstr "Válassz szülő évadot a listából"
+
+msgid "Predefined Ranges"
+msgstr "Előre megadott időszakok"
+
+msgid "Custom Range"
+msgstr "Egyéni időszak"
+
+msgid "Cancel"
+msgstr "Mégse"
+
+msgid "Apply Range"
+msgstr "Időszak alkalmazása"
+
+msgid "Completed Items"
+msgstr "Befejezett elemek"
+
+msgid "Average Rating"
+msgstr "Átlagos értékelés"
+
+msgid "Most Active Day"
+msgstr "Legaktívabb nap"
+
+msgid "%(percent)s% of activity"
+msgstr "a tevékenység %(percent)s%-a"
+
+msgid "Current Streak"
+msgstr "Jelenlegi sorozat"
+
+msgid "%(counter)s day"
+msgid_plural "%(counter)s days"
+msgstr[0] "%(counter)s nap"
+msgstr[1] "%(counter)s nap"
+
+msgid "Longest: %(counter)s day"
+msgid_plural "Longest: %(counter)s days"
+msgstr[0] "Leghosszabb: %(counter)s nap"
+msgstr[1] "Leghosszabb: %(counter)s nap"
+
+msgid "Activity History"
+msgstr "Tevékenység"
+
+msgid "%(date)s: %(counter)s activity"
+msgid_plural "%(date)s: %(counter)s activities"
+msgstr[0] "%(date)s: %(counter)s tevékenység"
+msgstr[1] "%(date)s: %(counter)s tevékenység"
+
+msgid "Less"
+msgstr "Kevesebb"
+
+msgid "More"
+msgstr "Több"
+
+msgid "Media Type Distribution"
+msgstr "Médiatípusok megoszlása"
+
+msgid "No media types to display"
+msgstr "Nincs megjeleníthető médiatípus"
+
+msgid "Add different types of media to see their distribution."
+msgstr "Vegyél fel többféle médiát, hogy lásd a megoszlásukat."
+
+msgid "Status Distribution"
+msgstr "Állapotok megoszlása"
+
+msgid "No status data to display"
+msgstr "Nincs megjeleníthető állapot"
+
+msgid "Track media items with different statuses to see their distribution."
+msgstr "Különböző állapotú elemek kellenek a megoszláshoz."
+
+msgid "Status Distribution by Media Type"
+msgstr "Állapotok médiatípus szerint"
+
+msgid "No data available"
+msgstr "Nincs adat"
+
+msgid "Add media items with different statuses to see their distribution by type."
+msgstr "Különböző állapotú elemek kellenek a típusonkénti megoszláshoz."
+
+msgid "Score Distribution by Media Type"
+msgstr "Pontszámok médiatípus szerint"
+
+msgid "No ratings yet"
+msgstr "Még nincs értékelés"
+
+msgid "Rate your media items to see score distribution statistics."
+msgstr "Értékeld a médiáidat, hogy lásd a pontszámok megoszlását."
+
+msgid "Top Rated Media"
+msgstr "Legjobbra értékelt média"
+
+msgid "Media Timeline"
+msgstr "Média idővonala"
+
+msgid "Your timeline is empty"
+msgstr "Az idővonal üres"
+
+msgid "Consume media items to see them appear on your timeline."
+msgstr "Nézz, olvass vagy játssz médiát, és megjelenik az idővonalon."
+
+msgid "Today"
+msgstr "Ma"
+
+msgid "Yesterday"
+msgstr "Tegnap"
+
+msgid "This Week"
+msgstr "Ez a hét"
+
+msgid "Last 7 Days"
+msgstr "Elmúlt 7 nap"
+
+msgid "This Month"
+msgstr "Ez a hónap"
+
+msgid "Last 30 Days"
+msgstr "Elmúlt 30 nap"
+
+msgid "Last 90 Days"
+msgstr "Elmúlt 90 nap"
+
+msgid "This Year"
+msgstr "Ez az év"
+
+msgid "Last 6 Months"
+msgstr "Elmúlt 6 hónap"
+
+msgid "Last 12 Months"
+msgstr "Elmúlt 12 hónap"
+
+msgid "All Time"
+msgstr "Teljes időszak"
+
+msgid "Search lists..."
+msgstr "Listák keresése..."
+
+msgid "No Lists Created Yet"
+msgstr "Még nincs lista"
+
+msgid "Create custom lists to organize your media collection and share with friends."
+msgstr "Készíts listákat a gyűjteményed rendszerezéséhez és megosztásához."
+
+msgid "Create Your First List"
+msgstr "Első lista létrehozása"
+
+msgid "Edit List"
+msgstr "Lista szerkesztése"
+
+msgid "Create New List"
+msgstr "Új lista"
+
+msgid "Save"
+msgstr "Mentés"
+
+msgid "Delete"
+msgstr "Törlés"
+
+msgid "Create List"
+msgstr "Lista létrehozása"
+
+msgid "%(counter)s item"
+msgid_plural "%(counter)s items"
+msgstr[0] "%(counter)s elem"
+msgstr[1] "%(counter)s elem"
+
+msgid "Edit list"
+msgstr "Lista szerkesztése"
+
+msgid "All Types"
+msgstr "Minden típus"
+
+msgid "Search in collection..."
+msgstr "Keresés a gyűjteményben..."
+
+msgid "No items in this list yet"
+msgstr "Ebben a listában még nincs elem"
+
+msgid "Start adding your favorite media to build your collection"
+msgstr "Adj hozzá médiát a gyűjteményedhez"
+
+msgid "Browse Media"
+msgstr "Média böngészése"
+
+msgid "%(counter)s collaborator"
+msgid_plural "%(counter)s collaborators"
+msgstr[0] "%(counter)s közreműködő"
+msgstr[1] "%(counter)s közreműködő"
+
+msgid "Collaborators"
+msgstr "Közreműködők"
+
+msgid "Search users to add..."
+msgstr "Felhasználó keresése..."
+
+msgid "Fetch New Releases"
+msgstr "Új megjelenések lekérése"
+
+msgid "Export link"
+msgstr "Export link"
+
+msgid "This link can be used to integrate your calendar into any of your calendar applications."
+msgstr "Ezzel a linkkel a naptár bármelyik naptárprogramba beköthető."
+
+msgid "%(content)s at %(time)s"
+msgstr "%(content)s, %(time)s"
+
+msgid "January"
+msgstr "január"
+
+msgid "February"
+msgstr "február"
+
+msgid "March"
+msgstr "március"
+
+msgid "April"
+msgstr "április"
+
+msgid "May"
+msgstr "május"
+
+msgid "June"
+msgstr "június"
+
+msgid "July"
+msgstr "július"
+
+msgid "August"
+msgstr "augusztus"
+
+msgid "September"
+msgstr "szeptember"
+
+msgid "October"
+msgstr "október"
+
+msgid "November"
+msgstr "november"
+
+msgid "December"
+msgstr "december"
+
+msgid "Jan"
+msgstr "jan"
+
+msgid "Feb"
+msgstr "feb"
+
+msgid "Mar"
+msgstr "már"
+
+msgid "Apr"
+msgstr "ápr"
+
+msgid "Jun"
+msgstr "jún"
+
+msgid "Jul"
+msgstr "júl"
+
+msgid "Aug"
+msgstr "aug"
+
+msgid "Sep"
+msgstr "szep"
+
+msgid "Oct"
+msgstr "okt"
+
+msgid "Nov"
+msgstr "nov"
+
+msgid "Dec"
+msgstr "dec"
+
+msgid "Mon"
+msgstr "Hét"
+
+msgid "Tue"
+msgstr "Ked"
+
+msgid "Wed"
+msgstr "Sze"
+
+msgid "Thu"
+msgstr "Csü"
+
+msgid "Fri"
+msgstr "Pén"
+
+msgid "Sat"
+msgstr "Szo"
+
+msgid "Sun"
+msgstr "Vas"
+
+msgid "Tuesday"
+msgstr "Kedd"
+
+msgid "Wednesday"
+msgstr "Szerda"
+
+msgid "Thursday"
+msgstr "Csütörtök"
+
+msgid "Friday"
+msgstr "Péntek"
+
+msgid "Saturday"
+msgstr "Szombat"
