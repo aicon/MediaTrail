@@ -1,6 +1,6 @@
 # MediaTrail
 
-[🇬🇧 English description (README in English)](README.md)
+[🇺🇸 English description (README in English)](README.md)
 
 Saját üzemeltetésű személyes médiakatalógus és napló mindarról, amit megnézel, elolvasol vagy végigjátszol.
 
