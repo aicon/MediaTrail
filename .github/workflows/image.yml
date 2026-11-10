@@ -52,10 +52,3 @@ jobs:
           build-args: |
             VERSION=${{ steps.version.outputs.version }}
           tags: ${{ steps.version.outputs.tags }}
-
-      - name: Make the package public
-        if: steps.version.outputs.skip != 'true'
-        continue-on-error: true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh api --method PATCH /user/packages/container/mediatrail -f visibility=public
