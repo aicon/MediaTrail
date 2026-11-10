@@ -60,12 +60,34 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - TMDB_LANG=hu # Metaadatok nyelve (pl. hu vagy en)
-      - ADMIN_ENABLED=true # Megjeleníti az admin linket a profil menüben
-      - MEDIATRAIL_SOURCE_URL=https://github.com/aicon/MediaTrail # Nyilvános hálózat esetén AGPL-3.0 kötelezettség
+      SECRET: longstring
+      TMDB_LANG: hu
+      TMDB_API:
+      TVDB_API:
+      URLS:
+      ADMIN_ENABLED: true
+      REGISTRATION: true
     volumes:
       - ./db:/mediatrail/db
 ```
+
+### A környezeti értékek cseréje
+
+Nyisd meg a Compose fájlt, és cseréld le a példa titkot:
+
+```text
+SECRET=longstring
+```
+
+A `SECRET` legyen hosszú, véletlen érték. Ha a MediaTrail fordított proxy mögött fut, a `URLS` a nyilvános cím:
+
+```text
+URLS=https://mediatrail.example.com
+```
+
+A cím tartalmazza a protokollt (`https` vagy `http`), és ne legyen a végén perjel vagy alkalmazásútvonal. Több cím vesszővel választható el.
+
+A támogatott beállítások teljes listája: [Environment Variables](https://fuzzygrim.github.io/Yamtrack/release/env-variables/).
 
 Indítsd el a konténert:
 

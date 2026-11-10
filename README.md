@@ -60,12 +60,34 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - TMDB_LANG=en
-      - ADMIN_ENABLED=true
-      - MEDIATRAIL_SOURCE_URL=https://github.com/aicon/MediaTrail
+      SECRET: longstring
+      TMDB_LANG: en
+      TMDB_API:
+      TVDB_API:
+      URLS:
+      ADMIN_ENABLED: true
+      REGISTRATION: true
     volumes:
       - ./db:/mediatrail/db
 ```
+
+### Update the environment values
+
+Open the Compose file and replace the example secret:
+
+```text
+SECRET=longstring
+```
+
+Use a long random value for `SECRET`. If you are running MediaTrail behind a reverse proxy, also set `URLS` to the public origin:
+
+```text
+URLS=https://mediatrail.example.com
+```
+
+The URL must include the protocol (`https` or `http`) and should not include a trailing slash or application path. Multiple origins can be separated with commas.
+
+For the full list of supported settings, see [Environment Variables](https://fuzzygrim.github.io/Yamtrack/release/env-variables/).
 
 Start the container:
 
