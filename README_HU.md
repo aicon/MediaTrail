@@ -45,6 +45,10 @@ A MediaTrail a kezdőlapon azonnal megjeleníti az éppen lejátszott tartalmat:
 
 ![Now Watching Compact](docs/screenshots/now-watching-narrow.png)
 
+A sáv a kezdőlap tetején van, a könyvtár fölött:
+
+![A Most nézem sáv a kezdőlapon](docs/screenshots/now-watching-desktop2.png)
+
 > **Megjegyzés:** A „Most nézem” sávhoz [kapcsolódó alkalmazás](#kapcsolódó-alkalmazások) kell. Akkor jelenik meg, amikor az alkalmazás jelzi, mit játszol.
 
 ---

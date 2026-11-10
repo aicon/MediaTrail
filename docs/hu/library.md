@@ -4,6 +4,10 @@
 
 A kezdőlap és az oldalsáv a könyvtár. A filmeknek, a sorozatoknak, az évadoknak és a többi típusnak külön listája van. A lista keresője annak a személynek a bejegyzéseiben keres.
 
+Lejátszás vagy szünet közben a kezdőlap tetején egy Most nézem sáv lehet. Rajta a cím, az epizód, a már megnézett rész és a hátralévő idő.
+
+![A Most nézem sáv a kezdőlapon](../screenshots/now-watching-desktop2.png)
+
 Egy cím megnyitása a katalógus adatait és a követő űrlapot mutatja. Az állapot, a pontszám, a haladás, a kezdő és záró dátum, valamint a jegyzet ehhez a bejegyzéshez tartozik. Egy befejezett cím újrakezdése új kört ír a történetbe. A sorozat szülő: az évadok és az epizódok külön sorok, ezért egy epizód bejelölése nem írja felül az egész műsort.
 
 ## Nyelv

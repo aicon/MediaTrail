@@ -45,6 +45,10 @@ MediaTrail features a live "Now Watching" banner on your home dashboard that upd
 
 ![Now Watching Compact](docs/screenshots/now-watching-narrow.png)
 
+The banner sits at the top of the home page, above the library:
+
+![Now Watching on the home page](docs/screenshots/now-watching-desktop2.png)
+
 > **Note:** Now Watching needs a [Companion App](#companion-apps). The banner appears when that app reports what is playing.
 
 ---
