@@ -1,5 +1,7 @@
 # MediaTrail
 
+[🇭🇺 Magyar nyelvű leírás (README in Hungarian)](README_HU.md)
+
 A self-hosted personal media tracker and digital logbook for everything you watch, read, and play.
 
 [![Release](https://img.shields.io/badge/version-0.25.7-blue.svg)](https://github.com/aicon/MediaTrail/releases)
