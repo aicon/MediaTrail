@@ -20,14 +20,18 @@ A projekt a [Yamtrack](https://github.com/FuzzyGrim/Yamtrack) független forkjak
 
 ## Főbb funkciók
 
-- **Minden média egy helyen:** Filmek, sorozatok, anime, manga, könyvek, képregények, videojátékok és társasjátékok kezelése.
-- **Most nézem (Now Watching):** Valós idejű lejátszási sáv a kezdőlapon, amely mutatja az aktuális pozíciót, az eltelt és a hátralévő időt.
-- **Részletes epizód-előzmény:** Egy epizódhoz több megtekintési dátum és egyedi jegyzet is rögzíthető. A filmek és a sorozatok külön kezelhetők.
+- **Napló mindenhez:** Filmek, sorozatok, anime, manga, videojátékok, könyvek, képregények és társasjátékok. Pontszám, állapot, haladás, ismétlések, kezdő- és záródátum, jegyzet.
+- **Évadok, és minden megtekintés:** Minden évad külön követhető. Egy epizódhoz több megtekintés is rögzíthető, saját dátummal és jegyzettel. A filmek és a sorozatok külön maradnak.
+- **A változtatások előzménye:** Megmarad, mikor vetted fel a tételt, mikor kezdted el, és mikor nézted vagy olvastad újra.
+- **Ami nincs a katalógusban:** Kézi tétel, ha egyik támogatott forrás sem ismeri.
+- **Közös listák:** Személyes lista bármilyen célra, más fiókok meghívásával.
+- **Közelgő megjelenések:** Naptár a soron következőkről, iCalendar (`.ics`) hivatkozással más naptárprogramokhoz. Értesítés Apprise-on (Discord, Telegram, ntfy, Slack, e-mail és mások).
+- **Külön fiókok:** Mindenkinek saját könyvtára van. A belépés lehet a MediaTrail sajátja, vagy OIDC és közösségi szolgáltató (Google, GitHub, Discord és mások) a django-allauthon keresztül.
+- **Magyar és angol felület:** A nyelv fiókonként választható. A TMDB címei a `TMDB_LANG` beállítást követik.
+- **Import, benne a Nuvio:** A Nuvio csak az új tételeket veheti fel, vagy a már követetteket frissítheti, titkosított hitelesítő adatokkal és ütemezéssel. A Trakt, a SIMKL, a MyAnimeList, az AniList és a Kitsu szintén ütemezhető. A teljes könyvtár CSV-be menthető és vissza is tölthető; IMDb-, Goodreads-, Steam- és HowLongToBeat-lista is behozható.
+- **Lejátszás, benne a Nuvio:** A kezdőlapon a „Most nézem” sáv mutatja a pozíciót, az eltelt és a hátralévő időt, amikor egy [Nuvio-s társalkalmazás](#kapcsolódó-alkalmazások) jelzi, mit játszol. A Jellyfin, a Plex és az Emby a frissen megnézett médiát magától is be tudja jelölni.
 - **REST API (Preview):** Modern API a `/api/v1/`, OpenAPI séma a `/api/schema/`, valamint interaktív Swagger dokumentáció a `/api/docs/` címen. Írott leírás: [API_HU.md](API_HU.md) ([English](API.md)).
-- **Nuvio-integráció:** Automatikus import Nuvio profilból. Támogatja a csak új elemek felvételét vagy a meglévők frissítését, titkosított hitelesítő adatokkal és ütemezett futtatással.
-- **Magyar felület:** Választható magyar vagy angol nyelv fiókonként a Beállításokban. A TMDB metaadatok nyelve külön szabályozható a `TMDB_LANG` változóval.
-- **Kompakt üzemeltetés:** Beépített belső Redis motor a konténeren belül – nincs szükség külön segédkonténerre, minden adat egyetlen mappában (`db`) marad.
-- **Univerzális import:** Beépített importforrások a Trakt, SIMKL, MyAnimeList (MAL) és egyéb felületekről.
+- **Egy konténer:** Docker Compose, SQLite vagy PostgreSQL. A Redis a képen belül fut, az adat egy csatolt mappában marad.
 
 ---
 

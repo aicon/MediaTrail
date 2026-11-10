@@ -20,14 +20,18 @@ MediaTrail originates as an independent fork of [Yamtrack](https://github.com/Fu
 
 ## Features
 
-- **All-in-One Tracker:** Movies, TV shows, anime, manga, books, comic books, video games, and board games.
-- **Now Watching:** Real-time playback status widget on the dashboard displaying your current progress, elapsed time, and time remaining.
-- **Detailed Episode History:** Multiple watch records per episode with individual dates and custom notes. Independent tracking for movies and TV series.
+- **A record for every title:** Movies, TV shows, anime, manga, video games, books, comics, and board games. Save a score, status, and progress, count repeats, set start and end dates, and write a note.
+- **Seasons, and every time you watched:** Follow each season on its own. An episode can keep several watch records, each with its own date and note. Movies and series stay separate.
+- **A history of the changes:** The log keeps the steps themselves: when you added a title, when you started it, and when you watched or read it again.
+- **Titles the catalogs do not have:** Add a custom entry when none of the supported sources lists it.
+- **Lists with other people:** Build a personal list for any purpose and add other accounts as collaborators.
+- **Upcoming releases:** A calendar of what is coming up, plus an iCalendar (`.ics`) link for other calendar apps. Release notices can go out through Apprise (Discord, Telegram, ntfy, Slack, email, and others).
+- **Separate accounts:** Each person has their own library. Sign-in can stay on MediaTrail, or use OIDC and social providers such as Google, GitHub, and Discord through django-allauth.
+- **English and Hungarian:** The interface language is chosen per account. TMDB titles follow `TMDB_LANG`.
+- **Imports, including Nuvio:** Nuvio can add only new items or refresh items you already track, with encrypted credentials and a schedule. Trakt, SIMKL, MyAnimeList, AniList, and Kitsu can run on a schedule too. Export the library to CSV and import that file back, or bring in IMDb, Goodreads, Steam, and HowLongToBeat lists.
+- **Playback, including Nuvio:** The home page shows a live Now Watching banner with position, elapsed time, and time remaining when a [Nuvio companion app](#companion-apps) reports what is playing. Jellyfin, Plex, and Emby can mark newly watched media on their own.
 - **REST API (Preview):** Full REST API at `/api/v1/`, OpenAPI schema at `/api/schema/`, and interactive Swagger documentation at `/api/docs/`. Written reference: [API.md](API.md) ([magyar](API_HU.md)).
-- **Nuvio Integration:** Two-way sync / import directly from your Nuvio profile. Supports both *Import Missing* and *Update Existing* modes with encrypted credentials and scheduled background sync.
-- **Multi-Language UI:** Seamless switching between English and Hungarian per account. Metadata from TMDB stays in your preferred language via `TMDB_LANG`.
-- **All-in-One Deployment:** Embedded Redis engine inside the image—no extra container needed. All data lives neatly in a single mounted volume.
-- **Universal Import:** Built-in imports from Trakt, SIMKL, MyAnimeList (MAL), and others.
+- **One container:** Docker Compose, with SQLite or PostgreSQL. Redis runs inside the image, and all data stays in a single mounted folder.
 
 ---
 
