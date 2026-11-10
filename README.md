@@ -67,8 +67,8 @@ services:
       TMDB_API:
       TVDB_API:
       URLS:
-      ADMIN_ENABLED: true
-      REGISTRATION: true
+      ADMIN_ENABLED: false
+      REGISTRATION: false
     volumes:
       - ./db:/mediatrail/db
 ```
