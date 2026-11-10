@@ -87,7 +87,7 @@ URLS=https://mediatrail.example.com
 
 A cím tartalmazza a protokollt (`https` vagy `http`), és ne legyen a végén perjel vagy alkalmazásútvonal. Több cím vesszővel választható el.
 
-A támogatott beállítások teljes listája: [Environment Variables](https://fuzzygrim.github.io/Yamtrack/release/env-variables/).
+A támogatott beállítások teljes listája: [Környezet](https://aicon.github.io/mediatrail-docs/hu/runtime/).
 
 Indítsd el a konténert:
 

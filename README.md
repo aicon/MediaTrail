@@ -87,7 +87,7 @@ URLS=https://mediatrail.example.com
 
 The URL must include the protocol (`https` or `http`) and should not include a trailing slash or application path. Multiple origins can be separated with commas.
 
-For the full list of supported settings, see [Environment Variables](https://fuzzygrim.github.io/Yamtrack/release/env-variables/).
+For the full list of supported settings, see [Runtime](https://aicon.github.io/mediatrail-docs/runtime/).
 
 Start the container:
 
