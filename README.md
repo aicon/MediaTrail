@@ -142,7 +142,6 @@ MediaTrail connects with dedicated companion applications to automatically scrob
 Comprehensive user guides, installation steps, and configuration examples are hosted in the official documentation repository:
 
 - **Manual:** [https://aicon.github.io/mediatrail-docs/](https://aicon.github.io/mediatrail-docs/)
-- **Repository:** [https://github.com/aicon/mediatrail-docs](https://github.com/aicon/mediatrail-docs)
 - **API reference:** [API.md](API.md) · [API_HU.md](API_HU.md)
 
 Documentation chapters: *Installation, Library, Imports (including Nuvio), Environment Configuration, Accounts, and Maintenance.*

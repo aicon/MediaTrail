@@ -142,7 +142,6 @@ A MediaTrailhez külön segédprogramok érhetők el a lejátszási események a
 A részletes felhasználói kézikönyv külön felületen érhető el:
 
 - **Kézikönyv:** [https://aicon.github.io/mediatrail-docs/hu/](https://aicon.github.io/mediatrail-docs/hu/)
-- **Tároló:** [https://github.com/aicon/mediatrail-docs](https://github.com/aicon/mediatrail-docs)
 - **API-leírás:** [API_HU.md](API_HU.md) · [API.md](API.md)
 
 A kézikönyv fejezetei: *Telepítés, Könyvtár, Import (benne a Nuvio), Környezet, Fiókok, Karbantartás.*
