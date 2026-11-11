@@ -374,7 +374,7 @@ AUTH_USER_MODEL = "users.User"
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
 
 # MediaTrail continues from 0.25.3 in small steps: 0.25.4, 0.25.5, 0.25.6, 0.25.7, ...
-VERSION = config("VERSION", default="0.25.7")
+VERSION = config("VERSION", default="0.25.8")
 
 
 def _public_http_url(name):
@@ -528,6 +528,15 @@ TRAKT_API_SECRET = config(
     "TRAKT_API_SECRET",
     default=secret(
         "TRAKT_API_SECRET_FILE",
+        "",
+    ),
+)
+
+# Client ID of a new Trakt app. Those apps do not issue a client secret.
+TRAKT_API_PKCE = config(
+    "TRAKT_API_PKCE",
+    default=secret(
+        "TRAKT_API_PKCE_FILE",
         "",
     ),
 )

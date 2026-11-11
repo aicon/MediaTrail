@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 from collections import defaultdict
 
 import requests
@@ -19,6 +20,138 @@ logger = logging.getLogger(__name__)
 
 TRAKT_API_BASE_URL = "https://api.trakt.tv"
 BULK_PAGE_SIZE = 1000
+DEVICE_CLIENT_ID = re.compile(r"^[A-Za-z0-9_-]{20,128}$")
+DEVICE_TERMINAL_ERRORS = {
+    "expired_token",
+    "access_denied",
+    "invalid_grant",
+    "invalid_client",
+}
+DEVICE_TERMINAL_STATUS = {404, 410, 418}
+
+
+def device_client_id():
+    """Return the configured client ID for a new Trakt app."""
+    client_id = str(getattr(settings, "TRAKT_API_PKCE", "") or "").strip()
+    if DEVICE_CLIENT_ID.fullmatch(client_id):
+        return client_id
+    return ""
+
+
+def _trakt_headers(client_id):
+    """Headers Trakt expects on OAuth calls."""
+    return {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "trakt-api-version": "2",
+        "trakt-api-key": client_id,
+        "User-Agent": "MediaTrail",
+    }
+
+
+def _post_trakt(path, payload, client_id):
+    """Post to Trakt without treating a pending device check as a failure."""
+    return services.session.post(
+        f"{TRAKT_API_BASE_URL}{path}",
+        json=payload,
+        headers=_trakt_headers(client_id),
+        timeout=settings.REQUEST_TIMEOUT,
+    )
+
+
+def _trakt_error_code(response):
+    """Return Trakt's error field, or an empty string when the body is empty."""
+    try:
+        payload = response.json()
+    except ValueError:
+        return ""
+    if isinstance(payload, dict):
+        return str(payload.get("error") or "")
+    return ""
+
+
+def start_device_login():
+    """Ask Trakt for a device code. The caller keeps device_code on the server."""
+    client_id = device_client_id()
+    if not client_id:
+        msg = "The new Trakt API is not configured on this server."
+        raise MediaImportError(msg)
+
+    response = _post_trakt("/oauth/device/code", {"client_id": client_id}, client_id)
+    if response.status_code != requests.codes.ok:
+        msg = "Trakt did not start the device sign-in."
+        raise MediaImportError(msg) from None
+
+    payload = response.json()
+    if not payload.get("device_code") or not payload.get("user_code"):
+        msg = "Trakt did not return a device code."
+        raise MediaImportError(msg)
+
+    verification_url = payload.get("verification_url") or "https://trakt.tv/activate"
+    if not str(verification_url).startswith("https://"):
+        verification_url = "https://trakt.tv/activate"
+    interval = payload.get("interval") or 5
+    try:
+        interval = max(5, int(interval))
+    except (TypeError, ValueError):
+        interval = 5
+    try:
+        expires_in = max(1, int(payload.get("expires_in") or 600))
+    except (TypeError, ValueError):
+        expires_in = 600
+
+    return {
+        "device_code": payload["device_code"],
+        "user_code": payload["user_code"],
+        "verification_url": verification_url,
+        "interval": interval,
+        "expires_in": expires_in,
+    }
+
+
+def poll_device_login(device_code):
+    """Check whether the user has entered the device code.
+
+    HTTP 400 and 429 mean the code is still waiting, including an empty 400 body.
+    """
+    client_id = device_client_id()
+    if not client_id:
+        return {
+            "status": "error",
+            "message": "The new Trakt API is not configured on this server.",
+        }
+
+    response = _post_trakt(
+        "/oauth/device/token",
+        {"code": device_code, "client_id": client_id},
+        client_id,
+    )
+    error_code = _trakt_error_code(response)
+    if response.status_code == requests.codes.ok:
+        payload = response.json()
+        if payload.get("access_token") and payload.get("refresh_token"):
+            return {"status": "approved", "token": payload}
+        return {
+            "status": "error",
+            "message": "Trakt did not return a token.",
+        }
+
+    pending = response.status_code in {
+        requests.codes.bad_request,
+        requests.codes.too_many_requests,
+    }
+    terminal = (
+        response.status_code in DEVICE_TERMINAL_STATUS
+        or error_code in DEVICE_TERMINAL_ERRORS
+    )
+    if pending and not terminal:
+        return {"status": "pending"}
+
+    detail = error_code or f"HTTP {response.status_code}"
+    return {
+        "status": "error",
+        "message": f"Trakt device check failed: {detail}.",
+    }
 
 
 def handle_oauth_callback(request, redirect_uri=None):
@@ -58,14 +191,14 @@ def handle_oauth_callback(request, redirect_uri=None):
     }
 
 
-def get_username_from_oauth(access_token):
+def get_username_from_oauth(access_token, client_id=None):
     """View for getting the Trakt OAuth2 username."""
     url = "https://api.trakt.tv/users/me"
 
     headers = {
         "Content-Type": "application/json",
         "trakt-api-version": "2",
-        "trakt-api-key": settings.TRAKT_API,
+        "trakt-api-key": client_id or settings.TRAKT_API,
         "Authorization": f"Bearer {access_token}",
     }
 
@@ -85,24 +218,36 @@ def get_username_from_oauth(access_token):
     return request["username"]
 
 
-def get_access_token(encrypted_refresh_token, redirect_uri=None):
+def get_access_token(encrypted_refresh_token, redirect_uri=None, auth="legacy"):
     """Get access token from encrypted refresh token."""
     url = "https://api.trakt.tv/oauth/token"
 
     decrypted_token = helpers.decrypt(encrypted_refresh_token)
-    redirect_uri = redirect_uri or app_helpers.build_absolute_app_url(
-        None,
-        reverse("import_trakt_private"),
-    )
-
-    params = {
-        "client_id": settings.TRAKT_API,
-        "client_secret": settings.TRAKT_API_SECRET,
-        "refresh_token": decrypted_token,
-        "grant_type": "refresh_token",
-    }
-    if redirect_uri:
-        params["redirect_uri"] = redirect_uri
+    headers = None
+    if auth == "device":
+        client_id = device_client_id()
+        if not client_id:
+            msg = "The new Trakt API is not configured on this server."
+            raise MediaImportError(msg)
+        params = {
+            "refresh_token": decrypted_token,
+            "client_id": client_id,
+            "grant_type": "refresh_token",
+        }
+        headers = _trakt_headers(client_id)
+    else:
+        redirect_uri = redirect_uri or app_helpers.build_absolute_app_url(
+            None,
+            reverse("import_trakt_private"),
+        )
+        params = {
+            "client_id": settings.TRAKT_API,
+            "client_secret": settings.TRAKT_API_SECRET,
+            "refresh_token": decrypted_token,
+            "grant_type": "refresh_token",
+        }
+        if redirect_uri:
+            params["redirect_uri"] = redirect_uri
 
     try:
         request = app.providers.services.api_request(
@@ -110,6 +255,7 @@ def get_access_token(encrypted_refresh_token, redirect_uri=None):
             "POST",
             url,
             params=params,
+            headers=headers,
         )
     except services.ProviderAPIError as error:
         if error.status_code == requests.codes.unauthorized:
@@ -136,7 +282,7 @@ def update_refresh_token(old_token, new_token):
         periodic_task.save()
 
 
-def importer(token, user, mode, username, redirect_uri=None):
+def importer(token, user, mode, username, redirect_uri=None, auth="legacy"):
     """Import the user's data from Trakt.
 
     Can import using either OAuth (token provided) or public username.
@@ -148,6 +294,7 @@ def importer(token, user, mode, username, redirect_uri=None):
         user: Django user object to import data for
         mode (str): Import mode ("new" or "overwrite")
         username (str): Trakt username to import from
+        auth (str): "legacy" keeps the client-secret login. "device" uses the new API.
     """
     trakt_importer = TraktImporter(
         username,
@@ -155,6 +302,7 @@ def importer(token, user, mode, username, redirect_uri=None):
         mode,
         refresh_token=token,
         redirect_uri=redirect_uri,
+        auth=auth,
     )
     return trakt_importer.import_data()
 
@@ -162,7 +310,15 @@ def importer(token, user, mode, username, redirect_uri=None):
 class TraktImporter:
     """Class to handle importing user data from Trakt."""
 
-    def __init__(self, username, user, mode, refresh_token=None, redirect_uri=None):
+    def __init__(
+        self,
+        username,
+        user,
+        mode,
+        refresh_token=None,
+        redirect_uri=None,
+        auth="legacy",
+    ):
         """Initialize the importer with user details and mode.
 
         Args:
@@ -177,6 +333,7 @@ class TraktImporter:
         self.mode = mode
         self.refresh_token = refresh_token
         self.redirect_uri = redirect_uri
+        self.auth = auth
         self.user_base_url = f"{TRAKT_API_BASE_URL}/users/{username}"
         self.warnings = []
 
@@ -218,10 +375,13 @@ class TraktImporter:
 
     def _make_api_request(self, url):
         """Make a request to the Trakt API with proper headers."""
+        client_id = (
+            device_client_id() if self.auth == "device" else settings.TRAKT_API
+        )
         headers = {
             "Content-Type": "application/json",
             "trakt-api-version": "2",
-            "trakt-api-key": settings.TRAKT_API,
+            "trakt-api-key": client_id or settings.TRAKT_API,
         }
         if self.refresh_token:
             try:
@@ -231,6 +391,7 @@ class TraktImporter:
                 self.access_token = get_access_token(
                     self.refresh_token,
                     redirect_uri=self.redirect_uri,
+                    auth=self.auth,
                 )
                 headers["Authorization"] = f"Bearer {self.access_token}"
         return services.api_request(

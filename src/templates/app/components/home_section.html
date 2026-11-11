@@ -3,7 +3,7 @@
 
 <section class="space-y-5">
   <div class="space-y-4">
-    <div class="flex items-center justify-between gap-4">
+    <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
         <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#39404b] {% if section.key == Status.IN_PROGRESS.value %}{{ Status.IN_PROGRESS.value|status_color }}{% else %}{{ Status.PLANNING.value|status_color }}{% endif %}">
           {% if section.key == Status.IN_PROGRESS.value %}
@@ -16,14 +16,52 @@
           <h2 class="text-2xl font-semibold text-white">{{ section.key|media_status_readable|title }}</h2>
         </div>
       </div>
-      <span class="inline-flex items-center gap-2 rounded-full border border-gray-700 bg-[#39404b] px-3 py-1 text-sm text-gray-300">
+      <div class="flex flex-wrap items-center justify-end gap-3">
+        {% if show_home_controls %}
+          <a href="{% url 'home' %}?sort={{ current_sort }}{% if hide_unreleased %}&hide_unreleased=false{% else %}&hide_unreleased=true{% endif %}"
+             class="inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors {% if hide_unreleased %}border-indigo-500 bg-indigo-600 text-white hover:bg-indigo-700{% else %}border-gray-700 bg-[#39404b] text-gray-300 hover:bg-[#454d5a] hover:text-white{% endif %}">
+            {% include "app/icons/eye-closed.svg" with classes="w-4 h-4" %}
+            <span>{% translate "Hide unreleased" %}</span>
+          </a>
+          <div class="relative" x-data="{ open: false }">
+            <button @click="open = !open"
+                    @click.outside="open = false"
+                    class="flex items-center gap-2 rounded-md border border-gray-700 bg-[#39404b] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#454d5a] cursor-pointer">
+              {% include "app/icons/arrows-up-down.svg" with classes="w-4 h-4" %}
+              <span>
+                {% for value, label in sort_choices %}
+                  {% if current_sort == value %}{{ label }}{% endif %}
+                {% endfor %}
+              </span>
+              {% include "app/icons/chevron-down.svg" with classes="w-4 h-4 text-gray-400" %}
+            </button>
+            <div x-show="open"
+                 x-cloak
+                 x-transition:enter="transition ease-out duration-100"
+                 x-transition:enter-start="transform opacity-0 scale-95"
+                 x-transition:enter-end="transform opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-75"
+                 x-transition:leave-start="transform opacity-100 scale-100"
+                 x-transition:leave-end="transform opacity-0 scale-95"
+                 class="absolute right-0 z-10 mt-2 w-52 overflow-hidden rounded-md border border-gray-700 bg-[#39404b] py-1 shadow-lg">
+              {% for value, label in sort_choices %}
+                <a href="{% url 'home' %}?sort={{ value }}{% if hide_unreleased %}&hide_unreleased=true{% endif %}"
+                   class="block w-full px-4 py-2 text-left text-sm transition-colors {% if current_sort == value %}bg-indigo-600 text-white font-medium{% else %}text-gray-300 hover:bg-[#454d5a] hover:text-white{% endif %}">
+                  {{ label }}
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+        <span class="inline-flex items-center gap-2 rounded-full border border-gray-700 bg-[#39404b] px-3 py-1 text-sm text-gray-300">
         {% if section.key == Status.IN_PROGRESS.value %}
           {% include "app/icons/pulse.svg" with classes="h-4 w-4 text-indigo-400" %}
         {% else %}
           {% include "app/icons/leaf.svg" with classes="h-4 w-4 text-sky-400" %}
         {% endif %}
         {% blocktranslate count counter=section.count %}{{ counter }} item{% plural %}{{ counter }} items{% endblocktranslate %}
-      </span>
+        </span>
+      </div>
     </div>
     <div class="relative h-px overflow-hidden rounded-full bg-gray-700/80">
       <div class="absolute inset-y-0 left-0 w-full bg-linear-to-r {% if section.key == Status.IN_PROGRESS.value %}from-indigo-400 via-indigo-400/45 to-indigo-400/8{% else %}from-sky-400 via-sky-400/45 to-sky-400/8{% endif %}">

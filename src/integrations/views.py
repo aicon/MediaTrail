@@ -3,14 +3,15 @@
 import json
 import logging
 import secrets
+import time
 from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponse, StreamingHttpResponse
-from django.shortcuts import redirect
+from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -113,34 +114,130 @@ def import_trakt_private(request):
         reverse("import_trakt_private"),
     )
     oauth_callback = trakt.handle_oauth_callback(request, redirect_uri=redirect_uri)
-    enc_token = helpers.encrypt(oauth_callback["refresh_token"])
+    _queue_trakt_import(
+        request,
+        username=oauth_callback["username"],
+        refresh_token=oauth_callback["refresh_token"],
+        state=state,
+        auth="legacy",
+    )
+    request.session.pop(state_token, None)
+    return redirect("import_data")
 
+
+def _queue_trakt_import(request, username, refresh_token, state, auth):
+    """Queue or schedule a private Trakt import."""
+    enc_token = helpers.encrypt(refresh_token)
     frequency = state["frequency"]
     mode = state["mode"]
     import_time = state["time"]
+    task_kwargs = {}
+    redirect_uri = state.get("redirect_uri")
+    if redirect_uri:
+        task_kwargs["redirect_uri"] = redirect_uri
+    if auth != "legacy":
+        task_kwargs["auth"] = auth
 
     if frequency == "once":
         tasks.import_trakt.delay(
             token=enc_token,
             user_id=request.user.id,
             mode=mode,
-            username=oauth_callback["username"],
+            username=username,
             redirect_uri=redirect_uri,
+            auth=auth,
         )
         messages.info(request, "The task to import media from Trakt has been queued.")
     else:
         helpers.create_import_schedule(
-            oauth_callback["username"],
+            username,
             request,
             mode,
             frequency,
             import_time,
             "Trakt",
             token=enc_token,
-            task_kwargs={"redirect_uri": redirect_uri},
+            task_kwargs=task_kwargs or None,
         )
-    request.session.pop(state_token, None)
-    return redirect("import_data")
+
+
+@require_POST
+def trakt_device_start(request):
+    """Start a Trakt device-code sign-in and show the code."""
+    if not trakt.device_client_id():
+        messages.error(request, "The new Trakt API is not configured on this server.")
+        return redirect("import_data")
+
+    try:
+        started = trakt.start_device_login()
+    except helpers.MediaImportError as error:
+        messages.error(request, str(error))
+        return redirect("import_data")
+
+    request.session["trakt_device"] = {
+        "device_code": started["device_code"],
+        "interval": started["interval"],
+        "expires_at": time.time() + started["expires_in"],
+        "mode": request.POST.get("mode", "new"),
+        "frequency": request.POST.get("frequency", "once"),
+        "time": request.POST.get("time", ""),
+    }
+    return render(
+        request,
+        "integrations/trakt_device.html",
+        {
+            "user_code": started["user_code"],
+            "verification_url": started["verification_url"],
+            "interval": started["interval"],
+        },
+    )
+
+
+@require_POST
+def trakt_device_poll(request):
+    """Poll Trakt until the device code is approved."""
+    entry = request.session.get("trakt_device")
+    if not entry or time.time() > float(entry.get("expires_at") or 0):
+        request.session.pop("trakt_device", None)
+        return JsonResponse(
+            {"status": "error", "error": "The Trakt code expired. Start again."},
+            status=400,
+        )
+
+    result = trakt.poll_device_login(entry["device_code"])
+    if result["status"] == "pending":
+        return JsonResponse(
+            {"status": "pending", "interval": entry.get("interval") or 5},
+        )
+    if result["status"] != "approved":
+        request.session.pop("trakt_device", None)
+        return JsonResponse(
+            {
+                "status": "error",
+                "error": result.get("message") or "Trakt rejected the device sign-in.",
+            },
+            status=400,
+        )
+
+    token = result["token"]
+    try:
+        username = trakt.get_username_from_oauth(
+            token["access_token"],
+            client_id=trakt.device_client_id(),
+        )
+    except helpers.MediaImportError as error:
+        request.session.pop("trakt_device", None)
+        return JsonResponse({"status": "error", "error": str(error)}, status=400)
+
+    _queue_trakt_import(
+        request,
+        username=username,
+        refresh_token=token["refresh_token"],
+        state=entry,
+        auth="device",
+    )
+    request.session.pop("trakt_device", None)
+    return JsonResponse({"status": "ok", "redirect": reverse("import_data")})
 
 
 @require_POST

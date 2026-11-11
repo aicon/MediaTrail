@@ -5,6 +5,12 @@ from integrations import views
 urlpatterns = [
     path("import/nuvio", views.import_nuvio, name="import_nuvio"),
     path("import/trakt-oauth", views.trakt_oauth, name="trakt_oauth"),
+    path("import/trakt/device", views.trakt_device_start, name="trakt_device_start"),
+    path(
+        "import/trakt/device/poll",
+        views.trakt_device_poll,
+        name="trakt_device_poll",
+    ),
     path(
         "import/trakt/private",
         views.import_trakt_private,

@@ -93,10 +93,18 @@ def import_nuvio(user_id, mode, username=None):
 
 
 @shared_task(name="Import from Trakt")
-def import_trakt(user_id, mode, token=None, username=None, redirect_uri=None):
+def import_trakt(
+    user_id,
+    mode,
+    token=None,
+    username=None,
+    redirect_uri=None,
+    auth="legacy",
+):
     """Celery task for importing media data from Trakt.
 
     Can import using either OAuth (token provided) or public username.
+    auth "device" refreshes the token with the new Trakt API.
     """
     return import_media(
         trakt.importer,
@@ -105,6 +113,7 @@ def import_trakt(user_id, mode, token=None, username=None, redirect_uri=None):
         mode,
         username,
         redirect_uri=redirect_uri,
+        auth=auth,
     )
 
 

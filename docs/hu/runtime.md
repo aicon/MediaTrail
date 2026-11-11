@@ -43,7 +43,8 @@ A film, a sorozat, az anime, a játék, a könyv, a képregény és a társasjá
 | `HARDCOVER_API` | Könyvek. Az értéknek a `Bearer` szóval és egy szóközzel kell kezdődnie. |
 | `COMICVINE_API` | Képregények. |
 | `BGG_API_TOKEN` | Társasjátékok. |
-| `TRAKT_API` és `TRAKT_API_SECRET` | Saját Trakt-alkalmazás, zárt importhoz vagy saját kerethez. |
+| `TRAKT_API` és `TRAKT_API_SECRET` | Saját Trakt-alkalmazás a jelenlegi zárt importhoz, vagy saját kerethez. |
+| `TRAKT_API_PKCE` | Új Trakt-alkalmazás Client ID-ja. Ezek az alkalmazások nem adnak titkot. Az importoldal ezt kínálja eszközkódos belépésként. Az ingyenes Trakt-fiók csak két alkalmazást enged bekötni. |
 | `ANILIST_ID` és `ANILIST_SECRET` | Saját AniList-alkalmazás, zárt importhoz. |
 | `SIMKL_ID` és `SIMKL_SECRET` | Saját Simkl-alkalmazás. |
 

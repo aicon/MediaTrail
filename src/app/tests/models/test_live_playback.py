@@ -4,6 +4,7 @@ from unittest.mock import patch
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from django.utils import timezone
+from django.utils import translation
 
 from app.models import Item, LivePlayback, LivePlaybackStatus, MediaTypes, Sources
 from app.playback_operations import (
@@ -49,6 +50,11 @@ class LivePlaybackModelTests(TestCase):
         self.assertEqual(playback.percent_watched, 25)
         self.assertEqual(playback.remaining_label, "1H 30M LEFT")
         self.assertEqual(playback.remaining_short, "1H 30M")
+        playback.position_ms = 0
+        playback.duration_ms = 85 * 60_000
+        with translation.override("hu"):
+            self.assertEqual(playback.remaining_short, "1ó25p")
+        self.assertEqual(playback.remaining_short, "1H 25M")
         self.assertIsNone(playback.season_episode_label)
 
     def test_missing_duration_hides_percent(self):

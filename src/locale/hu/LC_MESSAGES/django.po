@@ -832,6 +832,39 @@ msgstr "Importálás"
 msgid "Connect with Trakt & Import"
 msgstr "Csatlakozás a Trakthoz és importálás"
 
+msgid "Trakt login"
+msgstr "Trakt belépés"
+
+msgid "Current login"
+msgstr "Jelenlegi belépés"
+
+msgid "New API (device code)"
+msgstr "Új API (eszközkód)"
+
+msgid "Trakt shows a code to enter at trakt.tv/activate. A free account can connect only two applications."
+msgstr "A Trakt egy kódot ad, azt a trakt.tv/activate oldalon kell beírni. Az ingyenes fiók csak két alkalmazást enged bekötni."
+
+msgid "Connect with the new Trakt API"
+msgstr "Csatlakozás az új Trakt API-val"
+
+msgid "Waiting for approval on Trakt."
+msgstr "Várakozás a Trakt jóváhagyására."
+
+msgid "Trakt rejected the device sign-in."
+msgstr "A Trakt elutasította az eszközkódos belépést."
+
+msgid "Copied."
+msgstr "Másolva."
+
+msgid "Open <a href=\"%(verification_url)s\" target=\"_blank\" rel=\"noopener\" class=\"text-indigo-400 hover:text-indigo-300 underline\">trakt.tv/activate</a> and enter this code."
+msgstr "Nyisd meg a <a href=\"%(verification_url)s\" target=\"_blank\" rel=\"noopener\" class=\"text-indigo-400 hover:text-indigo-300 underline\">trakt.tv/activate</a> oldalt, és írd be ezt a kódot."
+
+msgid "A free Trakt account can connect only two applications. The code stays here until it expires."
+msgstr "Az ingyenes Trakt-fiók csak két alkalmazást enged bekötni. A kód a lejártáig itt marad."
+
+msgid "Back to import"
+msgstr "Vissza az importhoz"
+
 msgid "Import TV shows, movies and anime"
 msgstr "Sorozatok, filmek és animék importálása"
 

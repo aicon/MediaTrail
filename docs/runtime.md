@@ -43,7 +43,8 @@ Movie, series, anime, game, book, comic, and board-game lookups work with the cl
 | `HARDCOVER_API` | Books. The value has to start with `Bearer` followed by a space. |
 | `COMICVINE_API` | Comics. |
 | `BGG_API_TOKEN` | Board games. |
-| `TRAKT_API` and `TRAKT_API_SECRET` | Your own Trakt application, for a private import or your own rate limit. |
+| `TRAKT_API` and `TRAKT_API_SECRET` | Your own Trakt application, for the current private import or your own rate limit. |
+| `TRAKT_API_PKCE` | Client ID of a new Trakt app. Those apps do not issue a secret. The import page offers this as the device-code login. A free Trakt account can connect only two applications. |
 | `ANILIST_ID` and `ANILIST_SECRET` | Your own AniList application, for a private import. |
 | `SIMKL_ID` and `SIMKL_SECRET` | Your own Simkl application. |
 

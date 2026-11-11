@@ -4,7 +4,7 @@
 
 Saját üzemeltetésű személyes médiakatalógus és napló mindarról, amit megnézel, elolvasol vagy végigjátszol.
 
-[![Verzió](https://img.shields.io/badge/verzió-0.25.7-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Verzió](https://img.shields.io/badge/verzió-0.25.8-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![Licenc: AGPL v3](https://img.shields.io/badge/Licenc-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Dokumentáció](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/hu/)
@@ -28,7 +28,7 @@ A projekt a [Yamtrack](https://github.com/FuzzyGrim/Yamtrack) független forkjak
 - **Közelgő megjelenések:** Naptár a soron következőkről, iCalendar (`.ics`) hivatkozással más naptárprogramokhoz. Értesítés Apprise-on (Discord, Telegram, ntfy, Slack, e-mail és mások).
 - **Külön fiókok:** Mindenkinek saját könyvtára van. A belépés lehet a MediaTrail sajátja, vagy OIDC és közösségi szolgáltató (Google, GitHub, Discord és mások) a django-allauthon keresztül.
 - **Magyar és angol felület:** A nyelv fiókonként választható. A TMDB címei a `TMDB_LANG` beállítást követik.
-- **Import, benne a Nuvio:** A Nuvio csak az új tételeket veheti fel, vagy a már követetteket frissítheti, titkosított hitelesítő adatokkal és ütemezéssel. A Trakt, a SIMKL, a MyAnimeList, az AniList és a Kitsu szintén ütemezhető. Az ingyenes Trakt-fiók csak két alkalmazást enged az API-ra kötni. A teljes könyvtár CSV-be menthető és vissza is tölthető; IMDb-, Goodreads-, Steam- és HowLongToBeat-lista is behozható.
+- **Import, benne a Nuvio:** A Nuvio csak az új tételeket veheti fel, vagy a már követetteket frissítheti, titkosított hitelesítő adatokkal és ütemezéssel. A Trakt, a SIMKL, a MyAnimeList, az AniList és a Kitsu szintén ütemezhető. Az ingyenes Trakt-fiók csak két alkalmazást enged az API-ra kötni. A zárt import meghagyja a jelenlegi Trakt-belépést, és választható mellé az új, eszközkódos API (`TRAKT_API_PKCE`). A teljes könyvtár CSV-be menthető és vissza is tölthető; IMDb-, Goodreads-, Steam- és HowLongToBeat-lista is behozható.
 - **Lejátszás, benne a Nuvio:** A kezdőlapon a „Most nézem” sáv mutatja a pozíciót, az eltelt és a hátralévő időt, amikor egy [Nuvio-s társalkalmazás](#kapcsolódó-alkalmazások) jelzi, mit játszol. A Jellyfin, a Plex és az Emby a frissen megnézett médiát magától is be tudja jelölni.
 - **REST API (Preview):** Modern API a `/api/v1/`, OpenAPI séma a `/api/schema/`, valamint interaktív Swagger dokumentáció a `/api/docs/` címen. Írott leírás: [API_HU.md](API_HU.md) ([English](API.md)).
 - **Egy konténer:** Docker Compose, SQLite vagy PostgreSQL. A Redis a képen belül fut, az adat egy csatolt mappában marad.

@@ -1,9 +1,26 @@
+import time
 from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from django.urls import reverse
+
+
+class TraktResponse:
+    """Minimal response for the Trakt device calls."""
+
+    def __init__(self, status_code, payload):
+        """Store the status and JSON body. None means an empty body."""
+        self.status_code = status_code
+        self._payload = payload
+
+    def json(self):
+        """Return the JSON body."""
+        if self._payload is None:
+            msg = "empty"
+            raise ValueError(msg)
+        return self._payload
 
 
 class TraktOAuthViewTests(TestCase):
@@ -90,3 +107,109 @@ class TraktOAuthViewTests(TestCase):
 
         self.assertRedirects(response, reverse("import_data"))
         mock_oauth_callback.assert_not_called()
+
+    @override_settings(TRAKT_API_PKCE="")
+    def test_device_start_requires_the_new_client_id(self):
+        """The new API stays unavailable until TRAKT_API_PKCE is set."""
+        response = self.client.post(
+            reverse("trakt_device_start"),
+            {"mode": "new", "frequency": "once", "time": "14:30"},
+        )
+
+        self.assertRedirects(response, reverse("import_data"))
+
+    @override_settings(TRAKT_API_PKCE="pkce-client-id-1234567890")
+    @patch("integrations.imports.trakt._post_trakt")
+    def test_device_start_shows_the_user_code_only(self, mock_post):
+        """The page shows the short code and keeps the device code in the session."""
+        mock_post.return_value = TraktResponse(
+            200,
+            {
+                "device_code": "secret-device-code",
+                "user_code": "AB12CD34",
+                "verification_url": "https://trakt.tv/activate",
+                "expires_in": 600,
+                "interval": 5,
+            },
+        )
+
+        response = self.client.post(
+            reverse("trakt_device_start"),
+            {"mode": "new", "frequency": "once", "time": "14:30"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "AB12CD34")
+        self.assertNotContains(response, "secret-device-code")
+        self.assertEqual(
+            self.client.session["trakt_device"]["device_code"],
+            "secret-device-code",
+        )
+        self.assertEqual(
+            mock_post.call_args.args[1],
+            {"client_id": "pkce-client-id-1234567890"},
+        )
+
+    @override_settings(TRAKT_API_PKCE="pkce-client-id-1234567890")
+    @patch("integrations.imports.trakt._post_trakt")
+    def test_device_poll_keeps_waiting_on_an_empty_pending_response(self, mock_post):
+        """An empty HTTP 400 is still waiting, and the code stays available."""
+        session = self.client.session
+        session["trakt_device"] = {
+            "device_code": "secret-device-code",
+            "interval": 5,
+            "expires_at": time.time() + 600,
+            "mode": "new",
+            "frequency": "once",
+            "time": "14:30",
+        }
+        session.save()
+        mock_post.return_value = TraktResponse(400, None)
+
+        response = self.client.post(reverse("trakt_device_poll"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["status"], "pending")
+        self.assertIn("trakt_device", self.client.session)
+        self.assertEqual(
+            mock_post.call_args.args[1],
+            {"code": "secret-device-code", "client_id": "pkce-client-id-1234567890"},
+        )
+
+    @override_settings(TRAKT_API_PKCE="pkce-client-id-1234567890")
+    @patch("integrations.views.tasks.import_trakt.delay")
+    @patch(
+        "integrations.views.trakt.get_username_from_oauth",
+        return_value="trakt-user",
+    )
+    @patch("integrations.imports.trakt._post_trakt")
+    def test_device_poll_queues_the_new_api_import(
+        self,
+        mock_post,
+        _username,
+        mock_import,
+    ):
+        """Approval queues the import through the new API and drops the device code."""
+        session = self.client.session
+        session["trakt_device"] = {
+            "device_code": "secret-device-code",
+            "interval": 5,
+            "expires_at": time.time() + 600,
+            "mode": "overwrite",
+            "frequency": "once",
+            "time": "14:30",
+        }
+        session.save()
+        mock_post.return_value = TraktResponse(
+            200,
+            {"access_token": "access", "refresh_token": "refresh"},
+        )
+
+        response = self.client.post(reverse("trakt_device_poll"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["redirect"], reverse("import_data"))
+        self.assertNotIn("trakt_device", self.client.session)
+        self.assertEqual(mock_import.call_args.kwargs["auth"], "device")
+        self.assertEqual(mock_import.call_args.kwargs["username"], "trakt-user")
+        self.assertIsNone(mock_import.call_args.kwargs["redirect_uri"])

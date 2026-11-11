@@ -21,6 +21,7 @@ from django.db.models import (
 )
 from django.db.models.functions import RowNumber
 from django.utils import timezone
+from django.utils.translation import get_language
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy as _lazy
 from model_utils import FieldTracker
@@ -2127,27 +2128,46 @@ class LivePlayback(models.Model):
             return None
         return max(0, self.duration_ms - max(0, self.position_ms))
 
-    @property
-    def remaining_label(self):
-        """Return a short Simkl-style remaining time label."""
+    def _remaining_parts(self):
+        """Return hours, extra minutes, and total minutes left."""
         remaining = self.remaining_ms
         if remaining is None:
             return None
         total_minutes = (remaining + 59_999) // 60_000
-        if total_minutes >= 60:
-            hours, minutes = divmod(total_minutes, 60)
-            if minutes:
-                return f"{hours}H {minutes}M LEFT"
-            return f"{hours}H LEFT"
-        return f"{total_minutes}M LEFT"
+        hours, minutes = divmod(total_minutes, 60)
+        return hours, minutes, total_minutes
+
+    def _format_remaining(self, *, hungarian):
+        """Format the time left. Hungarian uses ó and p."""
+        parts = self._remaining_parts()
+        if parts is None:
+            return None
+        hours, minutes, total_minutes = parts
+        if hungarian:
+            if hours and minutes:
+                return f"{hours}ó{minutes}p"
+            if hours:
+                return f"{hours}ó"
+            return f"{total_minutes}p"
+        if hours and minutes:
+            return f"{hours}H {minutes}M"
+        if hours:
+            return f"{hours}H"
+        return f"{total_minutes}M"
+
+    @property
+    def remaining_label(self):
+        """Return a short Simkl-style remaining time label."""
+        short = self._format_remaining(hungarian=False)
+        if not short:
+            return None
+        return f"{short} LEFT"
 
     @property
     def remaining_short(self):
         """Return remaining time without the trailing LEFT word."""
-        label = self.remaining_label
-        if not label:
-            return None
-        return label.removesuffix(" LEFT").removesuffix(" Left")
+        language = (get_language() or "").lower()
+        return self._format_remaining(hungarian=language.startswith("hu"))
 
     @property
     def is_episode(self):

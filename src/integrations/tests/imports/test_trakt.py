@@ -3,7 +3,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from app.models import (
     MediaTypes,
@@ -311,3 +311,23 @@ class ImportTrakt(TestCase):
             params["redirect_uri"],
             "https://yamtrack.example.com/import/trakt/private",
         )
+        self.assertIn("client_secret", params)
+
+    @override_settings(TRAKT_API_PKCE="pkce-client-id-1234567890")
+    @patch("integrations.imports.trakt.update_refresh_token")
+    @patch("app.providers.services.api_request")
+    def test_device_refresh_omits_the_client_secret(self, mock_api_request, _):
+        """A token from the new API refreshes with the client ID only."""
+        mock_api_request.return_value = {
+            "access_token": "access-token",
+            "refresh_token": "new-refresh-token",
+        }
+        encrypted_token = helpers.encrypt("refresh-token")
+
+        access_token = get_access_token(encrypted_token, auth="device")
+
+        self.assertEqual(access_token, "access-token")
+        params = mock_api_request.call_args.kwargs["params"]
+        self.assertEqual(params["client_id"], "pkce-client-id-1234567890")
+        self.assertNotIn("client_secret", params)
+        self.assertNotIn("redirect_uri", params)

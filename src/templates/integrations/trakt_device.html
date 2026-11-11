@@ -1,0 +1,92 @@
+{% extends "users/base.html" %}
+{% load i18n %}
+
+{% block title %}
+  {% translate "Connect with the new Trakt API" %} - MediaTrail
+{% endblock title %}
+
+{% block settings_content %}
+  {% translate "Waiting for approval on Trakt." as waiting_text %}
+  {% translate "Trakt rejected the device sign-in." as failed_text %}
+  {% translate "Copied." as copied_text %}
+  <script>
+    function traktDevice(options) {
+      return {
+        status: options.waiting,
+        interval: options.interval,
+        async poll() {
+          const body = new FormData();
+          body.append("csrfmiddlewaretoken", options.csrf);
+          let response;
+          try {
+            response = await fetch(options.pollUrl, {
+              method: "POST",
+              body,
+              headers: {"X-CSRFToken": options.csrf},
+            });
+          } catch (error) {
+            this.status = options.failed;
+            return;
+          }
+          let data = {};
+          try {
+            data = await response.json();
+          } catch (error) {
+            data = {};
+          }
+          if (data.status === "pending") {
+            const seconds = Math.max(5, Number(data.interval) || this.interval);
+            window.setTimeout(() => this.poll(), seconds * 1000);
+            return;
+          }
+          if (data.redirect) {
+            window.location = data.redirect;
+            return;
+          }
+          this.status = data.error || options.failed;
+        },
+        async copy() {
+          const code = options.code;
+          try {
+            await navigator.clipboard.writeText(code);
+            this.status = options.copied;
+          } catch (error) {
+            this.status = code;
+          }
+        },
+      };
+    }
+  </script>
+  <div class="bg-[#2a2f35] rounded-lg p-6"
+       x-data="traktDevice({
+         pollUrl: '{% url 'trakt_device_poll' %}',
+         interval: {{ interval }},
+         code: '{{ user_code|escapejs }}',
+         csrf: '{{ csrf_token }}',
+         waiting: '{{ waiting_text|escapejs }}',
+         failed: '{{ failed_text|escapejs }}',
+         copied: '{{ copied_text|escapejs }}'
+       })"
+       x-init="poll()">
+    <h2 class="text-xl font-semibold mb-2">{% translate "Connect with the new Trakt API" %}</h2>
+    <p class="text-sm text-gray-400 mb-5">
+      {% blocktranslate trimmed %}Open <a href="{{ verification_url }}" target="_blank" rel="noopener" class="text-indigo-400 hover:text-indigo-300 underline">trakt.tv/activate</a> and enter this code.{% endblocktranslate %}
+    </p>
+    <div class="flex items-center gap-3 mb-4">
+      <p class="text-3xl tracking-[0.18em] text-white select-text">{{ user_code }}</p>
+      <button type="button"
+              @click="copy()"
+              class="px-3 py-2 text-sm rounded-md bg-[#39404b] text-white hover:bg-[#313842] cursor-pointer">
+        {% translate "Copy" %}
+      </button>
+    </div>
+    <p class="text-sm text-gray-400" x-text="status">{{ waiting_text }}</p>
+    <p class="mt-4 text-xs text-gray-500">
+      {% translate "A free Trakt account can connect only two applications. The code stays here until it expires." %}
+    </p>
+    <a href="{% url 'import_data' %}"
+       class="inline-block mt-5 text-sm text-indigo-400 hover:text-indigo-300">
+      {% translate "Back to import" %}
+    </a>
+  </div>
+{% endblock settings_content %}

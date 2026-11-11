@@ -4,7 +4,7 @@
 
 A self-hosted personal media tracker and digital logbook for everything you watch, read, and play.
 
-[![Release](https://img.shields.io/badge/version-0.25.7-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Release](https://img.shields.io/badge/version-0.25.8-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Documentation](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/)
@@ -28,7 +28,7 @@ MediaTrail originates as an independent fork of [Yamtrack](https://github.com/Fu
 - **Upcoming releases:** A calendar of what is coming up, plus an iCalendar (`.ics`) link for other calendar apps. Release notices can go out through Apprise (Discord, Telegram, ntfy, Slack, email, and others).
 - **Separate accounts:** Each person has their own library. Sign-in can stay on MediaTrail, or use OIDC and social providers such as Google, GitHub, and Discord through django-allauth.
 - **English and Hungarian:** The interface language is chosen per account. TMDB titles follow `TMDB_LANG`.
-- **Imports, including Nuvio:** Nuvio can add only new items or refresh items you already track, with encrypted credentials and a schedule. Trakt, SIMKL, MyAnimeList, AniList, and Kitsu can run on a schedule too. A free Trakt account can connect only two applications to the API. Export the library to CSV and import that file back, or bring in IMDb, Goodreads, Steam, and HowLongToBeat lists.
+- **Imports, including Nuvio:** Nuvio can add only new items or refresh items you already track, with encrypted credentials and a schedule. Trakt, SIMKL, MyAnimeList, AniList, and Kitsu can run on a schedule too. A free Trakt account can connect only two applications to the API. Private import can keep the current Trakt login or use the new device-code API (`TRAKT_API_PKCE`). Export the library to CSV and import that file back, or bring in IMDb, Goodreads, Steam, and HowLongToBeat lists.
 - **Playback, including Nuvio:** The home page shows a live Now Watching banner with position, elapsed time, and time remaining when a [Nuvio companion app](#companion-apps) reports what is playing. Jellyfin, Plex, and Emby can mark newly watched media on their own.
 - **REST API (Preview):** Full REST API at `/api/v1/`, OpenAPI schema at `/api/schema/`, and interactive Swagger documentation at `/api/docs/`. Written reference: [API.md](API.md) ([magyar](API_HU.md)).
 - **One container:** Docker Compose, with SQLite or PostgreSQL. Redis runs inside the image, and all data stays in a single mounted folder.
