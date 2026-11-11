@@ -612,8 +612,8 @@ msgstr "Bővítmény címe"
 msgid "Add this address in Nuvio under Settings, Addons."
 msgstr "A Nuvio alkalmazásban a Beállítások, Bővítmények alatt add hozzá ezt a címet."
 
-msgid "Play a movie or episode. Progress shows on the home page. A finished watch is saved at 80 percent."
-msgstr "Játssz le egy filmet vagy epizódot. Az előrehaladás megjelenik a kezdőlapon. A befejezett megtekintés 80 százaléknál kerül be."
+msgid "Play a movie or episode. Progress shows on the home page. A finished watch is saved at 90 percent."
+msgstr "Játssz le egy filmet vagy epizódot. Az előrehaladás megjelenik a kezdőlapon. A befejezett megtekintés 90 százaléknál kerül be."
 
 msgid "Connect Jellyfin to automatically track your watching progress."
 msgstr "A Jellyfin csatlakoztatása a nézési előrehaladás automatikus követéséhez."

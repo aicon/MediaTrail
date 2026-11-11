@@ -374,7 +374,7 @@ AUTH_USER_MODEL = "users.User"
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
 
 # MediaTrail continues from 0.25.3 in small steps: 0.25.4, 0.25.5, 0.25.6, 0.25.7, ...
-VERSION = config("VERSION", default="0.25.12")
+VERSION = config("VERSION", default="0.25.13")
 
 
 def _public_http_url(name):

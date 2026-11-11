@@ -27,13 +27,13 @@ from app.providers import services, tmdb
 logger = logging.getLogger(__name__)
 
 IMDB_RE = re.compile(r"^tt\d+$", re.IGNORECASE)
-WATCHED_THRESHOLD = 0.8
+WATCHED_THRESHOLD = 0.9
 DEDUPE_SECONDS = 120
 
 
-def manifest():
+def manifest(logo=None):
     """Return the Stremio addon manifest Nuvio installs."""
-    return {
+    payload = {
         "id": "community.mediatrail.nuvio",
         "version": "1.0.0",
         "name": "MediaTrail",
@@ -47,6 +47,9 @@ def manifest():
             "configurationRequired": False,
         },
     }
+    if logo:
+        payload["logo"] = logo
+    return payload
 
 
 def handle_player(user, media_type, video_id, extra, query):
@@ -112,7 +115,7 @@ def _progress(user, target, tmdb_id, action, current_ms, duration_ms):
 
 
 def _stop(user, target, tmdb_id, current_ms, duration_ms):
-    """Hide Now Watching, then save a finished watch at 80 percent."""
+    """Hide Now Watching, then save a finished watch at 90 percent."""
     progress = _progress_ratio(current_ms, duration_ms)
     if progress is None:
         progress = _stored_progress(user, target, tmdb_id)
@@ -186,7 +189,10 @@ def _tmdb_id(target):
 
 def _parse_video_id(video_id):
     """Accept movie `tt…` and episode `tt…:season:episode` ids."""
-    parts = (video_id or "").strip().split(":")
+    raw = (video_id or "").strip()
+    if raw.endswith(".json"):
+        raw = raw[: -len(".json")]
+    parts = raw.split(":")
     if len(parts) == 1 and IMDB_RE.match(parts[0]):
         imdb = parts[0].lower()
         return {

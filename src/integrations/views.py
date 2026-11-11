@@ -14,6 +14,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.templatetags.static import static
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
@@ -645,37 +646,74 @@ def _nuvio_cors(response):
     return response
 
 
-def _nuvio_user(token):
-    """Return the user for an addon token, or None."""
+def _nuvio_logo(request):
+    """Absolute logo URL advertised by the addon manifest."""
+    logo = None
     try:
-        return users.models.User.objects.get(token=token)
-    except ObjectDoesNotExist:
+        logo = app_helpers.build_absolute_app_url(
+            request,
+            static("nuvio/logo.png"),
+        )
+    except Exception:  # noqa: BLE001
+        logger.exception("Could not build the Nuvio logo URL")
+    return logo
+
+
+def _nuvio_account():
+    """The MediaTrail account that receives Nuvio playback."""
+    account = None
+    try:
+        account = _select_nuvio_account()
+    except Exception:  # noqa: BLE001
+        logger.exception("Could not read the MediaTrail account for Nuvio")
+    return account
+
+
+def _select_nuvio_account():
+    """Use the only account, otherwise the earliest active superuser."""
+    model = users.models.User
+    total = model.objects.count()
+    if total == 0:
         return None
+    if total == 1:
+        return model.objects.order_by("id").first()
+    admin = (
+        model.objects.filter(is_superuser=True, is_active=True).order_by("id").first()
+    )
+    if admin is not None:
+        return admin
+    return model.objects.filter(is_active=True).order_by("id").first()
 
 
 @login_not_required
 @csrf_exempt
 @require_http_methods(["GET", "OPTIONS"])
-def nuvio_manifest(request, token):
+def nuvio_manifest(request):
     """Serve the addon manifest Nuvio installs."""
     if request.method == "OPTIONS":
         return _nuvio_cors(HttpResponse(status=204))
-    if _nuvio_user(token) is None:
-        return _nuvio_cors(JsonResponse({"error": "invalid token"}, status=401))
-    return _nuvio_cors(JsonResponse(nuvio_player.manifest()))
+    return _nuvio_cors(JsonResponse(nuvio_player.manifest(_nuvio_logo(request))))
 
 
 @login_not_required
 @csrf_exempt
 @require_http_methods(["GET", "OPTIONS"])
-def nuvio_player(request, token, media_type, video_id, extra=None):
+def nuvio_player(request, media_type, video_id, extra=None):
     """Record a Nuvio player event on this MediaTrail."""
     if request.method == "OPTIONS":
         return _nuvio_cors(HttpResponse(status=204))
-    user = _nuvio_user(token)
-    if user is None:
-        return _nuvio_cors(JsonResponse({"error": "invalid token"}, status=401))
-    nuvio_player.handle_player(user, media_type, video_id, extra, request.GET)
+    user = _nuvio_account()
+    if user is not None:
+        try:
+            nuvio_player.handle_player(
+                user,
+                media_type,
+                video_id,
+                extra,
+                request.GET,
+            )
+        except Exception:  # noqa: BLE001
+            logger.exception("Nuvio player event failed")
     return _nuvio_cors(JsonResponse({}))
 
 

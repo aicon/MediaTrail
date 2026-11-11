@@ -14,7 +14,7 @@
   {% absolute_app_url plex_webhook_path as plex_webhook_url %}
   {% url 'emby_webhook' request.user.token as emby_webhook_path %}
   {% absolute_app_url emby_webhook_path as emby_webhook_url %}
-  {% url 'nuvio_manifest' request.user.token as nuvio_manifest_path %}
+  {% url 'nuvio_manifest' as nuvio_manifest_path %}
   {% absolute_app_url nuvio_manifest_path as nuvio_manifest_url %}
   <div class="space-y-6">
     <div class="bg-[#2a2f35] rounded-lg p-6">
@@ -123,7 +123,7 @@
                   {% include "app/icons/copy.svg" with classes="w-5 h-5 text-gray-400 group-hover:text-indigo-400 transition-colors" %}
                 </span>
               </div>
-              <p class="text-sm text-gray-300">{% translate "Play a movie or episode. Progress shows on the home page. A finished watch is saved at 80 percent." %}</p>
+              <p class="text-sm text-gray-300">{% translate "Play a movie or episode. Progress shows on the home page. A finished watch is saved at 90 percent." %}</p>
             </div>
           </div>
         </div>

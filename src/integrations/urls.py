@@ -4,13 +4,13 @@ from integrations import views
 
 urlpatterns = [
     re_path(
-        r"^nuvio/(?P<token>[^/]+)/manifest(?:\.json)?/?$",
+        r"^nuvio/manifest(?:\.json)?/?$",
         views.nuvio_manifest,
         name="nuvio_manifest",
     ),
     re_path(
-        r"^nuvio/(?P<token>[^/]+)/player/(?P<media_type>[^/]+)/"
-        r"(?P<video_id>[^/]+)(?:/(?P<extra>.+))?$",
+        r"^nuvio/player/(?P<media_type>[^/]+)/(?P<video_id>[^/]+)"
+        r"(?:/(?P<extra>.+))?$",
         views.nuvio_player,
         name="nuvio_player",
     ),
