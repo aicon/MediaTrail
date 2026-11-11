@@ -58,10 +58,19 @@
         <h2 class="text-xl font-semibold">{% translate "Media Servers" %}</h2>
       </div>
       <p class="text-gray-400 mb-5 text-sm">{% translate "Connect your media servers to automatically track your watching progress." %}</p>
-      <div x-data="{ activeIntegration: 'jellyfin' }">
+      <div x-data="{ activeIntegration: 'nuvio' }">
         <div class="mb-4 flex gap-2 overflow-x-auto"
              role="tablist"
              aria-label="{% translate "Integration services" %}">
+          <button type="button"
+                  class="flex items-center px-4 py-2 rounded-md transition-colors text-sm cursor-pointer"
+                  :class="activeIntegration === 'nuvio' ? 'bg-indigo-600 text-white' : 'bg-[#39404b] text-gray-300 hover:bg-[#454d59]'"
+                  @click="activeIntegration = 'nuvio'"
+                  role="tab"
+                  :aria-selected="activeIntegration === 'nuvio'">
+            {% include "app/icons/server.svg" with classes="w-4 h-4 mr-2" %}
+            Nuvio
+          </button>
           <button type="button"
                   class="flex items-center px-4 py-2 rounded-md transition-colors text-sm cursor-pointer"
                   :class="activeIntegration === 'jellyfin' ? 'bg-indigo-600 text-white' : 'bg-[#39404b] text-gray-300 hover:bg-[#454d59]'"
@@ -89,6 +98,26 @@
             {% include "app/icons/server.svg" with classes="w-4 h-4 mr-2" %}
             Emby
           </button>
+        </div>
+        <div x-cloak x-show="activeIntegration === 'nuvio'" role="tabpanel">
+          <div class="bg-[#39404b] p-5 rounded-lg mb-6">
+            <div class="flex items-center mb-3">
+              {% include "app/icons/server.svg" with classes="w-5 h-5 text-indigo-400 mr-2" %}
+              <h3 class="text-base font-medium">Nuvio</h3>
+            </div>
+            <p class="text-gray-400 mb-4 text-sm">{% translate "Connect Nuvio to automatically track your watching progress." %}</p>
+            <div class="bg-[#262a2f] p-4 rounded-md">
+              <h4 class="text-sm font-medium mb-3">{% translate "Setup Instructions" %}</h4>
+              <ol class="list-decimal list-inside space-y-2 text-sm text-gray-300">
+                <li>
+                  {% blocktranslate trimmed %}NuvioTV-MT and NuvioMobile-MT send playback through <a href="https://github.com/aicon/MediaTrail-Scrobbler" target="_blank" rel="noopener noreferrer" class="text-indigo-400 hover:underline">MediaTrail-Scrobbler</a>. The token above is the API key.{% endblocktranslate %}
+                </li>
+                <li>{% translate "Run the scrobbler in API mode, pointed at this MediaTrail, with the token above." %}</li>
+                <li>{% translate "In the Nuvio app, add the addon using the scrobbler address ending in /manifest.json." %}</li>
+                <li>{% translate "Play a movie or episode. Progress shows on the home page, and a finished watch is saved at the scrobbler threshold." %}</li>
+              </ol>
+            </div>
+          </div>
         </div>
         <div x-cloak x-show="activeIntegration === 'jellyfin'" role="tabpanel">
           <div class="bg-[#39404b] p-5 rounded-lg mb-6">
