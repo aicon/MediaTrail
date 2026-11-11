@@ -25,6 +25,7 @@ class NuvioPlayerTests(TestCase):
         response = self.client.get(reverse("nuvio_manifest"))
 
         self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.request["PATH_INFO"].endswith("/nuvio/manifest.json"))
         body = response.json()
         self.assertEqual(body["resources"], ["player"])
         self.assertEqual(

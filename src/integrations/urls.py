@@ -3,11 +3,8 @@ from django.urls import path, re_path
 from integrations import views
 
 urlpatterns = [
-    re_path(
-        r"^nuvio/manifest(?:\.json)?/?$",
-        views.nuvio_manifest,
-        name="nuvio_manifest",
-    ),
+    path("nuvio/manifest.json", views.nuvio_manifest, name="nuvio_manifest"),
+    re_path(r"^nuvio/manifest/?$", views.nuvio_manifest),
     re_path(
         r"^nuvio/player/(?P<media_type>[^/]+)/(?P<video_id>[^/]+)"
         r"(?:/(?P<extra>.+))?$",

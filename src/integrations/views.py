@@ -14,7 +14,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.templatetags.static import static
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
@@ -646,17 +645,28 @@ def _nuvio_cors(response):
     return response
 
 
-def _nuvio_logo(request):
-    """Absolute logo URL advertised by the addon manifest."""
-    logo = None
+def _nuvio_public_logo():
+    """Absolute logo URL from the configured public origin."""
     try:
-        logo = app_helpers.build_absolute_app_url(
-            request,
-            static("nuvio/logo.png"),
-        )
+        urls = getattr(settings, "URLS", None) or []
     except Exception:  # noqa: BLE001
-        logger.exception("Could not build the Nuvio logo URL")
-    return logo
+        return ""
+    origin = ""
+    for url in urls:
+        if url:
+            origin = str(url).rstrip("/")
+            break
+    if origin.startswith(("http://", "https://")):
+        return f"{origin}/static/nuvio/logo.png"
+    return ""
+
+
+def _nuvio_manifest_body():
+    """JSON manifest. A logo problem must not turn the addon into an error page."""
+    try:
+        return json.dumps(nuvio_player.manifest(_nuvio_public_logo()))
+    except Exception:  # noqa: BLE001
+        return json.dumps(nuvio_player.manifest())
 
 
 def _nuvio_account():
@@ -692,7 +702,9 @@ def nuvio_manifest(request):
     """Serve the addon manifest Nuvio installs."""
     if request.method == "OPTIONS":
         return _nuvio_cors(HttpResponse(status=204))
-    return _nuvio_cors(JsonResponse(nuvio_player.manifest(_nuvio_logo(request))))
+    return _nuvio_cors(
+        HttpResponse(_nuvio_manifest_body(), content_type="application/json"),
+    )
 
 
 @login_not_required
