@@ -4,7 +4,7 @@
 
 Saját üzemeltetésű személyes médiakatalógus és napló mindarról, amit megnézel, elolvasol vagy végigjátszol.
 
-[![Verzió](https://img.shields.io/badge/verzió-0.25.21-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Verzió](https://img.shields.io/badge/verzió-0.25.22-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![Licenc: AGPL v3](https://img.shields.io/badge/Licenc-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Dokumentáció](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/hu/)
@@ -29,7 +29,7 @@ A projekt a [Yamtrack](https://github.com/FuzzyGrim/Yamtrack) független forkjak
 - **Külön fiókok:** Mindenkinek saját könyvtára van. A belépés lehet a MediaTrail sajátja, vagy OIDC és közösségi szolgáltató (Google, GitHub, Discord és mások) a django-allauthon keresztül.
 - **Magyar és angol felület:** A nyelv fiókonként választható. A TMDB címei a `TMDB_LANG` beállítást követik.
 - **Import, benne a Nuvio:** A Nuvio csak az új tételeket veheti fel, vagy a már követetteket frissítheti, titkosított hitelesítő adatokkal és ütemezéssel. A Trakt, a SIMKL, a MyAnimeList, az AniList és a Kitsu szintén ütemezhető. Az ingyenes Trakt-fiók csak két alkalmazást enged az API-ra kötni. A zárt import meghagyja a jelenlegi Trakt-belépést, és választható mellé az új, eszközkódos API (`TRAKT_API_PKCE`). A teljes könyvtár CSV-be menthető és vissza is tölthető; IMDb-, Goodreads-, Steam- és HowLongToBeat-lista is behozható.
-- **Lejátszás, benne a Nuvio:** A kezdőlapon a „Most nézem” sáv mutatja a pozíciót, az eltelt és a hátralévő időt, amikor egy [Nuvio-s társalkalmazás](#kapcsolódó-alkalmazások) jelzi, mit játszol. A Jellyfin, a Plex és az Emby a frissen megnézett médiát magától is be tudja jelölni.
+- **Lejátszás, benne a Nuvio:** A kezdőlapon élő „Most nézem” sávok jelennek meg (eszközönként egy), pozícióval, eltelt és hátralévő idővel, amikor egy [Nuvio-s társalkalmazás](#kapcsolódó-alkalmazások) jelzi, mit játszol. A sávok átnevezhetők. A Jellyfin, a Plex és az Emby a frissen megnézett médiát magától is be tudja jelölni.
 - **REST API (Preview):** Modern API a `/api/v1/`, OpenAPI séma a `/api/schema/`, valamint interaktív Swagger dokumentáció a `/api/docs/` címen. Írott leírás: [API_HU.md](API_HU.md) ([English](API.md)).
 - **Egy konténer:** Docker Compose, SQLite vagy PostgreSQL. A Redis a képen belül fut, az adat egy csatolt mappában marad.
 
@@ -37,7 +37,7 @@ A projekt a [Yamtrack](https://github.com/FuzzyGrim/Yamtrack) független forkjak
 
 ## Előnézet: „Most nézem” sáv
 
-A MediaTrail a kezdőlapon azonnal megjeleníti az éppen lejátszott tartalmat:
+A MediaTrail a kezdőlapon élő **„Most nézem”** sávokat mutat. Minden társalkalmazás-példány (telefon, több tévé) saját sávot kap, így párhuzamos lejátszásnál nem írják felül egymást.
 
 ![Now Watching Banner](docs/screenshots/now-watching-desktop.png)
 
@@ -45,9 +45,17 @@ A MediaTrail a kezdőlapon azonnal megjeleníti az éppen lejátszott tartalmat:
 
 ![Now Watching Compact](docs/screenshots/now-watching-narrow.png)
 
-A sáv a kezdőlap tetején van, a könyvtár fölött:
+A sávok a kezdőlap tetején vannak, a könyvtár fölött:
 
 ![A Most nézem sáv a kezdőlapon](docs/screenshots/now-watching-desktop2.png)
+
+**Több eszközös működés**
+
+- Minden [kapcsolódó alkalmazásban](#kapcsolódó-alkalmazások) add hozzá a MediaTrail addon címét (Beállítások → Bővítmények). Külön scrobbler konténer nem kell.
+- Minden telepítés stabil `deviceId`-t és automatikus nevet küld, például `telefon · Pixel 8` vagy `TV · Shield`.
+- A kezdőlapon a sáv neve átírható; az egyéni név eszközönként megmarad stop / elvetés után is.
+- A `pause` és a `stop` csak az adott eszköz sávját érinti. A frissítést nem kapó sávokat a watching / paused idle TTL takarítja el.
+- A befejezett nézés **90%-nál** mentődik. Seek után is megy progress, hogy a sáv ne maradjon le.
 
 > **Megjegyzés:** A „Most nézem” sávhoz [kapcsolódó alkalmazás](#kapcsolódó-alkalmazások) kell. Akkor jelenik meg, amikor az alkalmazás jelzi, mit játszol.
 
@@ -125,7 +133,7 @@ Amikor a hivatalos Yamtrack átállt a `0.26`-os ágra, a MediaTrail szándékos
 | :--- | :---: | :---: |
 | **REST API** (`/api/v1/`) | Nincs | Van |
 | **Többszöri Epizód-előzmény** | Nincs | Van |
-| **Élő „Most nézem” sáv** | Nincs | Van |
+| **Élő „Most nézem” (több eszköz)** | Nincs | Van |
 | **Nuvio szinkronizáció / import** | Nincs | Van |
 | **Magyar nyelvű felület** | Nincs | Van |
 | **Beépített belső Redis** | Nincs *(Külön Redis kell)* | Van *(A konténerben fut)* |
@@ -139,8 +147,8 @@ A MediaTrailhez külön segédprogramok érhetők el a lejátszási események a
 
 | Név | Leírás |
 | :--- | :--- |
-| **[NuvioTV-MT](https://github.com/aicon/NuvioTV-MT)** | Tévére szabott Nuvio kliens saját példánya, beépített MediaTrail scrobblerrel. |
-| **[NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT)** | Mobil Nuvio kliens MediaTrail támogatással. |
+| **[NuvioTV-MT](https://github.com/aicon/NuvioTV-MT)** | Android TV / Google TV kliens, amely a lejátszást a MediaTrailnek jelenti (több eszközös „Most nézem”). |
+| **[NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT)** | Telefon / táblagép kliens, amely a lejátszást a MediaTrailnek jelenti (több eszközös „Most nézem”). |
 
 ---
 

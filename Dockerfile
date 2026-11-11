@@ -29,7 +29,7 @@ ENV PYTHONUNBUFFERED=1
 
 # Version label only. API keys, including a Gemini key, are runtime settings.
 # Do not pass them as build arguments and do not copy them into this image.
-ARG VERSION=0.25.21
+ARG VERSION=0.25.22
 # Set it as an environment variable
 ENV VERSION=$VERSION
 # Put the virtualenv on PATH so python/gunicorn/celery/supervisord resolve directly

@@ -57,3 +57,14 @@ A `SOCIAL_PROVIDERS` a django-allauth szolgáltatómoduljainak vesszővel elvál
 A `SOCIALACCOUNT_ONLY` `True` értéke elrejti a jelszavas belépést. A `REDIRECT_LOGIN_TO_SSO` `True` értéke a belépőoldalt egyből a külső szolgáltatóhoz küldi.
 
 A szolgáltatónál regisztrált visszairányítási cím a MediaTrail nyilvános címe, plusz az az útvonal, amelyet a szolgáltató vár. A `URLS` ugyanaz a cím legyen, különben a visszaút elutasításra kerül.
+
+## „Most nézem” idle időzítők
+
+A társalkalmazások a beépített MediaTrail addonon keresztül hajtják az élő sávokat. Az elmaradt `stop` eseményeket ezek az opcionális felülírások takarítják (a legtöbb telepítésen a gyári érték elég):
+
+| Változó | Alapérték | Szerep |
+| --- | --- | --- |
+| `LIVE_PLAYBACK_WATCHING_STALE_SECONDS` | `180` | A progress nélküli `watching` sáv ennyi idő után törlődik |
+| `LIVE_PLAYBACK_PAUSED_STALE_SECONDS` | `600` | A magára hagyott `paused` sáv ennyi idő után törlődik |
+
+Lásd: [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md).

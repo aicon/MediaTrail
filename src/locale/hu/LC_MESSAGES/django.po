@@ -615,8 +615,11 @@ msgstr "A Nuvio alkalmazásban a Beállítások, Bővítmények alatt add hozzá
 msgid "Add this address in Nuvio under Settings, Addons."
 msgstr "A Nuvio alkalmazásban a Beállítások, Bővítmények alatt add hozzá ezt a címet."
 
-msgid "Play a movie or episode. Progress shows on the home page. A finished watch is saved at 90 percent."
-msgstr "Játssz le egy filmet vagy epizódot. Az előrehaladás megjelenik a kezdőlapon. A befejezett megtekintés 90 százaléknál kerül be."
+msgid "Play a movie or episode. Each device gets its own Now Watching strip on the home page; you can rename the strip. A finished watch is saved at 90 percent."
+msgstr "Játssz le egy filmet vagy epizódot. Minden eszköz saját „Most nézem” sávot kap a kezdőlapon; a sáv neve átírható. A befejezett megtekintés 90 százaléknál kerül be."
+
+msgid "Rename this device"
+msgstr "Eszköz átnevezése"
 
 msgid "Connect Jellyfin to automatically track your watching progress."
 msgstr "A Jellyfin csatlakoztatása a nézési előrehaladás automatikus követéséhez."

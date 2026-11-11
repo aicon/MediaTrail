@@ -4,7 +4,7 @@
 
 A self-hosted personal media tracker and digital logbook for everything you watch, read, and play.
 
-[![Release](https://img.shields.io/badge/version-0.25.21-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Release](https://img.shields.io/badge/version-0.25.22-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Documentation](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/)
@@ -29,7 +29,7 @@ MediaTrail originates as an independent fork of [Yamtrack](https://github.com/Fu
 - **Separate accounts:** Each person has their own library. Sign-in can stay on MediaTrail, or use OIDC and social providers such as Google, GitHub, and Discord through django-allauth.
 - **English and Hungarian:** The interface language is chosen per account. TMDB titles follow `TMDB_LANG`.
 - **Imports, including Nuvio:** Nuvio can add only new items or refresh items you already track, with encrypted credentials and a schedule. Trakt, SIMKL, MyAnimeList, AniList, and Kitsu can run on a schedule too. A free Trakt account can connect only two applications to the API. Private import can keep the current Trakt login or use the new device-code API (`TRAKT_API_PKCE`). Export the library to CSV and import that file back, or bring in IMDb, Goodreads, Steam, and HowLongToBeat lists.
-- **Playback, including Nuvio:** The home page shows a live Now Watching banner with position, elapsed time, and time remaining when a [Nuvio companion app](#companion-apps) reports what is playing. Jellyfin, Plex, and Emby can mark newly watched media on their own.
+- **Playback, including Nuvio:** The home page shows live Now Watching strips (one per device) with position, elapsed time, and time remaining when a [Nuvio companion app](#companion-apps) reports what is playing. Each strip can be renamed. Jellyfin, Plex, and Emby can mark newly watched media on their own.
 - **REST API (Preview):** Full REST API at `/api/v1/`, OpenAPI schema at `/api/schema/`, and interactive Swagger documentation at `/api/docs/`. Written reference: [API.md](API.md) ([magyar](API_HU.md)).
 - **One container:** Docker Compose, with SQLite or PostgreSQL. Redis runs inside the image, and all data stays in a single mounted folder.
 
@@ -37,7 +37,7 @@ MediaTrail originates as an independent fork of [Yamtrack](https://github.com/Fu
 
 ## Preview: Now Watching
 
-MediaTrail features a live "Now Watching" banner on your home dashboard that updates in real time as you watch:
+MediaTrail shows live **Now Watching** strips on the home page. Each companion device gets its own strip, so a phone and two TVs can appear at the same time without overwriting each other.
 
 ![Now Watching Banner](docs/screenshots/now-watching-desktop.png)
 
@@ -45,11 +45,19 @@ MediaTrail features a live "Now Watching" banner on your home dashboard that upd
 
 ![Now Watching Compact](docs/screenshots/now-watching-narrow.png)
 
-The banner sits at the top of the home page, above the library:
+The strips sit at the top of the home page, above the library:
 
 ![Now Watching on the home page](docs/screenshots/now-watching-desktop2.png)
 
-> **Note:** Now Watching needs a [Companion App](#companion-apps). The banner appears when that app reports what is playing.
+**How multi-device Now Watching works**
+
+- Install the MediaTrail addon address in each [companion app](#companion-apps) (Settings → Addons). No separate scrobbler container.
+- Every install sends a stable `deviceId` plus an automatic label such as `telefon · Pixel 8` or `TV · Shield`.
+- Rename a strip on the home page; the custom name is stored per device and survives stop / dismiss.
+- `pause` and `stop` only clear that device’s strip. Idle strips age out with the watching / paused stale timers.
+- A finished watch is saved at **90%**. Seek also sends progress so the strip stays in sync.
+
+> **Note:** Now Watching needs a [Companion App](#companion-apps). Strips appear when that app reports what is playing.
 
 ---
 
@@ -125,7 +133,7 @@ When upstream Yamtrack adopted the `0.26` architecture, MediaTrail intentionally
 | :--- | :---: | :---: |
 | **REST API** (`/api/v1/`) | No | Yes |
 | **Multi-record Episode History** | No | Yes |
-| **Live "Now Watching" Banner** | No | Yes |
+| **Live "Now Watching" (multi-device)** | No | Yes |
 | **Nuvio Sync / Import** | No | Yes |
 | **Hungarian Localization** | No | Yes |
 | **Embedded Redis Container** | No *(Requires separate Redis)* | Yes *(Included in image)* |
@@ -139,8 +147,8 @@ MediaTrail connects with dedicated companion applications to automatically scrob
 
 | Project | Description |
 | :--- | :--- |
-| **[NuvioTV-MT](https://github.com/aicon/NuvioTV-MT)** | Dedicated Android TV build with native MediaTrail scrobbler integration. |
-| **[NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT)** | Dedicated mobile client build with MediaTrail support. |
+| **[NuvioTV-MT](https://github.com/aicon/NuvioTV-MT)** | Android TV / Google TV client that reports playback to MediaTrail (multi-device Now Watching). |
+| **[NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT)** | Phone / tablet client that reports playback to MediaTrail (multi-device Now Watching). |
 
 ---
 

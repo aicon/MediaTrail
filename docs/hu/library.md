@@ -4,9 +4,11 @@
 
 A kezdőlap és az oldalsáv a könyvtár. A filmeknek, a sorozatoknak, az évadoknak és a többi típusnak külön listája van. A lista keresője annak a személynek a bejegyzéseiben keres.
 
-Lejátszás vagy szünet közben a kezdőlap tetején egy Most nézem sáv lehet. Rajta a cím, az epizód, a már megnézett rész és a hátralévő idő.
+Lejátszás vagy szünet közben a kezdőlap tetején **„Most nézem”** sávok lehetnek — eszközönként egy (telefon, minden tévé külön). A sávon a cím, az epizód, a már megnézett rész, a hátralévő idő és egy átnevezhető eszköznév látszik. Egy eszköz stopja vagy elvetése a többit nem törli. A MediaTrail addon a befejezett nézést 90%-nál menti. A kép a magyar felület.
 
 ![A Most nézem sáv a kezdőlapon](../screenshots/now-watching-desktop2.png)
+
+A MediaTrail addon címét a Beállítások → Integrációk → Nuvio alól add hozzá minden [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) vagy [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) klienshez. Részletek: [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md).
 
 Egy cím megnyitása a katalógus adatait és a követő űrlapot mutatja. Az állapot, a pontszám, a haladás, a kezdő és záró dátum, valamint a jegyzet ehhez a bejegyzéshez tartozik. Egy befejezett cím újrakezdése új kört ír a történetbe. A sorozat szülő: az évadok és az epizódok külön sorok, ezért egy epizód bejelölése nem írja felül az egész műsort.
 

@@ -15,6 +15,8 @@ A források alatti történet az elmúlt hét napot mutatja. A „most fut” á
 
 A Nuvio az első forrás. Egy Nuvio-profil filmjeit és epizódjait olvassa. A Nuvio felé nem ír, és nem töröl helyi sort attól, hogy a forrásnál valami eltűnik.
 
+Az élő **„Most nézem”** sáv más út: a beépített MediaTrail addon a társalkalmazások `player` eseményeit kapja, eszközönkénti azonosítóval. Az előzményimport ezeket a sávokat nem írja felül. Lásd a [Könyvtár](library.md) oldalt és a [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md) leírást.
+
 Az űrlap a Nuvio e-mailt, a jelszót és a profil számát kéri. Az első sikeres küldés titkosítva menti őket a MediaTrail-fiókodhoz. Legközelebb az e-mail és a profil ki van töltve. A jelszómezőt üresen hagyva a mentett jelszó marad. Új jelszót csak akkor írj be, ha cserélni akarod. Más e-mail vagy más profil elölről kezdi ennek a fióknak az importkurzort.
 
 Egy futás ezt csinálja:

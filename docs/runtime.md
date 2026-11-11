@@ -57,3 +57,14 @@ Movie, series, anime, game, book, comic, and board-game lookups work with the cl
 `SOCIALACCOUNT_ONLY` set to `True` hides password sign-in. `REDIRECT_LOGIN_TO_SSO` set to `True` sends the login page straight to the external provider.
 
 The redirect address you register at the provider is the public MediaTrail origin plus the path that provider expects. `URLS` has to be the same origin, or the return trip is rejected.
+
+## Now Watching idle timers
+
+Companion apps drive live strips through the built-in MediaTrail addon. Missed `stop` events are cleaned up by these optional overrides (defaults are fine for most installs):
+
+| Variable | Default | Role |
+| --- | --- | --- |
+| `LIVE_PLAYBACK_WATCHING_STALE_SECONDS` | `180` | Drop a `watching` strip with no progress for this long |
+| `LIVE_PLAYBACK_PAUSED_STALE_SECONDS` | `600` | Drop a `paused` strip left idle this long |
+
+See [Live playback / Now Watching](LIVE_PLAYBACK_NOW_WATCHING.md).
