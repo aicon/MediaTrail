@@ -2109,6 +2109,19 @@ class LivePlayback(models.Model):
             f"@ {self.position_ms}ms ({self.status})"
         )
 
+    def clean(self):
+        """Restrict live playback to movie and episode items."""
+        super().clean()
+        if self.item_id and self.item.media_type not in {
+            MediaTypes.MOVIE.value,
+            MediaTypes.EPISODE.value,
+        }:
+            raise models.ValidationError(
+                {
+                    "item": "Live playback is only supported for movies and episodes.",
+                },
+            )
+
     @property
     def display_device_name(self):
         """Custom rename if set, otherwise the last client label."""
@@ -2128,46 +2141,6 @@ class LivePlayback(models.Model):
         if self.device_id == LEGACY_DEVICE_ID:
             return "Ismeretlen eszköz"
         return self.device_id
-
-
-class DeviceDisplayName(models.Model):
-    """User-chosen label for a playback device; survives live-row deletion."""
-
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="device_display_names",
-    )
-    device_id = models.CharField(max_length=128)
-    custom_name = models.CharField(max_length=128)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        """Meta options for the model."""
-
-        constraints = [
-            UniqueConstraint(
-                fields=["user", "device_id"],
-                name="unique_device_display_name_per_user",
-            ),
-        ]
-
-    def __str__(self):
-        """Return a short label for admin and logs."""
-        return f"{self.user_id}:{self.device_id}={self.custom_name}"
-
-    def clean(self):
-        """Restrict live playback to movie and episode items."""
-        super().clean()
-        if self.item_id and self.item.media_type not in {
-            MediaTypes.MOVIE.value,
-            MediaTypes.EPISODE.value,
-        }:
-            raise models.ValidationError(
-                {
-                    "item": "Live playback is only supported for movies and episodes.",
-                },
-            )
 
     @property
     def percent_watched(self):
@@ -2275,3 +2248,30 @@ class DeviceDisplayName(models.Model):
             )
         age = (timezone.now() - self.updated_at).total_seconds()
         return age > stale_after
+
+
+class DeviceDisplayName(models.Model):
+    """User-chosen label for a playback device; survives live-row deletion."""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="device_display_names",
+    )
+    device_id = models.CharField(max_length=128)
+    custom_name = models.CharField(max_length=128)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        """Meta options for the model."""
+
+        constraints = [
+            UniqueConstraint(
+                fields=["user", "device_id"],
+                name="unique_device_display_name_per_user",
+            ),
+        ]
+
+    def __str__(self):
+        """Return a short label for admin and logs."""
+        return f"{self.user_id}:{self.device_id}={self.custom_name}"
