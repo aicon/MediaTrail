@@ -6,7 +6,14 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
-from app.models import Item, LivePlayback, LivePlaybackStatus, MediaTypes, Sources
+from app.models import (
+    DeviceDisplayName,
+    Item,
+    LivePlayback,
+    LivePlaybackStatus,
+    MediaTypes,
+    Sources,
+)
 from app.playback_operations import clear_live_playback, upsert_live_playback
 
 _LOCMEM_CACHE = {
@@ -307,4 +314,30 @@ class NowWatchingHomeTests(TestCase):
         )
         self.assertTrue(
             LivePlayback.objects.filter(user=self.user, device_id="tv-1").exists(),
+        )
+
+    def test_rename_device_persists_across_strip(self):
+        """Custom device names appear on the strip and survive empty live rows."""
+        upsert_live_playback(
+            user=self.user,
+            media_type=MediaTypes.MOVIE.value,
+            source=Sources.TMDB.value,
+            media_id="550",
+            position_ms=10_000,
+            duration_ms=100_000,
+            device_id="tv-living",
+            device_label="TV · Shield",
+        )
+        response = self.client.post(
+            reverse("now_watching_rename"),
+            {"device_id": "tv-living", "custom_name": "Nappali TV"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Nappali TV")
+        self.assertEqual(
+            DeviceDisplayName.objects.get(
+                user=self.user,
+                device_id="tv-living",
+            ).custom_name,
+            "Nappali TV",
         )

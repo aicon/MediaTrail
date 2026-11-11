@@ -13,6 +13,7 @@ from django.db.models import Q
 from django.utils import timezone
 
 from app.models import (
+    DeviceDisplayName,
     Item,
     LEGACY_DEVICE_ID,
     LivePlayback,
@@ -74,6 +75,24 @@ def normalize_device_label(device_label, device_id):
     if normalize_device_id(device_id) == LEGACY_DEVICE_ID:
         return LEGACY_DEVICE_LABEL
     return ""
+
+
+def set_device_display_name(user, device_id, custom_name):
+    """Save or clear the user-chosen device label. Survives strip deletion."""
+    resolved_id = normalize_device_id(device_id)
+    cleaned = (custom_name or "").strip()[:128]
+    if not cleaned:
+        deleted, _ = DeviceDisplayName.objects.filter(
+            user=user,
+            device_id=resolved_id,
+        ).delete()
+        return deleted
+    DeviceDisplayName.objects.update_or_create(
+        user=user,
+        device_id=resolved_id,
+        defaults={"custom_name": cleaned},
+    )
+    return 1
 
 
 def is_placeholder_episode_title(title, episode_number=None):

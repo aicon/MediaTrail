@@ -19,6 +19,11 @@ urlpatterns = [
         views.now_watching_dismiss,
         name="now_watching_dismiss",
     ),
+    path(
+        "now-watching/rename/",
+        views.now_watching_rename,
+        name="now_watching_rename",
+    ),
     path("<str:username>/<media_type:media_type>", views.media_list, name="medialist"),
     path("search", views.media_search, name="search"),
     path(

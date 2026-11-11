@@ -59,8 +59,31 @@
                     <span class="nw-badge-dot"></span>
                     {{ now_watching.status_label }}
                   </span>
-                  {% if now_watching.device_name %}
-                    <span class="nw-device">{{ now_watching.device_name }}</span>
+                  {% if now_watching.device_id %}
+                    <form class="nw-rename"
+                          hx-post="{% url 'now_watching_rename' %}"
+                          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                          hx-target="#now-watching-strip"
+                          hx-swap="outerHTML">
+                      <input type="hidden" name="device_id" value="{{ now_watching.device_id }}">
+                      <label class="nw-device-label">
+                        <span class="sr-only">{% translate "Device name" %}</span>
+                        <input class="nw-device"
+                               type="text"
+                               name="custom_name"
+                               value="{{ now_watching.device_name }}"
+                               maxlength="128"
+                               placeholder="{% translate "Device name" %}"
+                               title="{% translate "Rename this device" %}"
+                               aria-label="{% translate "Rename this device" %}"
+                               hx-post="{% url 'now_watching_rename' %}"
+                               hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                               hx-include="closest form"
+                               hx-target="#now-watching-strip"
+                               hx-swap="outerHTML"
+                               hx-trigger="change delay:500ms, keydown[key=='Enter']">
+                      </label>
+                    </form>
                   {% endif %}
                   {% if now_watching.started_ago %}
                     <span class="nw-started">{{ now_watching.started_ago }}</span>

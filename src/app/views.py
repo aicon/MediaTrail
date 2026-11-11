@@ -34,7 +34,7 @@ from app.models import (
     Status,
     UserMessage,
 )
-from app.playback_operations import dismiss_now_watching
+from app.playback_operations import dismiss_now_watching, set_device_display_name
 from app.providers import manual, services, tmdb
 from app.templatetags import app_tags
 from events.models import Event
@@ -126,6 +126,26 @@ def now_watching_dismiss(request):
     """Clear one Now Watching strip (or all, if device_id is omitted)."""
     device_id = (request.POST.get("device_id") or "").strip() or None
     dismiss_now_watching(request.user, device_id=device_id)
+    return render(
+        request,
+        "app/components/now_watching.html",
+        {
+            "now_watching_list": home_helpers.get_now_watching_contexts(request.user),
+        },
+    )
+
+
+@require_POST
+def now_watching_rename(request):
+    """Rename a playback device; empty name restores the automatic label."""
+    device_id = (request.POST.get("device_id") or "").strip()
+    if not device_id:
+        return HttpResponseBadRequest("device_id required")
+    set_device_display_name(
+        request.user,
+        device_id,
+        request.POST.get("custom_name"),
+    )
     return render(
         request,
         "app/components/now_watching.html",
