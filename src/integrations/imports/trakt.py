@@ -27,7 +27,7 @@ DEVICE_TERMINAL_ERRORS = {
     "invalid_grant",
     "invalid_client",
 }
-DEVICE_TERMINAL_STATUS = {404, 410, 418}
+DEVICE_TERMINAL_STATUS = {409, 410, 418}
 
 
 def device_client_id():
@@ -138,6 +138,7 @@ def poll_device_login(device_code):
 
     pending = response.status_code in {
         requests.codes.bad_request,
+        requests.codes.not_found,
         requests.codes.too_many_requests,
     }
     terminal = (

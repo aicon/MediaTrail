@@ -178,6 +178,28 @@ class TraktOAuthViewTests(TestCase):
         )
 
     @override_settings(TRAKT_API_PKCE="pkce-client-id-1234567890")
+    @patch("integrations.imports.trakt._post_trakt")
+    def test_device_poll_keeps_the_code_when_trakt_returns_404(self, mock_post):
+        """A not-found token check is still waiting, and the code stays usable."""
+        session = self.client.session
+        session["trakt_device"] = {
+            "device_code": "secret-device-code",
+            "interval": 5,
+            "expires_at": time.time() + 600,
+            "mode": "new",
+            "frequency": "once",
+            "time": "14:30",
+        }
+        session.save()
+        mock_post.return_value = TraktResponse(404, None)
+
+        response = self.client.post(reverse("trakt_device_poll"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["status"], "pending")
+        self.assertIn("trakt_device", self.client.session)
+
+    @override_settings(TRAKT_API_PKCE="pkce-client-id-1234567890")
     @patch("integrations.views.tasks.import_trakt.delay")
     @patch(
         "integrations.views.trakt.get_username_from_oauth",

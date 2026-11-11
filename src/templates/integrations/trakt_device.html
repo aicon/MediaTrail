@@ -16,13 +16,17 @@
         interval: options.interval,
         polling: false,
         init() {
-          this.poll();
+          this.schedule(this.interval);
           document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === "visible") {
               this.pollNow();
             }
           });
-          window.addEventListener("pageshow", () => this.pollNow());
+          window.addEventListener("pageshow", (event) => {
+            if (event.persisted) {
+              this.pollNow();
+            }
+          });
         },
         timer: null,
         schedule(seconds) {
@@ -55,7 +59,7 @@
             data = {};
           }
           this.polling = false;
-          if (data.status === "pending") {
+          if (data.status === "pending" || (!response.ok && data.status !== "error")) {
             const seconds = Math.max(5, Number(data.interval) || this.interval);
             this.schedule(seconds);
             return;
@@ -108,11 +112,6 @@
     <p class="mt-3 text-sm text-gray-400">
       {% translate "After you approve on Trakt, return to this page. The connection is saved and the import uses the time you already chose." %}
     </p>
-    <button type="button"
-            @click="pollNow()"
-            class="mt-4 px-4 py-2 text-sm rounded-md bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer">
-      {% translate "Check approval" %}
-    </button>
     <p class="mt-4 text-xs text-gray-500">
       {% translate "A free Trakt account can connect only two applications. The code stays here until it expires." %}
     </p>

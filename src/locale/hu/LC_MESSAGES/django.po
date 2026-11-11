@@ -871,9 +871,6 @@ msgstr "A Trakt-kód lejárt. Kezdd újra."
 msgid "After you approve on Trakt, return to this page. The connection is saved and the import uses the time you already chose."
 msgstr "A Trakt jóváhagyása után térj vissza erre az oldalra. A kapcsolat elmentődik, és az import a már beállított időpontot használja."
 
-msgid "Check approval"
-msgstr "Jóváhagyás ellenőrzése"
-
 msgid "Import TV shows, movies and anime"
 msgstr "Sorozatok, filmek és animék importálása"
 

@@ -4,7 +4,7 @@
 
 A self-hosted personal media tracker and digital logbook for everything you watch, read, and play.
 
-[![Release](https://img.shields.io/badge/version-0.25.9-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Release](https://img.shields.io/badge/version-0.25.10-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Documentation](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/)
