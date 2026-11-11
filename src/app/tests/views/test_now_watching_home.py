@@ -238,3 +238,73 @@ class NowWatchingHomeTests(TestCase):
         self.assertContains(response, 'id="now-watching-strip"')
         self.assertNotContains(response, "Now Watching")
         self.assertFalse(LivePlayback.objects.filter(user=self.user).exists())
+
+    def test_two_devices_show_two_strips(self):
+        """Phone and TV sessions appear as separate cards."""
+        upsert_live_playback(
+            user=self.user,
+            media_type=MediaTypes.MOVIE.value,
+            source=Sources.TMDB.value,
+            media_id="550",
+            position_ms=10_000,
+            duration_ms=100_000,
+            device_id="phone-1",
+            device_label="telefon",
+        )
+        upsert_live_playback(
+            user=self.user,
+            media_type=MediaTypes.TV.value,
+            source=Sources.TMDB.value,
+            media_id="1396",
+            season_number=2,
+            episode_number=21,
+            position_ms=20_000,
+            duration_ms=100_000,
+            device_id="tv-1",
+            device_label="TV",
+        )
+        LivePlayback.objects.filter(device_id="tv-1").update(
+            episode_title="The Committee",
+        )
+        response = self.client.get(reverse("now_watching_partial"))
+        self.assertContains(response, "Fight Club")
+        self.assertContains(response, "Starsky &amp; Hutch")
+        self.assertContains(response, "telefon")
+        self.assertContains(response, "TV")
+        self.assertContains(response, 'hx-vals=\'{"device_id": "phone-1"}\'')
+
+    def test_dismiss_one_device_keeps_the_other(self):
+        """Dismiss with device_id only clears that strip."""
+        upsert_live_playback(
+            user=self.user,
+            media_type=MediaTypes.MOVIE.value,
+            source=Sources.TMDB.value,
+            media_id="550",
+            position_ms=10_000,
+            duration_ms=100_000,
+            device_id="phone-1",
+            device_label="telefon",
+        )
+        upsert_live_playback(
+            user=self.user,
+            media_type=MediaTypes.MOVIE.value,
+            source=Sources.TMDB.value,
+            media_id="550",
+            position_ms=40_000,
+            duration_ms=100_000,
+            device_id="tv-1",
+            device_label="TV",
+        )
+        response = self.client.post(
+            reverse("now_watching_dismiss"),
+            {"device_id": "phone-1"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "telefon")
+        self.assertContains(response, "TV")
+        self.assertFalse(
+            LivePlayback.objects.filter(user=self.user, device_id="phone-1").exists(),
+        )
+        self.assertTrue(
+            LivePlayback.objects.filter(user=self.user, device_id="tv-1").exists(),
+        )

@@ -2045,10 +2045,14 @@ class LivePlaybackStatus(models.TextChoices):
     PAUSED = "paused", "Paused"
 
 
+LEGACY_DEVICE_ID = "legacy"
+
+
 class LivePlayback(models.Model):
     """Active or paused playback position for a movie or episode.
 
     Separate from Episode/Movie history rows, which represent completed watches.
+    One row per (user, device_id): the device owns the strip.
     """
 
     user = models.ForeignKey(
@@ -2061,6 +2065,8 @@ class LivePlayback(models.Model):
         on_delete=models.CASCADE,
         related_name="live_playbacks",
     )
+    device_id = models.CharField(max_length=128, default=LEGACY_DEVICE_ID)
+    device_label = models.CharField(max_length=128, blank=True, default="")
     position_ms = models.PositiveBigIntegerField(default=0)
     duration_ms = models.PositiveBigIntegerField(null=True, blank=True)
     status = models.CharField(
@@ -2080,8 +2086,8 @@ class LivePlayback(models.Model):
 
         constraints = [
             UniqueConstraint(
-                fields=["user", "item"],
-                name="unique_live_playback_per_user_item",
+                fields=["user", "device_id"],
+                name="unique_live_playback_per_user_device",
             ),
             CheckConstraint(
                 condition=Q(status__in=LivePlaybackStatus.values),
@@ -2098,7 +2104,57 @@ class LivePlayback(models.Model):
 
     def __str__(self):
         """Return a short label for admin and logs."""
-        return f"{self.user_id}:{self.item} @ {self.position_ms}ms ({self.status})"
+        return (
+            f"{self.user_id}:{self.device_id}:{self.item} "
+            f"@ {self.position_ms}ms ({self.status})"
+        )
+
+    @property
+    def display_device_name(self):
+        """Custom rename if set, otherwise the last client label."""
+        custom = (
+            DeviceDisplayName.objects.filter(
+                user_id=self.user_id,
+                device_id=self.device_id,
+            )
+            .values_list("custom_name", flat=True)
+            .first()
+        )
+        if custom and custom.strip():
+            return custom.strip()
+        label = (self.device_label or "").strip()
+        if label:
+            return label
+        if self.device_id == LEGACY_DEVICE_ID:
+            return "Ismeretlen eszköz"
+        return self.device_id
+
+
+class DeviceDisplayName(models.Model):
+    """User-chosen label for a playback device; survives live-row deletion."""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="device_display_names",
+    )
+    device_id = models.CharField(max_length=128)
+    custom_name = models.CharField(max_length=128)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        """Meta options for the model."""
+
+        constraints = [
+            UniqueConstraint(
+                fields=["user", "device_id"],
+                name="unique_device_display_name_per_user",
+            ),
+        ]
+
+    def __str__(self):
+        """Return a short label for admin and logs."""
+        return f"{self.user_id}:{self.device_id}={self.custom_name}"
 
     def clean(self):
         """Restrict live playback to movie and episode items."""

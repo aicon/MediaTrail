@@ -7,98 +7,106 @@
      hx-get="{% url 'now_watching_partial' %}"
      hx-trigger="every 10s"
      hx-swap="outerHTML">
-  {% if now_watching %}
-    <section class="nw-card">
-      <div class="nw-stage">
-        {% if now_watching.image %}
-          <div class="nw-backdrop" aria-hidden="true">
-            <img src="{{ now_watching.image }}" alt="" loading="lazy">
-            <div class="nw-backdrop-shade"></div>
-          </div>
-        {% endif %}
-
-        {% if now_watching.percent_watched is not None %}
-          <div class="nw-wash-elapsed"
-               style="--nw-pct: {{ now_watching.percent_watched }}"
-               aria-hidden="true"></div>
-        {% endif %}
-
-        <button type="button"
-                class="nw-dismiss"
-                hx-post="{% url 'now_watching_dismiss' %}"
-                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                hx-target="#now-watching-strip"
-                hx-swap="outerHTML"
-                title="Dismiss Now Watching"
-                aria-label="{% translate "Dismiss Now Watching" %}">
-          <svg class="nw-dismiss-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
-            <path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/>
-          </svg>
-        </button>
-
-        <div class="nw-layout">
-          <a class="nw-poster-link" href="{{ now_watching.detail_url }}">
-            {% if now_watching.poster_image %}
-              <img class="nw-poster"
-                   src="{{ now_watching.poster_image }}"
-                   alt=""
-                   width="64"
-                   height="96"
-                   loading="lazy">
-            {% else %}
-              <div class="nw-poster" aria-hidden="true"></div>
+  {% if now_watching_list %}
+    <div class="nw-stack">
+      {% for now_watching in now_watching_list %}
+        <section class="nw-card">
+          <div class="nw-stage">
+            {% if now_watching.image %}
+              <div class="nw-backdrop" aria-hidden="true">
+                <img src="{{ now_watching.image }}" alt="" loading="lazy">
+                <div class="nw-backdrop-shade"></div>
+              </div>
             {% endif %}
-          </a>
 
-          <div class="nw-main">
-            <div class="nw-status-row">
-              <span class="nw-badge {% if now_watching.is_watching %}nw-badge-watching{% else %}nw-badge-paused{% endif %}">
-                <span class="nw-badge-dot"></span>
-                {{ now_watching.status_label }}
-              </span>
-              {% if now_watching.started_ago %}
-                <span class="nw-started">{{ now_watching.started_ago }}</span>
-              {% endif %}
+            {% if now_watching.percent_watched is not None %}
+              <div class="nw-wash-elapsed"
+                   style="--nw-pct: {{ now_watching.percent_watched }}"
+                   aria-hidden="true"></div>
+            {% endif %}
+
+            <button type="button"
+                    class="nw-dismiss"
+                    hx-post="{% url 'now_watching_dismiss' %}"
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    hx-vals='{"device_id": "{{ now_watching.device_id|escapejs }}"}'
+                    hx-target="#now-watching-strip"
+                    hx-swap="outerHTML"
+                    title="Dismiss Now Watching"
+                    aria-label="{% translate "Dismiss Now Watching" %}">
+              <svg class="nw-dismiss-icon" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+                <path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/>
+              </svg>
+            </button>
+
+            <div class="nw-layout">
+              <a class="nw-poster-link" href="{{ now_watching.detail_url }}">
+                {% if now_watching.poster_image %}
+                  <img class="nw-poster"
+                       src="{{ now_watching.poster_image }}"
+                       alt=""
+                       width="64"
+                       height="96"
+                       loading="lazy">
+                {% else %}
+                  <div class="nw-poster" aria-hidden="true"></div>
+                {% endif %}
+              </a>
+
+              <div class="nw-main">
+                <div class="nw-status-row">
+                  <span class="nw-badge {% if now_watching.is_watching %}nw-badge-watching{% else %}nw-badge-paused{% endif %}">
+                    <span class="nw-badge-dot"></span>
+                    {{ now_watching.status_label }}
+                  </span>
+                  {% if now_watching.device_name %}
+                    <span class="nw-device">{{ now_watching.device_name }}</span>
+                  {% endif %}
+                  {% if now_watching.started_ago %}
+                    <span class="nw-started">{{ now_watching.started_ago }}</span>
+                  {% endif %}
+                </div>
+
+                <a class="nw-title" href="{{ now_watching.detail_url }}">
+                  {{ now_watching.title }}{% if now_watching.year %} <span class="nw-year">({{ now_watching.year }})</span>{% endif %}
+                </a>
+                {% if now_watching.is_episode %}
+                  <div class="nw-episode-row">
+                    {% if now_watching.season_episode %}
+                      <span class="nw-se">{{ now_watching.season_episode }}</span>
+                    {% endif %}
+                    {% if now_watching.episode_title %}
+                      <span class="nw-episode-title">{{ now_watching.episode_title }}</span>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="nw-progress">
+                {% if now_watching.percent_watched is not None %}
+                  <div>
+                    <div class="nw-percent">{{ now_watching.percent_watched }}%</div>
+                    <div class="nw-watched-label">{% translate "Watched" %}</div>
+                  </div>
+                {% endif %}
+                {% if now_watching.remaining_short %}
+                  <div class="nw-remaining">
+                    {{ now_watching.remaining_short }}
+                    <span class="nw-left-label">{% translate "Left" %}</span>
+                  </div>
+                {% endif %}
+              </div>
             </div>
 
-            <a class="nw-title" href="{{ now_watching.detail_url }}">
-              {{ now_watching.title }}{% if now_watching.year %} <span class="nw-year">({{ now_watching.year }})</span>{% endif %}
-            </a>
-            {% if now_watching.is_episode %}
-              <div class="nw-episode-row">
-                {% if now_watching.season_episode %}
-                  <span class="nw-se">{{ now_watching.season_episode }}</span>
-                {% endif %}
-                {% if now_watching.episode_title %}
-                  <span class="nw-episode-title">{{ now_watching.episode_title }}</span>
-                {% endif %}
-              </div>
-            {% endif %}
-          </div>
-
-          <div class="nw-progress">
             {% if now_watching.percent_watched is not None %}
-              <div>
-                <div class="nw-percent">{{ now_watching.percent_watched }}%</div>
-                <div class="nw-watched-label">{% translate "Watched" %}</div>
-              </div>
-            {% endif %}
-            {% if now_watching.remaining_short %}
-              <div class="nw-remaining">
-                {{ now_watching.remaining_short }}
-                <span class="nw-left-label">{% translate "Left" %}</span>
+              <div class="nw-bar-track">
+                <div class="nw-bar-fill"
+                     style="width: {{ now_watching.percent_watched }}%"></div>
               </div>
             {% endif %}
           </div>
-        </div>
-
-        {% if now_watching.percent_watched is not None %}
-          <div class="nw-bar-track">
-            <div class="nw-bar-fill"
-                 style="width: {{ now_watching.percent_watched }}%"></div>
-          </div>
-        {% endif %}
-      </div>
-    </section>
+        </section>
+      {% endfor %}
+    </div>
   {% endif %}
 </div>

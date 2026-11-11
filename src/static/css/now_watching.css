@@ -4,6 +4,13 @@
   width: 100%;
 }
 
+.nw-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
 .nw-card {
   position: relative;
   overflow: hidden;
@@ -179,6 +186,22 @@
   border-radius: 9999px;
   background: #fff;
   flex-shrink: 0;
+}
+
+.nw-device {
+  display: inline-flex;
+  align-items: center;
+  max-width: 10rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.7rem;
+  line-height: 1.2;
 }
 
 .nw-started {

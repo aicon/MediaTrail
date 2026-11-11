@@ -73,6 +73,7 @@ class LivePlaybackModelTests(TestCase):
         zero_duration = LivePlayback.objects.create(
             user=self.user,
             item=self.episode,
+            device_id="episode-device",
             position_ms=90_000,
             duration_ms=0,
             status=LivePlaybackStatus.WATCHING,
@@ -143,6 +144,75 @@ class LivePlaybackModelTests(TestCase):
         self.assertEqual(playback.position_ms, 90_000)
         self.assertEqual(playback.status, LivePlaybackStatus.PAUSED)
 
+    def test_two_devices_same_item_keep_separate_rows(self):
+        """The same title on two devices creates two live rows."""
+        phone = upsert_live_playback(
+            user=self.user,
+            media_type=MediaTypes.MOVIE.value,
+            source=Sources.TMDB.value,
+            media_id="550",
+            position_ms=10_000,
+            duration_ms=100_000,
+            device_id="phone-1",
+            device_label="telefon",
+        )
+        tv = upsert_live_playback(
+            user=self.user,
+            media_type=MediaTypes.MOVIE.value,
+            source=Sources.TMDB.value,
+            media_id="550",
+            position_ms=40_000,
+            duration_ms=100_000,
+            device_id="tv-1",
+            device_label="TV",
+        )
+        self.assertNotEqual(phone.id, tv.id)
+        self.assertEqual(LivePlayback.objects.filter(user=self.user).count(), 2)
+        self.assertEqual(phone.position_ms, 10_000)
+        self.assertEqual(tv.position_ms, 40_000)
+
+    def test_same_device_content_switch_updates_one_row(self):
+        """One device switching titles updates its own row only."""
+        upsert_live_playback(
+            user=self.user,
+            media_type=MediaTypes.MOVIE.value,
+            source=Sources.TMDB.value,
+            media_id="550",
+            position_ms=10_000,
+            duration_ms=100_000,
+            device_id="tv-1",
+            device_label="TV",
+        )
+        other = upsert_live_playback(
+            user=self.user,
+            media_type=MediaTypes.TV.value,
+            source=Sources.TMDB.value,
+            media_id="1396",
+            season_number=2,
+            episode_number=21,
+            position_ms=5_000,
+            duration_ms=100_000,
+            device_id="phone-1",
+            device_label="telefon",
+        )
+        switched = upsert_live_playback(
+            user=self.user,
+            media_type=MediaTypes.TV.value,
+            source=Sources.TMDB.value,
+            media_id="1396",
+            season_number=2,
+            episode_number=21,
+            position_ms=20_000,
+            duration_ms=100_000,
+            device_id="tv-1",
+            device_label="TV",
+        )
+        self.assertEqual(LivePlayback.objects.filter(user=self.user).count(), 2)
+        self.assertEqual(switched.item_id, self.episode.id)
+        self.assertEqual(switched.position_ms, 20_000)
+        other.refresh_from_db()
+        self.assertEqual(other.position_ms, 5_000)
+
     def test_pause_keeps_row(self):
         """Pause keeps the live row so the strip can show PAUSED."""
         upsert_live_playback(
@@ -179,6 +249,8 @@ class LivePlaybackModelTests(TestCase):
             media_id="550",
             position_ms=10_000,
             duration_ms=100_000,
+            device_id="phone-1",
+            device_label="telefon",
         )
         upsert_live_playback(
             user=self.user,
@@ -189,6 +261,8 @@ class LivePlaybackModelTests(TestCase):
             episode_number=21,
             position_ms=50_000,
             duration_ms=100_000,
+            device_id="tv-1",
+            device_label="TV",
         )
         now = get_now_watching(self.user)
         self.assertEqual(now.item_id, self.episode.id)

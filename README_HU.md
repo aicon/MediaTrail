@@ -4,7 +4,7 @@
 
 Saját üzemeltetésű személyes médiakatalógus és napló mindarról, amit megnézel, elolvasol vagy végigjátszol.
 
-[![Verzió](https://img.shields.io/badge/verzió-0.25.17-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Verzió](https://img.shields.io/badge/verzió-0.25.18-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![Licenc: AGPL v3](https://img.shields.io/badge/Licenc-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Dokumentáció](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/hu/)
@@ -139,7 +139,6 @@ A MediaTrailhez külön segédprogramok érhetők el a lejátszási események a
 
 | Név | Leírás |
 | :--- | :--- |
-| **[MediaTrail-Scrobbler](https://github.com/aicon/MediaTrail-Scrobbler)** | Háttérszolgáltatás, amely a Nuvio lejátszási eseményeit írja a MediaTrailba. (`ghcr.io/aicon/mediatrail-scrobbler`) |
 | **[NuvioTV-MT](https://github.com/aicon/NuvioTV-MT)** | Tévére szabott Nuvio kliens saját példánya, beépített MediaTrail scrobblerrel. |
 | **[NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT)** | Mobil Nuvio kliens MediaTrail támogatással. |
 

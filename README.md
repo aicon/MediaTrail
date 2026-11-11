@@ -4,7 +4,7 @@
 
 A self-hosted personal media tracker and digital logbook for everything you watch, read, and play.
 
-[![Release](https://img.shields.io/badge/version-0.25.17-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Release](https://img.shields.io/badge/version-0.25.18-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Documentation](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/)
@@ -139,7 +139,6 @@ MediaTrail connects with dedicated companion applications to automatically scrob
 
 | Project | Description |
 | :--- | :--- |
-| **[MediaTrail-Scrobbler](https://github.com/aicon/MediaTrail-Scrobbler)** | Background service that scrobbles Nuvio playback events to MediaTrail. (`ghcr.io/aicon/mediatrail-scrobbler`) |
 | **[NuvioTV-MT](https://github.com/aicon/NuvioTV-MT)** | Dedicated Android TV build with native MediaTrail scrobbler integration. |
 | **[NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT)** | Dedicated mobile client build with MediaTrail support. |
 

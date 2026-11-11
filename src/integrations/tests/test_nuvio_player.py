@@ -62,6 +62,7 @@ class NuvioPlayerTests(TestCase):
             mock_upsert.call_args.kwargs["status"],
             LivePlaybackStatus.WATCHING,
         )
+        self.assertEqual(mock_upsert.call_args.kwargs["device_id"], "legacy")
 
     @patch("integrations.nuvio_player.upsert_live_playback")
     @patch(

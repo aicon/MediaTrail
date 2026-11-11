@@ -14,6 +14,7 @@ from django.utils import timezone
 
 from app.models import (
     Item,
+    LEGACY_DEVICE_ID,
     LivePlayback,
     LivePlaybackStatus,
     MediaTypes,
@@ -21,6 +22,8 @@ from app.models import (
 from app.providers import services
 
 logger = logging.getLogger(__name__)
+
+LEGACY_DEVICE_LABEL = "Ismeretlen eszköz"
 
 _YEAR_RE = re.compile(r"^(\d{4})")
 # TMDB localized placeholders like "21. epizód" / "Episode 21" are not real titles.
@@ -43,10 +46,34 @@ class PlaybackItemNotFoundError(ValueError):
     """Raised when provider metadata does not contain the requested title."""
 
 
-def dismiss_now_watching(user):
-    """Clear every live row for the user without writing history."""
-    deleted, _ = LivePlayback.objects.filter(user=user).delete()
+def dismiss_now_watching(user, device_id=None):
+    """Clear live row(s) without writing history.
+
+    When ``device_id`` is set, only that device strip is removed.
+    """
+    qs = LivePlayback.objects.filter(user=user)
+    if device_id:
+        qs = qs.filter(device_id=normalize_device_id(device_id))
+    deleted, _ = qs.delete()
     return deleted
+
+
+def normalize_device_id(device_id):
+    """Return a safe device id, falling back to the legacy bucket."""
+    cleaned = (device_id or "").strip()
+    if not cleaned:
+        return LEGACY_DEVICE_ID
+    return cleaned[:128]
+
+
+def normalize_device_label(device_label, device_id):
+    """Return a display label for a device."""
+    cleaned = (device_label or "").strip()
+    if cleaned:
+        return cleaned[:128]
+    if normalize_device_id(device_id) == LEGACY_DEVICE_ID:
+        return LEGACY_DEVICE_LABEL
+    return ""
 
 
 def is_placeholder_episode_title(title, episode_number=None):
@@ -151,8 +178,10 @@ def upsert_live_playback(
     status=LivePlaybackStatus.WATCHING,
     season_number=None,
     episode_number=None,
+    device_id=None,
+    device_label=None,
 ):
-    """Create or update a live playback row for a movie or episode."""
+    """Create or update the live playback row for one device."""
     item = resolve_playback_item(
         media_type=media_type,
         source=source,
@@ -167,11 +196,15 @@ def upsert_live_playback(
     position_ms = max(0, int(position_ms))
     if duration_ms is not None:
         duration_ms = max(0, int(duration_ms)) or None
+    resolved_device_id = normalize_device_id(device_id)
+    resolved_label = normalize_device_label(device_label, resolved_device_id)
 
     playback, created = LivePlayback.objects.select_for_update().get_or_create(
         user=user,
-        item=item,
+        device_id=resolved_device_id,
         defaults={
+            "item": item,
+            "device_label": resolved_label,
             "position_ms": position_ms,
             "duration_ms": duration_ms,
             "status": status_value,
@@ -181,14 +214,24 @@ def upsert_live_playback(
     if created:
         _apply_display_metadata(playback, item, force=True)
         playback.save()
-        logger.info("Created live playback for %s (%s)", item, user)
+        logger.info(
+            "Created live playback device=%s item=%s (%s)",
+            resolved_device_id,
+            item,
+            user,
+        )
         return playback
 
-    # Zero-position guard: keep last known seek when client reports 0.
-    if position_ms <= 0 and playback.position_ms > 0:
+    item_changed = playback.item_id != item.id
+    if item_changed:
+        playback.item = item
+        playback.position_ms = position_ms
+        _apply_display_metadata(playback, item, force=True)
+    elif position_ms <= 0 and playback.position_ms > 0:
+        # Zero-position guard: keep last known seek when client reports 0.
         logger.info(
-            "Ignored zero position for %s; kept %sms",
-            item,
+            "Ignored zero position for device=%s; kept %sms",
+            resolved_device_id,
             playback.position_ms,
         )
     else:
@@ -197,9 +240,14 @@ def upsert_live_playback(
     if duration_ms is not None:
         playback.duration_ms = duration_ms
     playback.status = status_value
-    _apply_display_metadata(playback, item, force=False)
+    if resolved_label:
+        playback.device_label = resolved_label
+    if not item_changed:
+        _apply_display_metadata(playback, item, force=False)
     playback.save(
         update_fields=[
+            "item",
+            "device_label",
             "position_ms",
             "duration_ms",
             "status",
@@ -210,7 +258,8 @@ def upsert_live_playback(
         ],
     )
     logger.info(
-        "Updated live playback for %s to %sms (%s)",
+        "Updated live playback device=%s item=%s to %sms (%s)",
+        resolved_device_id,
         item,
         playback.position_ms,
         playback.status,
@@ -227,16 +276,25 @@ def clear_live_playback(
     season_number=None,
     episode_number=None,
     item=None,
+    device_id=None,
 ):
     """Delete matching live playback row(s). Returns deleted count.
 
     Does not modify Episode/Movie history or tracked media status.
+    When ``device_id`` is set, only that device is cleared.
     """
+    qs = LivePlayback.objects.filter(user=user)
+    if device_id:
+        qs = qs.filter(device_id=normalize_device_id(device_id))
+
     if item is not None:
-        deleted, _ = LivePlayback.objects.filter(user=user, item=item).delete()
+        deleted, _ = qs.filter(item=item).delete()
         return deleted
 
     if not all([media_type, source, media_id]):
+        if device_id:
+            deleted, _ = qs.delete()
+            return deleted
         raise ValidationError(
             "media_type, source and media_id are required to clear playback.",
         )
@@ -249,13 +307,13 @@ def clear_live_playback(
         episode_number=episode_number,
     )
     items = Item.objects.filter(**lookup)
-    deleted, _ = LivePlayback.objects.filter(user=user, item__in=items).delete()
+    deleted, _ = qs.filter(item__in=items).delete()
     return deleted
 
 
-def clear_live_playback_for_item(*, user, item):
+def clear_live_playback_for_item(*, user, item, device_id=None):
     """Delete live playback for a concrete Item (e.g. after completion)."""
-    return clear_live_playback(user=user, item=item)
+    return clear_live_playback(user=user, item=item, device_id=device_id)
 
 
 def refresh_playback_display(playback):

@@ -4,16 +4,31 @@ from django.utils.translation import gettext as _
 
 from app.models import BasicMedia, LivePlaybackStatus, MediaTypes, Status
 from app.playback_operations import (
-    get_now_watching,
     is_placeholder_episode_title,
+    list_live_playbacks,
     refresh_playback_display,
 )
 from app.templatetags.app_tags import slug
 
 
+def get_now_watching_contexts(user):
+    """Build template contexts for every active Now Watching strip."""
+    contexts = []
+    for playback in list_live_playbacks(user):
+        context = _playback_context(playback)
+        if context is not None:
+            contexts.append(context)
+    return contexts
+
+
 def get_now_watching_context(user):
-    """Build template context for the Now Watching home strip."""
-    playback = get_now_watching(user)
+    """Build template context for the newest Now Watching strip (compat)."""
+    contexts = get_now_watching_contexts(user)
+    return contexts[0] if contexts else None
+
+
+def _playback_context(playback):
+    """Build one strip context from a LivePlayback row."""
     if playback is None:
         return None
 
@@ -82,6 +97,8 @@ def get_now_watching_context(user):
         "media_type": MediaTypes.TV.value if is_episode else item.media_type,
         "season_number": item.season_number,
         "detail_url": detail_url,
+        "device_id": playback.device_id,
+        "device_name": playback.display_device_name,
     }
 
 

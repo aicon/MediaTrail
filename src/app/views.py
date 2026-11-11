@@ -104,31 +104,34 @@ def home(request):
         "sort_choices": HomeSortChoices.choices,
         "hide_unreleased": hide_unreleased,
         "items_limit": items_limit,
-        "now_watching": home_helpers.get_now_watching_context(request.user),
+        "now_watching_list": home_helpers.get_now_watching_contexts(request.user),
     }
     return render(request, "app/home.html", context)
 
 
 @require_GET
 def now_watching_partial(request):
-    """HTMX fragment for the home Now Watching strip (polled while on home)."""
+    """HTMX fragment for the home Now Watching strips (polled while on home)."""
     return render(
         request,
         "app/components/now_watching.html",
         {
-            "now_watching": home_helpers.get_now_watching_context(request.user),
+            "now_watching_list": home_helpers.get_now_watching_contexts(request.user),
         },
     )
 
 
 @require_POST
 def now_watching_dismiss(request):
-    """Clear a stuck Now Watching strip without writing history."""
-    dismiss_now_watching(request.user)
+    """Clear one Now Watching strip (or all, if device_id is omitted)."""
+    device_id = (request.POST.get("device_id") or "").strip() or None
+    dismiss_now_watching(request.user, device_id=device_id)
     return render(
         request,
         "app/components/now_watching.html",
-        {"now_watching": None},
+        {
+            "now_watching_list": home_helpers.get_now_watching_contexts(request.user),
+        },
     )
 
 

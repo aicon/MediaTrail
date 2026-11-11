@@ -2,6 +2,7 @@
 
 Matches the MediaTrail-Scrobbler addon contract: same path shape, unquoted
 video ids, start at zero creates the strip, later zero ticks keep the last seek.
+One live strip per device; stop/pause only touch that device.
 """
 
 import logging
@@ -14,6 +15,7 @@ from django.utils import timezone
 
 from app.episode_operations import EpisodeNotFoundError, watch_episode
 from app.models import (
+    LEGACY_DEVICE_ID,
     LivePlayback,
     LivePlaybackStatus,
     MediaTypes,
@@ -23,6 +25,8 @@ from app.models import (
 )
 from app.playback_operations import (
     clear_live_playback,
+    normalize_device_id,
+    normalize_device_label,
     resolve_playback_item,
     upsert_live_playback,
 )
@@ -39,7 +43,7 @@ def manifest(logo=None):
     """Return the Stremio addon manifest Nuvio installs."""
     payload = {
         "id": "community.mediatrail.nuvio",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "name": "MediaTrail",
         "description": "Sends Nuvio playback to this MediaTrail.",
         "resources": ["player"],
@@ -59,17 +63,23 @@ def manifest(logo=None):
 def handle_player(user, media_type, video_id, extra, query):
     """Apply one Nuvio player event for this user."""
     params = _player_params(extra, query)
-    action = (params.get("action") or "").strip().lower()
+    action = (params.get("action") or "").strip().lowercase()
     if action == "resume":
         action = "start"
     current_ms = _as_int(params.get("currentTime"))
     duration_ms = _as_int(params.get("duration"))
+    device_id = normalize_device_id(params.get("deviceId") or params.get("device_id"))
+    device_label = normalize_device_label(
+        params.get("deviceName") or params.get("device_name"),
+        device_id,
+    )
     target = _parse_video_id(video_id)
     logger.info(
-        "Nuvio player action=%s type=%s videoId=%s currentTime=%s duration=%s",
+        "Nuvio player action=%s type=%s videoId=%s device=%s currentTime=%s duration=%s",
         action,
         media_type,
         video_id,
+        device_id,
         current_ms,
         duration_ms,
     )
@@ -89,13 +99,39 @@ def handle_player(user, media_type, video_id, extra, query):
         return
 
     if action == "stop":
-        _stop(user, target, tmdb_id, current_ms, duration_ms)
+        _stop(
+            user,
+            target,
+            tmdb_id,
+            current_ms,
+            duration_ms,
+            device_id=device_id,
+        )
         return
-    _progress(user, target, tmdb_id, action, current_ms, duration_ms)
+    _progress(
+        user,
+        target,
+        tmdb_id,
+        action,
+        current_ms,
+        duration_ms,
+        device_id=device_id,
+        device_label=device_label,
+    )
 
 
-def _progress(user, target, tmdb_id, action, current_ms, duration_ms):
-    """Update the Now Watching row like the scrobbler did."""
+def _progress(
+    user,
+    target,
+    tmdb_id,
+    action,
+    current_ms,
+    duration_ms,
+    *,
+    device_id,
+    device_label,
+):
+    """Update the Now Watching row for one device."""
     # start@0 creates the strip immediately. Later zero/empty ticks keep the
     # last seek inside upsert_live_playback.
     if current_ms is None:
@@ -120,17 +156,19 @@ def _progress(user, target, tmdb_id, action, current_ms, duration_ms):
             status=status,
             season_number=target["season"],
             episode_number=target["episode"],
+            device_id=device_id,
+            device_label=device_label,
         )
     except (ValidationError, services.ProviderAPIError):
         logger.exception("Nuvio playback update failed for %s", target["key"])
 
 
-def _stop(user, target, tmdb_id, current_ms, duration_ms):
-    """Hide Now Watching, then save a finished watch at 90 percent."""
+def _stop(user, target, tmdb_id, current_ms, duration_ms, *, device_id):
+    """Hide this device's Now Watching, then maybe save a finished watch."""
     progress = _progress_ratio(current_ms, duration_ms)
     if progress is None:
-        progress = _stored_progress(user, target, tmdb_id)
-    LivePlayback.objects.filter(user=user).delete()
+        progress = _stored_progress(user, target, tmdb_id, device_id=device_id)
+    clear_live_playback(user=user, device_id=device_id)
     if progress is None or progress < WATCHED_THRESHOLD:
         return
     if cache.get(_dedupe_key(user, target)):
@@ -138,7 +176,7 @@ def _stop(user, target, tmdb_id, current_ms, duration_ms):
     when = timezone.now().replace(second=0, microsecond=0)
     try:
         if target["kind"] == "movie":
-            _complete_movie(user, tmdb_id, when)
+            _complete_movie(user, tmdb_id, when, device_id=device_id)
         else:
             watch_episode(
                 user=user,
@@ -148,14 +186,23 @@ def _stop(user, target, tmdb_id, current_ms, duration_ms):
                 episode_number=target["episode"],
                 end_date=when,
             )
+            clear_live_playback(
+                user=user,
+                media_type=MediaTypes.TV.value,
+                source=Sources.TMDB.value,
+                media_id=str(tmdb_id),
+                season_number=target["season"],
+                episode_number=target["episode"],
+                device_id=device_id,
+            )
     except (EpisodeNotFoundError, ValidationError, services.ProviderAPIError):
         logger.exception("Nuvio completion failed for %s", target["key"])
         return
     cache.set(_dedupe_key(user, target), 1, DEDUPE_SECONDS)
 
 
-def _complete_movie(user, tmdb_id, when):
-    """Mark the movie finished and drop its live row."""
+def _complete_movie(user, tmdb_id, when, *, device_id):
+    """Mark the movie finished and drop this device's live row."""
     item = resolve_playback_item(
         media_type=MediaTypes.MOVIE.value,
         source=Sources.TMDB.value,
@@ -167,10 +214,10 @@ def _complete_movie(user, tmdb_id, when):
     movie.status = Status.COMPLETED.value
     movie.end_date = when
     movie.save()
-    clear_live_playback(user=user, item=item)
+    clear_live_playback(user=user, item=item, device_id=device_id)
 
 
-def _stored_progress(user, target, tmdb_id):
+def _stored_progress(user, target, tmdb_id, *, device_id):
     """Use the saved Now Watching position when the stop event has no time."""
     try:
         item = resolve_playback_item(
@@ -182,7 +229,13 @@ def _stored_progress(user, target, tmdb_id):
         )
     except (ValidationError, services.ProviderAPIError):
         return None
-    row = LivePlayback.objects.filter(user=user, item=item).first()
+    row = LivePlayback.objects.filter(
+        user=user,
+        item=item,
+        device_id=normalize_device_id(device_id),
+    ).first()
+    if row is None and normalize_device_id(device_id) != LEGACY_DEVICE_ID:
+        row = LivePlayback.objects.filter(user=user, item=item).first()
     if row is None or not row.duration_ms:
         return None
     return max(0.0, min(1.0, row.position_ms / row.duration_ms))
@@ -232,43 +285,44 @@ def _parse_video_id(video_id):
     }
 
 
-def _player_params(extra, query):
-    """Read action and times from the Stremio path or query string."""
-    raw = unquote(extra or "")
-    if raw.endswith(".json"):
-        raw = raw[: -len(".json")]
-    parsed = {
-        key: values[0]
-        for key, values in parse_qs(raw.replace(";", "&")).items()
-        if values
-    }
-    for key in ("action", "currentTime", "duration"):
-        value = query.get(key) if query is not None else None
-        if value and key not in parsed:
-            parsed[key] = value
-    return parsed
-
-
-def _progress_ratio(current_ms, duration_ms):
-    if current_ms is None or not duration_ms or duration_ms <= 0 or current_ms <= 0:
-        return None
-    return max(0.0, min(1.0, current_ms / duration_ms))
-
-
 def _playback_type(target):
+    """Map parsed video id to MediaTrail media_type."""
     if target["kind"] == "movie":
         return MediaTypes.MOVIE.value
     return MediaTypes.TV.value
 
 
-def _dedupe_key(user, target):
-    return f"nuvio-stop:{user.pk}:{target['key']}"
+def _player_params(extra, query):
+    """Merge path extras and query string into one dict of first values."""
+    params = {}
+    if extra:
+        raw = unquote(extra)
+        if raw.endswith(".json"):
+            raw = raw[: -len(".json")]
+        params.update({k: v[-1] for k, v in parse_qs(raw, keep_blank_values=True).items()})
+    if query:
+        params.update({k: v[-1] for k, v in parse_qs(query, keep_blank_values=True).items()})
+    return params
 
 
 def _as_int(value):
+    """Parse a non-negative int, or None."""
     if value is None or value == "":
         return None
     try:
-        return int(float(value))
+        number = int(float(str(value).strip()))
     except (TypeError, ValueError):
         return None
+    return number if number >= 0 else None
+
+
+def _progress_ratio(current_ms, duration_ms):
+    """Return watched ratio 0–1, or None when unknown."""
+    if current_ms is None or duration_ms is None or duration_ms <= 0:
+        return None
+    return max(0.0, min(1.0, current_ms / duration_ms))
+
+
+def _dedupe_key(user, target):
+    """Cache key so a double stop does not write history twice."""
+    return f"nuvio-player-complete:{user.id}:{target['key']}"

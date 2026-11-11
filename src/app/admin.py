@@ -5,6 +5,7 @@ from django.contrib import admin
 from django.contrib.admin.sites import AlreadyRegistered
 
 from app.models import (
+    DeviceDisplayName,
     Episode,
     Item,
     LivePlayback,
@@ -50,9 +51,17 @@ class UserMessageAdmin(admin.ModelAdmin):
 class LivePlaybackAdmin(admin.ModelAdmin):
     """Admin for in-progress movie/episode playback sessions."""
 
-    search_fields = ["item__title", "user__username", "item__media_id"]
+    search_fields = [
+        "item__title",
+        "user__username",
+        "item__media_id",
+        "device_id",
+        "device_label",
+    ]
     list_display = [
         "__str__",
+        "device_id",
+        "device_label",
         "status",
         "position_ms",
         "duration_ms",
@@ -75,7 +84,22 @@ class MediaAdmin(admin.ModelAdmin):
 
 # Auto-register remaining models
 app_models = apps.get_app_config("app").get_models()
-SpecialModels = ["Item", "Episode", "BasicMedia", "UserMessage", "LivePlayback"]
+@admin.register(DeviceDisplayName)
+class DeviceDisplayNameAdmin(admin.ModelAdmin):
+    """Admin for renamed playback devices."""
+
+    search_fields = ["device_id", "custom_name", "user__username"]
+    list_display = ["user", "device_id", "custom_name", "updated_at"]
+
+
+SpecialModels = [
+    "Item",
+    "Episode",
+    "BasicMedia",
+    "UserMessage",
+    "LivePlayback",
+    "DeviceDisplayName",
+]
 for model in app_models:
     if (
         not model.__name__.startswith("Historical")

@@ -15,8 +15,8 @@ from django.conf import settings
 from simple_history.utils import bulk_update_with_history
 
 import app
-from app.models import LivePlayback, LivePlaybackStatus, MediaTypes, Sources, Status
-from app.playback_operations import resolve_playback_item, upsert_live_playback
+from app.models import LivePlaybackStatus, MediaTypes, Sources, Status
+from app.playback_operations import upsert_live_playback
 from app.providers import services
 from integrations.imports import helpers
 from integrations.imports.helpers import MediaImportError
@@ -106,13 +106,6 @@ def _show_nuvio_watch(user, current):
     media_type = (
         MediaTypes.MOVIE.value if current["kind"] == "movie" else MediaTypes.TV.value
     )
-    item = resolve_playback_item(
-        media_type=media_type,
-        source=Sources.TMDB.value,
-        media_id=str(rows[0]["id"]),
-        season_number=current["season"],
-        episode_number=current["episode"],
-    )
     upsert_live_playback(
         user=user,
         media_type=media_type,
@@ -127,8 +120,10 @@ def _show_nuvio_watch(user, current):
         ),
         season_number=current["season"],
         episode_number=current["episode"],
+        device_id="legacy",
+        device_label="Ismeretlen eszköz",
     )
-    LivePlayback.objects.filter(user=user).exclude(item=item).delete()
+    # Sync only owns the legacy bucket; player-device strips stay.
     logger.info(
         "Nuvio sync live playback %s s%s e%s for %s",
         current["imdb_id"],
