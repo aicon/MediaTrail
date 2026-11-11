@@ -6,6 +6,7 @@ import secrets
 import time
 from urllib.parse import urlencode
 
+import requests
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_not_required
@@ -16,7 +17,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 import users
 from app import helpers as app_helpers
@@ -161,9 +162,12 @@ def _queue_trakt_import(request, username, refresh_token, state, auth):
         )
 
 
-@require_POST
+@require_http_methods(["GET", "POST"])
 def trakt_device_start(request):
-    """Start a Trakt device-code sign-in and show the code."""
+    """Start a device sign-in, then keep the code page refreshable."""
+    if request.method == "GET":
+        return _render_trakt_device_wait(request)
+
     if not trakt.device_client_id():
         messages.error(request, "The new Trakt API is not configured on this server.")
         return redirect("import_data")
@@ -176,19 +180,33 @@ def trakt_device_start(request):
 
     request.session["trakt_device"] = {
         "device_code": started["device_code"],
+        "user_code": started["user_code"],
+        "verification_url": started["verification_url"],
         "interval": started["interval"],
         "expires_at": time.time() + started["expires_in"],
         "mode": request.POST.get("mode", "new"),
         "frequency": request.POST.get("frequency", "once"),
         "time": request.POST.get("time", ""),
     }
+    return redirect("trakt_device_start")
+
+
+def _render_trakt_device_wait(request):
+    """Show the device code and keep polling after the user comes back."""
+    entry = request.session.get("trakt_device")
+    if not entry or time.time() > float(entry.get("expires_at") or 0):
+        request.session.pop("trakt_device", None)
+        messages.error(request, "The Trakt code expired. Start again.")
+        return redirect("import_data")
+
     return render(
         request,
         "integrations/trakt_device.html",
         {
-            "user_code": started["user_code"],
-            "verification_url": started["verification_url"],
-            "interval": started["interval"],
+            "user_code": entry.get("user_code") or "",
+            "verification_url": entry.get("verification_url")
+            or "https://trakt.tv/activate",
+            "interval": entry.get("interval") or 5,
         },
     )
 
@@ -220,24 +238,30 @@ def trakt_device_poll(request):
         )
 
     token = result["token"]
+    username = ""
     try:
         username = trakt.get_username_from_oauth(
             token["access_token"],
             client_id=trakt.device_client_id(),
         )
-    except helpers.MediaImportError as error:
-        request.session.pop("trakt_device", None)
-        return JsonResponse({"status": "error", "error": str(error)}, status=400)
+    except (helpers.MediaImportError, requests.RequestException):
+        logger.exception("Trakt username lookup failed after device approval")
 
+    request.session.pop("trakt_device", None)
     _queue_trakt_import(
         request,
         username=username,
         refresh_token=token["refresh_token"],
-        state=entry,
+        state={
+            "mode": entry.get("mode") or "new",
+            "frequency": entry.get("frequency") or "once",
+            "time": entry.get("time") or "",
+        },
         auth="device",
     )
-    request.session.pop("trakt_device", None)
-    return JsonResponse({"status": "ok", "redirect": reverse("import_data")})
+    return JsonResponse(
+        {"status": "ok", "redirect": reverse("import_data")},
+    )
 
 
 @require_POST

@@ -14,7 +14,26 @@
       return {
         status: options.waiting,
         interval: options.interval,
+        polling: false,
+        init() {
+          this.poll();
+          document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") {
+              this.pollNow();
+            }
+          });
+          window.addEventListener("pageshow", () => this.pollNow());
+        },
+        timer: null,
+        schedule(seconds) {
+          window.clearTimeout(this.timer);
+          this.timer = window.setTimeout(() => this.poll(), seconds * 1000);
+        },
         async poll() {
+          if (this.polling) {
+            return;
+          }
+          this.polling = true;
           const body = new FormData();
           body.append("csrfmiddlewaretoken", options.csrf);
           let response;
@@ -25,7 +44,8 @@
               headers: {"X-CSRFToken": options.csrf},
             });
           } catch (error) {
-            this.status = options.failed;
+            this.polling = false;
+            this.schedule(this.interval);
             return;
           }
           let data = {};
@@ -34,9 +54,10 @@
           } catch (error) {
             data = {};
           }
+          this.polling = false;
           if (data.status === "pending") {
             const seconds = Math.max(5, Number(data.interval) || this.interval);
-            window.setTimeout(() => this.poll(), seconds * 1000);
+            this.schedule(seconds);
             return;
           }
           if (data.redirect) {
@@ -44,6 +65,10 @@
             return;
           }
           this.status = data.error || options.failed;
+        },
+        pollNow() {
+          window.clearTimeout(this.timer);
+          this.poll();
         },
         async copy() {
           const code = options.code;
@@ -66,8 +91,7 @@
          waiting: '{{ waiting_text|escapejs }}',
          failed: '{{ failed_text|escapejs }}',
          copied: '{{ copied_text|escapejs }}'
-       })"
-       x-init="poll()">
+       })">
     <h2 class="text-xl font-semibold mb-2">{% translate "Connect with the new Trakt API" %}</h2>
     <p class="text-sm text-gray-400 mb-5">
       {% blocktranslate trimmed %}Open <a href="{{ verification_url }}" target="_blank" rel="noopener" class="text-indigo-400 hover:text-indigo-300 underline">trakt.tv/activate</a> and enter this code.{% endblocktranslate %}
@@ -81,6 +105,14 @@
       </button>
     </div>
     <p class="text-sm text-gray-400" x-text="status">{{ waiting_text }}</p>
+    <p class="mt-3 text-sm text-gray-400">
+      {% translate "After you approve on Trakt, return to this page. The connection is saved and the import uses the time you already chose." %}
+    </p>
+    <button type="button"
+            @click="pollNow()"
+            class="mt-4 px-4 py-2 text-sm rounded-md bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer">
+      {% translate "Check approval" %}
+    </button>
     <p class="mt-4 text-xs text-gray-500">
       {% translate "A free Trakt account can connect only two applications. The code stays here until it expires." %}
     </p>

@@ -136,6 +136,7 @@ class TraktOAuthViewTests(TestCase):
         response = self.client.post(
             reverse("trakt_device_start"),
             {"mode": "new", "frequency": "once", "time": "14:30"},
+            follow=True,
         )
 
         self.assertEqual(response.status_code, 200)
@@ -183,13 +184,13 @@ class TraktOAuthViewTests(TestCase):
         return_value="trakt-user",
     )
     @patch("integrations.imports.trakt._post_trakt")
-    def test_device_poll_queues_the_new_api_import(
+    def test_device_poll_queues_with_the_time_chosen_earlier(
         self,
         mock_post,
         _username,
         mock_import,
     ):
-        """Approval queues the import through the new API and drops the device code."""
+        """Approval saves the connection and queues the time already chosen."""
         session = self.client.session
         session["trakt_device"] = {
             "device_code": "secret-device-code",
@@ -212,4 +213,42 @@ class TraktOAuthViewTests(TestCase):
         self.assertNotIn("trakt_device", self.client.session)
         self.assertEqual(mock_import.call_args.kwargs["auth"], "device")
         self.assertEqual(mock_import.call_args.kwargs["username"], "trakt-user")
-        self.assertIsNone(mock_import.call_args.kwargs["redirect_uri"])
+
+    @override_settings(TRAKT_API_PKCE="pkce-client-id-1234567890")
+    @patch("integrations.views.helpers.create_import_schedule")
+    @patch(
+        "integrations.views.trakt.get_username_from_oauth",
+        return_value="trakt-user",
+    )
+    @patch("integrations.imports.trakt._post_trakt")
+    def test_device_poll_keeps_a_recurring_start_time(
+        self,
+        mock_post,
+        _username,
+        mock_schedule,
+    ):
+        """A recurring import keeps the start time chosen before sign-in."""
+        session = self.client.session
+        session["trakt_device"] = {
+            "device_code": "secret-device-code",
+            "interval": 5,
+            "expires_at": time.time() + 600,
+            "mode": "new",
+            "frequency": "daily",
+            "time": "08:15",
+        }
+        session.save()
+        mock_post.return_value = TraktResponse(
+            200,
+            {"access_token": "access", "refresh_token": "refresh"},
+        )
+
+        response = self.client.post(reverse("trakt_device_poll"))
+
+        self.assertEqual(response.json()["redirect"], reverse("import_data"))
+        self.assertEqual(mock_schedule.call_args.args[3], "daily")
+        self.assertEqual(mock_schedule.call_args.args[4], "08:15")
+        self.assertEqual(
+            mock_schedule.call_args.kwargs["task_kwargs"]["auth"],
+            "device",
+        )
