@@ -1,5 +1,3 @@
-import logging
-
 from django.urls import reverse
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
@@ -12,17 +10,9 @@ from app.playback_operations import (
 )
 from app.templatetags.app_tags import slug
 
-logger = logging.getLogger(__name__)
-
 
 def get_now_watching_context(user):
     """Build template context for the Now Watching home strip."""
-    try:
-        from integrations.imports import nuvio
-
-        nuvio.sync_now_watching_throttled(user)
-    except Exception:
-        logger.exception("Could not refresh Now Watching from Nuvio")
     playback = get_now_watching(user)
     if playback is None:
         return None

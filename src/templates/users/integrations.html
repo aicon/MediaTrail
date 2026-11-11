@@ -108,17 +108,9 @@
               <h3 class="text-base font-medium">Nuvio</h3>
             </div>
             <p class="text-gray-400 mb-4 text-sm">{% translate "Connect Nuvio to automatically track your watching progress." %}</p>
-            <div class="bg-[#262a2f] p-4 rounded-md mb-4">
-              <h4 class="text-sm font-medium mb-3">{% translate "Nuvio account" %}</h4>
-              <p class="text-sm text-gray-300 mb-3">{% translate "Save your Nuvio email and password under Import. MediaTrail reads Watch Progress from Nuvio Sync and shows it on the home page." %}</p>
-              <a href="{% url 'import_data' %}"
-                 class="inline-flex items-center px-4 py-2 text-sm rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition-colors">
-                {% translate "Open Import" %}
-              </a>
-            </div>
             <div class="bg-[#262a2f] p-4 rounded-md">
               <h4 class="text-sm font-medium mb-3">{% translate "Addon address" %}</h4>
-              <p class="text-gray-400 mb-3 text-sm">{% translate "Add this address in Nuvio under Settings, Addons." %}</p>
+              <p class="text-gray-400 mb-3 text-sm">{% translate "Add this address in Nuvio under Settings, Addons. Remove the old scrobbler address." %}</p>
               <div class="flex items-start gap-2 mb-4">
                 <textarea readonly
                           id="nuvio-manifest-url"

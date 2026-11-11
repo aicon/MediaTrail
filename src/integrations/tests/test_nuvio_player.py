@@ -62,3 +62,21 @@ class NuvioPlayerTests(TestCase):
             mock_upsert.call_args.kwargs["status"],
             LivePlaybackStatus.WATCHING,
         )
+
+    @patch("integrations.nuvio_player.upsert_live_playback")
+    @patch(
+        "integrations.nuvio_player.tmdb.find",
+        return_value={"movie_results": [], "tv_results": [{"id": 888}]},
+    )
+    def test_encoded_series_id_updates_now_watching(self, _find, mock_upsert):
+        """Nuvio encodes episode colons; the scrobbler unquoted them first."""
+        response = self.client.get(
+            "/nuvio/player/series/tt0072567%3A2%3A21/"
+            "action=progress&currentTime=590000&duration=2842000.json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(mock_upsert.call_args.kwargs["media_id"], "888")
+        self.assertEqual(mock_upsert.call_args.kwargs["season_number"], 2)
+        self.assertEqual(mock_upsert.call_args.kwargs["episode_number"], 21)
+        self.assertEqual(mock_upsert.call_args.kwargs["position_ms"], 590000)

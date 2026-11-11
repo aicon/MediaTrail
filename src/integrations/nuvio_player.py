@@ -1,8 +1,12 @@
-"""Receive Nuvio player events and update Now Watching inside MediaTrail."""
+"""Receive Nuvio player events and update Now Watching inside MediaTrail.
+
+Matches the MediaTrail-Scrobbler addon contract: same path shape, unquoted
+video ids, start at zero creates the strip, later zero ticks keep the last seek.
+"""
 
 import logging
 import re
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, unquote
 
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
@@ -35,7 +39,7 @@ def manifest(logo=None):
     """Return the Stremio addon manifest Nuvio installs."""
     payload = {
         "id": "community.mediatrail.nuvio",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "name": "MediaTrail",
         "description": "Sends Nuvio playback to this MediaTrail.",
         "resources": ["player"],
@@ -43,7 +47,7 @@ def manifest(logo=None):
         "idPrefixes": ["tt"],
         "catalogs": [],
         "behaviorHints": {
-            "configurable": False,
+            "configurable": True,
             "configurationRequired": False,
         },
     }
@@ -69,7 +73,10 @@ def handle_player(user, media_type, video_id, extra, query):
         current_ms,
         duration_ms,
     )
-    if target is None or action not in {"start", "pause", "progress", "stop"}:
+    if target is None:
+        logger.warning("Nuvio player skipped bad videoId=%s", video_id)
+        return
+    if action not in {"start", "pause", "progress", "stop"}:
         return
 
     try:
@@ -88,11 +95,15 @@ def handle_player(user, media_type, video_id, extra, query):
 
 
 def _progress(user, target, tmdb_id, action, current_ms, duration_ms):
-    """Update the Now Watching row."""
+    """Update the Now Watching row like the scrobbler did."""
+    # start@0 creates the strip immediately. Later zero/empty ticks keep the
+    # last seek inside upsert_live_playback.
     if current_ms is None:
-        return
+        if action != "start":
+            return
+        current_ms = 0
     if current_ms <= 0 and action != "start":
-        return
+        current_ms = 0
     status = (
         LivePlaybackStatus.PAUSED
         if action == "pause"
@@ -189,7 +200,7 @@ def _tmdb_id(target):
 
 def _parse_video_id(video_id):
     """Accept movie `tt…` and episode `tt…:season:episode` ids."""
-    raw = (video_id or "").strip()
+    raw = unquote((video_id or "").strip())
     if raw.endswith(".json"):
         raw = raw[: -len(".json")]
     parts = raw.split(":")
@@ -223,7 +234,7 @@ def _parse_video_id(video_id):
 
 def _player_params(extra, query):
     """Read action and times from the Stremio path or query string."""
-    raw = extra or ""
+    raw = unquote(extra or "")
     if raw.endswith(".json"):
         raw = raw[: -len(".json")]
     parsed = {
@@ -232,8 +243,9 @@ def _player_params(extra, query):
         if values
     }
     for key in ("action", "currentTime", "duration"):
-        if query.get(key) and key not in parsed:
-            parsed[key] = query.get(key)
+        value = query.get(key) if query is not None else None
+        if value and key not in parsed:
+            parsed[key] = value
     return parsed
 
 

@@ -12,7 +12,6 @@ from datetime import datetime, timezone
 import requests
 from cryptography.fernet import InvalidToken
 from django.conf import settings
-from django.core.cache import cache
 from simple_history.utils import bulk_update_with_history
 
 import app
@@ -60,25 +59,9 @@ def sync_now_watching(user):
         return False
     current = _current_nuvio_watch(NuvioClient(account))
     if current is None:
-        LivePlayback.objects.filter(user=user).delete()
         return False
     _show_nuvio_watch(user, current)
     return True
-
-
-def sync_now_watching_throttled(user, *, seconds=15):
-    """Refresh from Nuvio Sync at most once per interval for this user."""
-    if not getattr(user, "is_authenticated", False):
-        return False
-    key = f"nuvio-now-watching-sync:{user.pk}"
-    if cache.get(key):
-        return False
-    cache.set(key, 1, max(5, int(seconds)))
-    try:
-        return sync_now_watching(user)
-    except Exception:
-        logger.exception("Nuvio now-watching sync failed for %s", user.pk)
-        return False
 
 
 def _current_nuvio_watch(client):

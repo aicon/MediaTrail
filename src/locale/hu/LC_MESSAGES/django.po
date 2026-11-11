@@ -606,17 +606,11 @@ msgstr "Integrációs szolgáltatások"
 msgid "Connect Nuvio to automatically track your watching progress."
 msgstr "A Nuvio csatlakoztatása a nézési előrehaladás automatikus követéséhez."
 
-msgid "Nuvio account"
-msgstr "Nuvio fiók"
-
-msgid "Save your Nuvio email and password under Import. MediaTrail reads Watch Progress from Nuvio Sync and shows it on the home page."
-msgstr "Mentésd el a Nuvio e-mail címed és jelszavad az Importálás oldalon. A MediaTrail a Nuvio Sync nézési előrehaladásából tölti a kezdőlap sávját."
-
-msgid "Open Import"
-msgstr "Importálás megnyitása"
-
 msgid "Addon address"
 msgstr "Bővítmény címe"
+
+msgid "Add this address in Nuvio under Settings, Addons. Remove the old scrobbler address."
+msgstr "A Nuvio alkalmazásban a Beállítások, Bővítmények alatt add hozzá ezt a címet. A régi scrobbler címet vedd ki."
 
 msgid "Add this address in Nuvio under Settings, Addons."
 msgstr "A Nuvio alkalmazásban a Beállítások, Bővítmények alatt add hozzá ezt a címet."
