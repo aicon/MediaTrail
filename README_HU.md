@@ -4,7 +4,7 @@
 
 Saját üzemeltetésű személyes médiakatalógus és napló mindarról, amit megnézel, elolvasol vagy végigjátszol.
 
-[![Verzió](https://img.shields.io/badge/verzió-0.25.15-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Verzió](https://img.shields.io/badge/verzió-0.25.16-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![Licenc: AGPL v3](https://img.shields.io/badge/Licenc-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Dokumentáció](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/hu/)

@@ -12,10 +12,12 @@ from datetime import datetime, timezone
 import requests
 from cryptography.fernet import InvalidToken
 from django.conf import settings
+from django.core.cache import cache
 from simple_history.utils import bulk_update_with_history
 
 import app
-from app.models import MediaTypes, Sources, Status
+from app.models import LivePlayback, LivePlaybackStatus, MediaTypes, Sources, Status
+from app.playback_operations import resolve_playback_item, upsert_live_playback
 from app.providers import services
 from integrations.imports import helpers
 from integrations.imports.helpers import MediaImportError
@@ -42,6 +44,186 @@ class NuvioError(Exception):
 
 class RecordError(ValueError):
     """A history row is not a movie or episode this import can store."""
+
+
+LIVE_WATCHING_SECONDS = 120
+LIVE_VISIBLE_SECONDS = 15 * 60
+_MS_THRESHOLD = 10_000
+_EPOCH_MS_THRESHOLD = 10_000_000_000
+
+
+def sync_now_watching(user):
+    """Put the newest open Nuvio watch on the home strip."""
+    try:
+        account = user.nuvio_account
+    except NuvioAccount.DoesNotExist:
+        return False
+    current = _current_nuvio_watch(NuvioClient(account))
+    if current is None:
+        LivePlayback.objects.filter(user=user).delete()
+        return False
+    _show_nuvio_watch(user, current)
+    return True
+
+
+def sync_now_watching_throttled(user, *, seconds=15):
+    """Refresh from Nuvio Sync at most once per interval for this user."""
+    if not getattr(user, "is_authenticated", False):
+        return False
+    key = f"nuvio-now-watching-sync:{user.pk}"
+    if cache.get(key):
+        return False
+    cache.set(key, 1, max(5, int(seconds)))
+    try:
+        return sync_now_watching(user)
+    except Exception:
+        logger.exception("Nuvio now-watching sync failed for %s", user.pk)
+        return False
+
+
+def _current_nuvio_watch(client):
+    """Newest in-progress row that is still part of the current session."""
+    profiles = [client._profile_id]
+    for index in client.profile_indexes():
+        if index not in profiles:
+            profiles.append(index)
+    newest = None
+    for profile_id in profiles:
+        for row in client.watch_progress(profile_id):
+            parsed = _parse_progress_row(row)
+            if parsed is None:
+                continue
+            if newest is None or parsed["last_watched"] > newest["last_watched"]:
+                newest = parsed
+    if newest is None:
+        return None
+    age = datetime.now(timezone.utc).timestamp() - _epoch_seconds(
+        newest["last_watched"],
+    )
+    if age > LIVE_VISIBLE_SECONDS:
+        return None
+    duration = _as_ms(newest["duration"])
+    position = _as_ms(newest["position"])
+    if duration and position / duration >= 0.9:
+        return None
+    newest["position_ms"] = position
+    newest["duration_ms"] = duration or None
+    newest["watching"] = age <= LIVE_WATCHING_SECONDS
+    return newest
+
+
+def _show_nuvio_watch(user, current):
+    """Resolve the title and keep only this live row."""
+    found = services.tmdb.find(current["imdb_id"], "imdb_id") or {}
+    key = "movie_results" if current["kind"] == "movie" else "tv_results"
+    rows = found.get(key) or []
+    if not rows or rows[0].get("id") is None:
+        logger.info("No TMDB id for Nuvio watch %s", current["imdb_id"])
+        return
+    media_type = (
+        MediaTypes.MOVIE.value if current["kind"] == "movie" else MediaTypes.TV.value
+    )
+    item = resolve_playback_item(
+        media_type=media_type,
+        source=Sources.TMDB.value,
+        media_id=str(rows[0]["id"]),
+        season_number=current["season"],
+        episode_number=current["episode"],
+    )
+    upsert_live_playback(
+        user=user,
+        media_type=media_type,
+        source=Sources.TMDB.value,
+        media_id=str(rows[0]["id"]),
+        position_ms=current["position_ms"],
+        duration_ms=current["duration_ms"],
+        status=(
+            LivePlaybackStatus.WATCHING
+            if current["watching"]
+            else LivePlaybackStatus.PAUSED
+        ),
+        season_number=current["season"],
+        episode_number=current["episode"],
+    )
+    LivePlayback.objects.filter(user=user).exclude(item=item).delete()
+    logger.info(
+        "Nuvio sync live playback %s s%s e%s for %s",
+        current["imdb_id"],
+        current["season"],
+        current["episode"],
+        user.username,
+    )
+
+
+def _parse_progress_row(row):
+    if not isinstance(row, dict):
+        return None
+    imdb_id = _imdb_id(row.get("content_id")) or _imdb_id(row.get("video_id"))
+    if imdb_id is None:
+        return None
+    kind = _progress_kind(row.get("content_type"))
+    season, episode = _season_episode(row, kind)
+    if kind == "episode" and (season is None or episode is None):
+        return None
+    try:
+        position = int(row.get("position") or 0)
+        duration = int(row.get("duration") or 0)
+        last_watched = int(row.get("last_watched") or 0)
+    except (TypeError, ValueError):
+        return None
+    if last_watched <= 0 or position < 0:
+        return None
+    return {
+        "imdb_id": imdb_id,
+        "kind": "movie" if kind == "movie" else "episode",
+        "season": season,
+        "episode": episode,
+        "position": position,
+        "duration": duration,
+        "last_watched": last_watched,
+    }
+
+
+def _imdb_id(value):
+    text = str(value or "").strip().lower()
+    head = text.split(":", 1)[0]
+    if _IMDB_ID.match(head):
+        return head
+    return None
+
+
+def _progress_kind(content_type):
+    kind = str(content_type or "").strip().lower()
+    if kind in {"movie", "movies"}:
+        return "movie"
+    return "episode"
+
+
+def _season_episode(row, kind):
+    if kind == "movie":
+        return None, None
+    season = _optional_int(row.get("season"))
+    episode = _optional_int(row.get("episode"))
+    if season is not None and episode is not None:
+        return season, episode
+    parts = str(row.get("video_id") or "").split(":")
+    if len(parts) != 3:
+        return season, episode
+    return _optional_int(parts[1]), _optional_int(parts[2])
+
+
+def _as_ms(value):
+    if value <= 0:
+        return 0
+    if value < _MS_THRESHOLD:
+        return value * 1000
+    return value
+
+
+def _epoch_seconds(value):
+    if value > _EPOCH_MS_THRESHOLD:
+        return value / 1000
+    return float(value)
 
 
 def importer(_identifier, user, mode):
@@ -161,6 +343,34 @@ class NuvioClient:
             if len(payload) < PAGE_SIZE:
                 return
             page += 1
+
+    def profile_indexes(self):
+        """Return every profile index on this Nuvio account."""
+        payload = self._rpc("sync_pull_profiles", {})
+        if not isinstance(payload, list):
+            raise NuvioError("Nuvio profile list was not a list")
+        indexes = []
+        for row in payload:
+            if not isinstance(row, dict):
+                continue
+            index = row.get("profile_index")
+            if isinstance(index, bool) or not isinstance(index, int):
+                continue
+            indexes.append(index)
+        return indexes
+
+    def watch_progress(self, profile_id=None):
+        """Return in-progress watches for one profile."""
+        payload = self._rpc(
+            "sync_pull_watch_progress",
+            {
+                "p_profile_id": self._profile_id if profile_id is None else profile_id,
+                "p_limit": 200,
+            },
+        )
+        if not isinstance(payload, list):
+            raise NuvioError("Nuvio watch progress was not a list")
+        return payload
 
     def iter_delta(self, since_event_id):
         """Yield watch-history changes after the saved cursor."""

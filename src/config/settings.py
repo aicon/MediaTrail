@@ -374,7 +374,7 @@ AUTH_USER_MODEL = "users.User"
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
 
 # MediaTrail continues from 0.25.3 in small steps: 0.25.4, 0.25.5, 0.25.6, 0.25.7, ...
-VERSION = config("VERSION", default="0.25.15")
+VERSION = config("VERSION", default="0.25.16")
 
 
 def _public_http_url(name):
@@ -644,6 +644,10 @@ USER_MESSAGE_RETENTION_DAYS = config(
     cast=int,
 )
 CELERY_BEAT_SCHEDULE = {
+    "sync_nuvio_playback": {
+        "task": "Sync Nuvio playback",
+        "schedule": 30,
+    },
     "reload_calendar": {
         "task": "Reload calendar",
         "schedule": 60 * 60 * 24,  # every 24 hours

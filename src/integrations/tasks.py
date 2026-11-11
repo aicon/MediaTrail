@@ -86,6 +86,18 @@ def import_media(
     return format_import_message(imported_counts, warnings)
 
 
+@shared_task(name="Sync Nuvio playback")
+def sync_nuvio_playback():
+    """Refresh Now Watching from each saved Nuvio account."""
+    from integrations.models import NuvioAccount
+
+    for account in NuvioAccount.objects.select_related("user"):
+        try:
+            nuvio.sync_now_watching(account.user)
+        except Exception:
+            logger.exception("Nuvio playback sync failed for %s", account.user_id)
+
+
 @shared_task(name="Import from Nuvio")
 def import_nuvio(user_id, mode, username=None):
     """Celery task for importing missing movies and episodes from Nuvio."""
