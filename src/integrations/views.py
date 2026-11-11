@@ -21,7 +21,7 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 
 import users
 from app import helpers as app_helpers
-from integrations import exports, nuvio_player, tasks
+from integrations import exports, nuvio_player as nuvio_addon, tasks
 from integrations.imports import anilist, helpers, nuvio, simkl, trakt
 from integrations.webhooks import emby, jellyfin, plex
 
@@ -664,9 +664,10 @@ def _nuvio_public_logo():
 def _nuvio_manifest_body():
     """JSON manifest. A logo problem must not turn the addon into an error page."""
     try:
-        return json.dumps(nuvio_player.manifest(_nuvio_public_logo()))
+        return json.dumps(nuvio_addon.manifest(_nuvio_public_logo()))
     except Exception:  # noqa: BLE001
-        return json.dumps(nuvio_player.manifest())
+        logger.exception("Nuvio manifest failed")
+        return json.dumps(nuvio_addon.manifest(None))
 
 
 def _nuvio_account():
@@ -717,7 +718,7 @@ def nuvio_player(request, media_type, video_id, extra=None):
     user = _nuvio_account()
     if user is not None:
         try:
-            nuvio_player.handle_player(
+            nuvio_addon.handle_player(
                 user,
                 media_type,
                 video_id,
