@@ -14,6 +14,8 @@
   {% absolute_app_url plex_webhook_path as plex_webhook_url %}
   {% url 'emby_webhook' request.user.token as emby_webhook_path %}
   {% absolute_app_url emby_webhook_path as emby_webhook_url %}
+  {% url 'nuvio_manifest' request.user.token as nuvio_manifest_path %}
+  {% absolute_app_url nuvio_manifest_path as nuvio_manifest_url %}
   <div class="space-y-6">
     <div class="bg-[#2a2f35] rounded-lg p-6">
       <div class="flex items-center mb-4">
@@ -107,15 +109,21 @@
             </div>
             <p class="text-gray-400 mb-4 text-sm">{% translate "Connect Nuvio to automatically track your watching progress." %}</p>
             <div class="bg-[#262a2f] p-4 rounded-md">
-              <h4 class="text-sm font-medium mb-3">{% translate "Setup Instructions" %}</h4>
-              <ol class="list-decimal list-inside space-y-2 text-sm text-gray-300">
-                <li>
-                  {% blocktranslate trimmed %}NuvioTV-MT and NuvioMobile-MT send playback through <a href="https://github.com/aicon/MediaTrail-Scrobbler" target="_blank" rel="noopener noreferrer" class="text-indigo-400 hover:underline">MediaTrail-Scrobbler</a>. The token above is the API key.{% endblocktranslate %}
-                </li>
-                <li>{% translate "Run the scrobbler in API mode, pointed at this MediaTrail, with the token above." %}</li>
-                <li>{% translate "In the Nuvio app, add the addon using the scrobbler address ending in /manifest.json." %}</li>
-                <li>{% translate "Play a movie or episode. Progress shows on the home page, and a finished watch is saved at the scrobbler threshold." %}</li>
-              </ol>
+              <h4 class="text-sm font-medium mb-3">{% translate "Addon address" %}</h4>
+              <p class="text-gray-400 mb-3 text-sm">{% translate "Add this address in Nuvio under Settings, Addons." %}</p>
+              <div class="flex items-center gap-2 mb-4">
+                <input readonly
+                       id="nuvio-manifest-url"
+                       class="w-full bg-[#262a2f] rounded-md text-gray-300 text-sm border-0 focus:ring-0 outline-none font-mono"
+                       type="text"
+                       value="{{ nuvio_manifest_url }}">
+                <span class="flex items-center cursor-pointer group"
+                      title="{% translate "Copy" %}"
+                      data-copy-target="#nuvio-manifest-url">
+                  {% include "app/icons/copy.svg" with classes="w-5 h-5 text-gray-400 group-hover:text-indigo-400 transition-colors" %}
+                </span>
+              </div>
+              <p class="text-sm text-gray-300">{% translate "Play a movie or episode. Progress shows on the home page. A finished watch is saved at 80 percent." %}</p>
             </div>
           </div>
         </div>

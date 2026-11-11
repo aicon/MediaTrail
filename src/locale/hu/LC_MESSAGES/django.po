@@ -606,17 +606,14 @@ msgstr "Integrációs szolgáltatások"
 msgid "Connect Nuvio to automatically track your watching progress."
 msgstr "A Nuvio csatlakoztatása a nézési előrehaladás automatikus követéséhez."
 
-msgid "NuvioTV-MT and NuvioMobile-MT send playback through <a href=\"https://github.com/aicon/MediaTrail-Scrobbler\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">MediaTrail-Scrobbler</a>. The token above is the API key."
-msgstr "A NuvioTV-MT és a NuvioMobile-MT a <a href=\"https://github.com/aicon/MediaTrail-Scrobbler\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">MediaTrail-Scrobbler</a> segítségével küldi a lejátszást. A fenti token az API-kulcs."
+msgid "Addon address"
+msgstr "Bővítmény címe"
 
-msgid "Run the scrobbler in API mode, pointed at this MediaTrail, with the token above."
-msgstr "Indítsd a scrobblert API módban, erre a MediaTrailre és a fenti tokenre állítva."
+msgid "Add this address in Nuvio under Settings, Addons."
+msgstr "A Nuvio alkalmazásban a Beállítások, Bővítmények alatt add hozzá ezt a címet."
 
-msgid "In the Nuvio app, add the addon using the scrobbler address ending in /manifest.json."
-msgstr "A Nuvio alkalmazásban add hozzá a bővítményt a scrobbler /manifest.json végű címével."
-
-msgid "Play a movie or episode. Progress shows on the home page, and a finished watch is saved at the scrobbler threshold."
-msgstr "Játssz le egy filmet vagy epizódot. Az előrehaladás megjelenik a kezdőlapon, a befejezett megtekintés pedig a scrobbler küszöbénél kerül be."
+msgid "Play a movie or episode. Progress shows on the home page. A finished watch is saved at 80 percent."
+msgstr "Játssz le egy filmet vagy epizódot. Az előrehaladás megjelenik a kezdőlapon. A befejezett megtekintés 80 százaléknál kerül be."
 
 msgid "Connect Jellyfin to automatically track your watching progress."
 msgstr "A Jellyfin csatlakoztatása a nézési előrehaladás automatikus követéséhez."

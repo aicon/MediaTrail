@@ -21,7 +21,7 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 
 import users
 from app import helpers as app_helpers
-from integrations import exports, tasks
+from integrations import exports, nuvio_player, tasks
 from integrations.imports import anilist, helpers, nuvio, simkl, trakt
 from integrations.webhooks import emby, jellyfin, plex
 
@@ -635,6 +635,48 @@ def export_csv(request):
     )
     logger.info("User %s started CSV export", request.user.username)
     return response
+
+
+def _nuvio_cors(response):
+    """Allow the Nuvio app to call the addon routes."""
+    response["Access-Control-Allow-Origin"] = "*"
+    response["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+    response["Access-Control-Allow-Headers"] = "Content-Type"
+    return response
+
+
+def _nuvio_user(token):
+    """Return the user for an addon token, or None."""
+    try:
+        return users.models.User.objects.get(token=token)
+    except ObjectDoesNotExist:
+        return None
+
+
+@login_not_required
+@csrf_exempt
+@require_http_methods(["GET", "OPTIONS"])
+def nuvio_manifest(request, token):
+    """Serve the addon manifest Nuvio installs."""
+    if request.method == "OPTIONS":
+        return _nuvio_cors(HttpResponse(status=204))
+    if _nuvio_user(token) is None:
+        return _nuvio_cors(JsonResponse({"error": "invalid token"}, status=401))
+    return _nuvio_cors(JsonResponse(nuvio_player.manifest()))
+
+
+@login_not_required
+@csrf_exempt
+@require_http_methods(["GET", "OPTIONS"])
+def nuvio_player(request, token, media_type, video_id, extra=None):
+    """Record a Nuvio player event on this MediaTrail."""
+    if request.method == "OPTIONS":
+        return _nuvio_cors(HttpResponse(status=204))
+    user = _nuvio_user(token)
+    if user is None:
+        return _nuvio_cors(JsonResponse({"error": "invalid token"}, status=401))
+    nuvio_player.handle_player(user, media_type, video_id, extra, request.GET)
+    return _nuvio_cors(JsonResponse({}))
 
 
 @login_not_required

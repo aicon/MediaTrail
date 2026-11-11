@@ -1,8 +1,19 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from integrations import views
 
 urlpatterns = [
+    re_path(
+        r"^nuvio/(?P<token>[^/]+)/manifest(?:\.json)?/?$",
+        views.nuvio_manifest,
+        name="nuvio_manifest",
+    ),
+    re_path(
+        r"^nuvio/(?P<token>[^/]+)/player/(?P<media_type>[^/]+)/"
+        r"(?P<video_id>[^/]+)(?:/(?P<extra>.+))?$",
+        views.nuvio_player,
+        name="nuvio_player",
+    ),
     path("import/nuvio", views.import_nuvio, name="import_nuvio"),
     path("import/trakt-oauth", views.trakt_oauth, name="trakt_oauth"),
     path("import/trakt/device", views.trakt_device_start, name="trakt_device_start"),
