@@ -63,7 +63,7 @@ def manifest(logo=None):
 def handle_player(user, media_type, video_id, extra, query):
     """Apply one Nuvio player event for this user."""
     params = _player_params(extra, query)
-    action = (params.get("action") or "").strip().lowercase()
+    action = (params.get("action") or "").strip().lower()
     if action == "resume":
         action = "start"
     current_ms = _as_int(params.get("currentTime"))
