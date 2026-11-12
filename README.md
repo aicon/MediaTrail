@@ -4,7 +4,7 @@
 
 A self-hosted personal media tracker and digital logbook for everything you watch, read, and play.
 
-[![Release](https://img.shields.io/badge/version-0.26.1-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Release](https://img.shields.io/badge/version-0.26.2-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Documentation](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/)
@@ -117,16 +117,19 @@ The URL must include the protocol (`https` or `http`) and should not include a t
 
 #### Simkl AUTH V2
 
-New Simkl links use **AUTH V2 + PKCE** when `SIMKL_V2_ID` is set. Register your app callback as `https://your-host/import/simkl_private` (exact match). Optional `SIMKL_V2_SECRET` is only for server-type Simkl apps. Prefer `SIMKL_V2_ID_FILE` / `SIMKL_V2_SECRET_FILE` over putting secrets in Compose.
+1. Open [Simkl Developer settings](https://simkl.com/settings/developer/) and create a **new** AUTH V2 app (a V1 `client_id` cannot be upgraded).
+2. Prefer **Server apps & services** for MediaTrail; copy `client_id` and the one-time `client_secret`. (**Mobile, desktop & browser apps** also works with PKCE and no secret.)
+3. Register redirect URI `https://your-host/import/simkl_private` (exact match to `URLS` + that path).
+4. Set Compose / `.env` (prefer `*_FILE` mounts for secrets):
 
 ```text
 SIMKL_V2_ID=your-v2-client-id
-# SIMKL_V2_SECRET=optional-for-server-apps
+SIMKL_V2_SECRET=your-v2-client-secret
 ```
 
-Existing AUTH V1 tokens keep working until Simkl retires V1 (~April 2027). `SIMKL_ID` / `SIMKL_SECRET` remain the V1 fallback when V2 is unset. After configuring V2, reconnect Simkl from Import so schedules store a V2 refresh token.
+5. Recreate the container, then **Import → Connect with Simkl**. Existing AUTH V1 tokens keep working until Simkl retires V1 (~April 2027); reconnect after enabling V2 so schedules store a V2 refresh token.
 
-For the full list of supported settings, see [Runtime Documentation](https://aicon.github.io/mediatrail-docs/runtime/).
+Full walkthrough: [Runtime → Simkl AUTH V2](https://aicon.github.io/mediatrail-docs/runtime/#simkl-auth-v2-get-keys-and-connect).
 
 Start the container:
 
@@ -148,7 +151,7 @@ MediaTrail is an independent, unofficial fork and is **not affiliated with, main
 ### Background
 MediaTrail diverged from Yamtrack `dev` post-`v0.25.3` (specifically the July 12, 2026 tabbed detail view), incorporating PR `#1378` (REST API preview) and PR `#1608` (Episode history).
 
-MediaTrail continues with small patch releases after `0.26.1`, prioritizing stability, self-contained deployment, and its own integrations (Nuvio, journal, statistics, and import tools).
+MediaTrail continues with small patch releases after `0.26.2`, prioritizing stability, self-contained deployment, and its own integrations (Nuvio, journal, statistics, and import tools).
 
 | Feature | Upstream Yamtrack (Stable) | MediaTrail |
 | :--- | :---: | :---: |

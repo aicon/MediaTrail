@@ -4,7 +4,7 @@
 
 Önállóan üzemeltethető személyes médiakatalógus és digitális krónika mindarról, amit megnézel, elolvasol vagy végigjátszol.
 
-[![Verzió](https://img.shields.io/badge/verzió-0.26.1-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Verzió](https://img.shields.io/badge/verzió-0.26.2-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![Licenc: AGPL v3](https://img.shields.io/badge/Licenc-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Dokumentáció](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/hu/)
@@ -117,16 +117,19 @@ A megadott címnek minden esetben tartalmaznia kell a protokollt (`https://` vag
 
 #### Simkl AUTH V2
 
-Az új Simkl-kapcsolások **AUTH V2 + PKCE**-t használnak, ha a `SIMKL_V2_ID` be van állítva. Az alkalmazás callback címe legyen pontosan: `https://sajat-host/import/simkl_private`. A `SIMKL_V2_SECRET` csak szerver-típusú Simkl-alkalmazásokhoz kell. A titkot inkább `SIMKL_V2_ID_FILE` / `SIMKL_V2_SECRET_FILE` fájlból add át.
+1. Nyisd meg a [Simkl fejlesztői beállításokat](https://simkl.com/settings/developer/), és hozz létre **új** AUTH V2 alkalmazást (a V1 `client_id` nem frissíthető).
+2. A MediaTrailhez ajánlott a **Server apps & services**; másold ki a `client_id`-t és az egyszer megjelenő `client_secret`-et. (A **Mobile, desktop & browser apps** típus is működik PKCE-vel, secret nélkül.)
+3. A redirect URI legyen pontosan: `https://sajat-host/import/simkl_private` (`URLS` + ez az útvonal).
+4. Állítsd be a Compose / `.env` értékeket (a titkot inkább `*_FILE` fájlból add át):
 
 ```text
 SIMKL_V2_ID=sajat-v2-ugyfelazonosito
-# SIMKL_V2_SECRET=opcionalis-szerver-alkalmazashoz
+SIMKL_V2_SECRET=sajat-v2-titok
 ```
 
-A meglévő AUTH V1 tokenek a V1 kivezetéséig (~2027. április) működnek. A `SIMKL_ID` / `SIMKL_SECRET` a V2 nélküli tartalék. V2 beállítása után az Import oldalon kapcsolódj újra, hogy az ütemezés V2 refresh tokent tároljon.
+5. Hozd létre újra a konténert, majd **Import → Simkl összekapcsolás**. A V1 tokenek ~2027. áprilisig élnek; V2 után kapcsolódj újra, hogy az ütemezés V2 refresh tokent tároljon.
 
-A támogatott beállítások részletes leírását a kézikönyv [Környezet](https://aicon.github.io/mediatrail-docs/hu/runtime/) fejezetében találod.
+Részletes lépések: [Környezet → Simkl AUTH V2](https://aicon.github.io/mediatrail-docs/hu/runtime/#simkl-auth-v2-kulcsok-beszerzese-es-kapcsolas).
 
 Indítsd el a konténert:
 
@@ -148,7 +151,7 @@ A MediaTrail egy független, nem hivatalos leágazás; **nem áll kapcsolatban a
 ### Háttér és célkitűzések
 A MediaTrail fejlesztése a Yamtrack `dev` ágából indult a `v0.25.3` kiadást követően (konkrétan a 2026. július 12-i, fülekkel ellátott részletes adatlap állapotából), beépítve a `#1378`-as számú REST API előzetest és a `#1608`-as epizód-előzménykezelést.
 
-A MediaTrail a `0.26.1` után ismét kisebb patch-lépésekkel folytatódik, a stabilitást, az önálló üzemeltethetőséget és a saját integrációkat (Nuvio, napló, statisztikák, importeszközök) helyezve előtérbe.
+A MediaTrail a `0.26.2` után ismét kisebb patch-lépésekkel folytatódik, a stabilitást, az önálló üzemeltethetőséget és a saját integrációkat (Nuvio, napló, statisztikák, importeszközök) helyezve előtérbe.
 
 | Funkció | Eredeti Yamtrack (Stabil) | MediaTrail |
 | :--- | :---: | :---: |

@@ -36,13 +36,16 @@ Compose + `Nuvio/nginx` vhost/`proxy.conf`, plusz üzemeltetői megerősítés:
 | TLS, `$scheme` proto, `URLS`, `SECRET:?err` | **OK** |
 | `TRUSTED_PROXIES` + `8082` szűkítés | **OK** (üzemeltető) |
 
-### Nem release-kapu (main / kiadás előtt még nyitva)
+### Elfogadott maradék (nem blokkolja a 0.26.2-t)
 
-- Teljes pytest suite nincs végigfuttatva
-- Nincs friss élő/dev ellenőrzés: napló/statisztika, Nuvio sync, Trakt device flow
-- Hardcover `Fiction` assert: **külső API címke-drift**, nem `dev` regresszió
-  (`hardcover.py` / teszt = `main`; élő `377193` → pl. `Literary Fiction`, nincs
-  pontos `Fiction` / `Young Adult`)
+Üzemeltetőileg nem blokkoló ehhez a kiadáshoz:
+
+- Teljes pytest suite nincs végigfuttatva; a célzott OAuth/lock + SoupSieve
+  importutak zöldek
+- Trakt device élő smoke és napló/statisztika végső elfogadása — később
+- Nuvio sync — külön lezárva (automatikus törlés napló + korábbi kézi ellenőrzés)
+- Hardcover `Fiction` assert: **külső API címke-drift**, `main`-en is
+  (`hardcover.py` / teszt változatlan; élő `377193` → pl. `Literary Fiction`)
 
 ## Támogatott telepítés (reprodukálható)
 
@@ -91,6 +94,6 @@ nincs hivatalos Brotli ≥ 1.2.1 wheel.
 
 ## Deployment ellenőrzések
 
-Az élő deployment tételek **lezárva** (lásd Status). Ami még nyitva: **kiadási**
-ellenőrzések (teljes suite, termék smoke, Hardcover API assert drift) — nem
-nyitott CVE/proxy.
+Az élő deployment tételek **lezárva** (lásd Status). Az **Elfogadott maradék**
+tételek a `0.26.2` kiadáshoz üzemeltetőileg elfogadottak — nem nyitott
+CVE/proxy.

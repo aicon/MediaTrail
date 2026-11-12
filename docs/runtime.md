@@ -50,25 +50,35 @@ Movie, series, anime, game, book, comic, and board-game lookups work with the cl
 | `TRAKT_API_SECRET` | Only needed to refresh older private-import schedules that still use the legacy client. New logins do not use it. |
 | `TRAKT_API_PKCE` | Client ID of a modern Trakt app (no secret). Used for browser PKCE login on `auth.trakt.tv` and for device-code login. Register the MediaTrail callback URL (`…/import/trakt/private`) on that app. A free Trakt account can connect only two applications. |
 | `ANILIST_ID` and `ANILIST_SECRET` | Your own AniList application, for a private import. |
-| `SIMKL_ID` and `SIMKL_SECRET` | Simkl AUTH V1 app (deprecated; planned retirement ~April 2027). Still used for existing V1 tokens and as fallback when V2 is unset. |
+| `SIMKL_ID` and `SIMKL_SECRET` | Simkl AUTH V1 app (deprecated; planned retirement ~April 2027). Still used for existing V1 tokens and as fallback when V2 is unset. A V1 `client_id` **cannot** be upgraded to V2. |
 | `SIMKL_V2_ID` | Simkl AUTH V2 client id for new connections (PKCE). Register callback `…/import/simkl_private`. |
-| `SIMKL_V2_SECRET` | Optional V2 client secret for server-type apps. Never commit; prefer `*_FILE` mounts. |
+| `SIMKL_V2_SECRET` | V2 client secret when the Simkl app type is **Server apps & services** (required for that type). Leave unset for a public client type. Never commit; prefer `*_FILE` mounts. |
 
-### Simkl AUTH V2 (Compose / `.env`)
+### Simkl AUTH V2 — get keys and connect
 
-When `SIMKL_V2_ID` is set, Import → Connect with Simkl starts the V2 authorize URL (`simkl.com/oauth2/authorize`) with S256 PKCE, stores an encrypted **refresh** token, and schedules imports with `auth=v2`. Without `SIMKL_V2_ID`, MediaTrail falls back to AUTH V1 (`/oauth/authorize`) and encrypted access tokens.
+MediaTrail runs the OAuth callback and token exchange on your server. Prefer a **new** AUTH V2 app; V1 credentials do not work on `/oauth2/*`.
 
-Example environment block:
+1. Sign in at [simkl.com](https://simkl.com) and open [Developer settings](https://simkl.com/settings/developer/).
+2. Create a **new** app (V2). The client type is fixed at registration:
+   - **Server apps & services** — best fit for MediaTrail. You get a `client_id` and a `client_secret` (shown once). Set both `SIMKL_V2_ID` and `SIMKL_V2_SECRET`.
+   - **Mobile, desktop & browser apps** — public client, no secret. Set only `SIMKL_V2_ID`. MediaTrail still uses S256 PKCE.
+   - Do **not** pick **TV, devices & command line** for this Import button (that type has no redirect URI).
+3. Add a redirect URI that matches MediaTrail exactly: `{URLS}/import/simkl_private`  
+   Example: if `URLS=https://mediatrail.example.com`, register `https://mediatrail.example.com/import/simkl_private` (scheme, host, port, path; no trailing slash on `URLS`).
+4. Put the values in Compose or `.env`, then recreate the container:
 
 ```text
 SIMKL_V2_ID=your-v2-client-id
-# SIMKL_V2_SECRET=only-if-your-simkl-app-is-server-type
+SIMKL_V2_SECRET=your-v2-client-secret
 # Or file mounts:
 # SIMKL_V2_ID_FILE=/run/secrets/simkl_v2_id
 # SIMKL_V2_SECRET_FILE=/run/secrets/simkl_v2_secret
 ```
 
-Register the redirect URI exactly as MediaTrail builds it from `URLS` + `/import/simkl_private`. After enabling V2, reconnect once so recurring tasks stop relying on V1-only access tokens. V1 remains until Simkl’s planned ~April 2027 retirement.
+5. Open **Import → Connect with Simkl**. With `SIMKL_V2_ID` set, MediaTrail uses `https://simkl.com/oauth2/authorize` (PKCE), stores an encrypted **refresh** token, and schedules imports with `auth=v2`.
+6. After turning V2 on, reconnect once so recurring tasks stop relying on V1-only access tokens.
+
+Without `SIMKL_V2_ID`, MediaTrail falls back to AUTH V1 (`/oauth/authorize`) and encrypted access tokens. V1 remains until Simkl’s planned ~April 2027 retirement. Official Simkl reference: [AUTH V2 overview](https://api.simkl.org/api-reference/auth-v2) and [How to register an app](https://docs.simkl.org/how-to-use-simkl/for-developers/how-to-register-an-app).
 
 `MU_NSFW` is the adult-content switch for MangaUpdates.
 

@@ -54,17 +54,18 @@ firewalled to the proxy source and/or internal Docker reachability).
 | `TRUSTED_PROXIES` = MediaTrail-visible proxy peer | **OK** (operator) |
 | `8082` not a public/LAN bypass of TLS | **OK** (operator) |
 
-### Not a release gate (still open for main / product release)
+### Accepted residual (not blocking 0.26.2)
 
-This security round does **not** replace a full release checklist. Still unset
-here:
+Operator accepted these as non-blocking for this product release:
 
-- Full pytest suite end-to-end (not claimed green)
-- Fresh live/dev checks: journal/stats, Nuvio sync, Trakt device flow
+- Full pytest suite end-to-end — not claimed green; targeted OAuth/lock +
+  SoupSieve import paths are green
+- Trakt device live smoke and journal/stats final acceptance — deferred
+- Nuvio sync — closed separately (auto-delete log + prior manual checks)
 - Hardcover live metadata assert `Fiction` ∈ genres — **external API tag drift**,
-  not a `dev` regression: `hardcover.py` / `test_hardcover_book` are **unchanged
-  vs `main`**; live API for book `377193` now returns e.g. `Literary Fiction`,
-  `Classics`, … and **not** exact `Fiction` / `Young Adult`
+  also on `main`: `hardcover.py` / `test_hardcover_book` unchanged; live book
+  `377193` returns e.g. `Literary Fiction`, `Classics`, … not exact `Fiction` /
+  `Young Adult`
 
 ## Supported dependency install (reproducible)
 
@@ -143,6 +144,6 @@ entrypoint validator uses an ash-safe character class (no bare `"` inside
 
 ## Deployment checks
 
-Live deployment items are **closed** under Status above. Remaining gaps are
-**release** checks (full suite, product smoke, Hardcover API assert drift), not
-open CVE/proxy findings.
+Live deployment items are **closed** under Status above. Residual items under
+**Accepted residual** are operator-accepted for `0.26.2`, not open CVE/proxy
+findings.

@@ -375,8 +375,8 @@ AUTH_USER_MODEL = "users.User"
 FILE_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50 MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50 MB
 
-# MediaTrail versioning: 0.26.1 marks the journal/stats/import step-up; then small patches again.
-VERSION = config("VERSION", default="0.26.1")
+# MediaTrail versioning: 0.26.2 is Simkl AUTH V2 + dependency/proxy hardening; then small patches again.
+VERSION = config("VERSION", default="0.26.2")
 
 
 def _public_http_url(name):

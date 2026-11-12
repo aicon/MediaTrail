@@ -50,25 +50,35 @@ A filmek, sorozatok, animék, videojátékok, könyvek, képregények és társa
 | `TRAKT_API_SECRET` | Csak a régi, secret-es ügyféllel létrehozott ütemezett importok tokenfrissítéséhez kell. Az új belépések nem használják. |
 | `TRAKT_API_PKCE` | Modern Trakt-alkalmazás ügyfélazonosítója (nincs secret). Böngészős PKCE-belépéshez (`auth.trakt.tv`) és eszközkódos belépéshez. Az alkalmazásnál állítsd be a MediaTrail callback URL-t (`…/import/trakt/private`). Az ingyenes Trakt-fiókok legfeljebb két csatlakoztatott alkalmazást engedélyeznek. |
 | `ANILIST_ID` és `ANILIST_SECRET` | Saját AniList-alkalmazás zárt profilok eléréséhez. |
-| `SIMKL_ID` és `SIMKL_SECRET` | Simkl AUTH V1 alkalmazás (elavult; tervezett kivezetés ~2027. április). Meglévő V1 tokenekhez és V2 nélküli tartalékként. |
+| `SIMKL_ID` és `SIMKL_SECRET` | Simkl AUTH V1 alkalmazás (elavult; tervezett kivezetés ~2027. április). Meglévő V1 tokenekhez és V2 nélküli tartalékként. A V1 `client_id` **nem** frissíthető V2-re. |
 | `SIMKL_V2_ID` | Simkl AUTH V2 ügyfélazonosító az új kapcsolásokhoz (PKCE). Callback: `…/import/simkl_private`. |
-| `SIMKL_V2_SECRET` | Opcionális V2 titok szerver-típusú alkalmazásokhoz. Ne kerüljön a repóba; inkább `*_FILE`. |
+| `SIMKL_V2_SECRET` | V2 titok, ha a Simkl alkalmazástípus **Server apps & services** (ehhez a típushoz kötelező). Nyilvános kliensnél hagyd üresen. Ne kerüljön a repóba; inkább `*_FILE`. |
 
-### Simkl AUTH V2 (Compose / `.env`)
+### Simkl AUTH V2 — kulcsok beszerzése és kapcsolás
 
-Ha a `SIMKL_V2_ID` be van állítva, az Import → Simkl összekapcsolás a V2 authorize URL-t nyitja (`simkl.com/oauth2/authorize`) S256 PKCE-vel, titkosított **refresh** tokent tárol, és az ütemezést `auth=v2` mellett futtatja. `SIMKL_V2_ID` nélkül a rendszer AUTH V1-re esik vissza (`/oauth/authorize`) és access tokent tárol.
+A MediaTrail a visszatérő OAuth-hívást és a token cseréjét a te szervereden intézi. Új AUTH V2 alkalmazást regisztrálj; a V1 hitelesítő adatok nem működnek a `/oauth2/*` végpontokon.
 
-Példa környezeti blokk:
+1. Jelentkezz be a [simkl.com](https://simkl.com)-ra, majd nyisd meg a [Fejlesztői beállításokat](https://simkl.com/settings/developer/).
+2. Hozz létre **új** (V2) alkalmazást. A kliens típusa a regisztrációnál rögzül:
+   - **Server apps & services** — a MediaTrailhez ajánlott. Kapod a `client_id`-t és egyszer a `client_secret`-et. Állítsd be a `SIMKL_V2_ID` és a `SIMKL_V2_SECRET` értékeket.
+   - **Mobile, desktop & browser apps** — nyilvános kliens, nincs secret. Csak a `SIMKL_V2_ID` kell; a MediaTrail így is S256 PKCE-t használ.
+   - Az Import gombhoz **ne** válaszd a **TV, devices & command line** típust (nincs redirect URI).
+3. Add meg a redirect URI-t pontosan így: `{URLS}/import/simkl_private`  
+   Példa: ha `URLS=https://mediatrail.pelda.hu`, akkor `https://mediatrail.pelda.hu/import/simkl_private` (séma, hoszt, port, útvonal; a `URLS`-ön nincs záró perjel).
+4. Írd be a Compose / `.env` fájlba, majd hozd létre újra a konténert:
 
 ```text
 SIMKL_V2_ID=sajat-v2-ugyfelazonosito
-# SIMKL_V2_SECRET=csak-szerver-tipusu-alkalmazashoz
+SIMKL_V2_SECRET=sajat-v2-titok
 # Vagy fájlból:
 # SIMKL_V2_ID_FILE=/run/secrets/simkl_v2_id
 # SIMKL_V2_SECRET_FILE=/run/secrets/simkl_v2_secret
 ```
 
-A redirect URI legyen pontosan a `URLS` + `/import/simkl_private` cím. V2 bekapcsolása után egyszer kapcsolódj újra, hogy az ütemezett feladatok ne V1-only access tokenre támaszkodjanak. A V1 a tervezett ~2027. áprilisi kivezetésig marad.
+5. Az **Import → Simkl összekapcsolás** gombbal, ha van `SIMKL_V2_ID`, a MediaTrail a `https://simkl.com/oauth2/authorize` címet nyitja (PKCE), titkosított **refresh** tokent tárol, és `auth=v2` mellett ütemez.
+6. V2 bekapcsolása után egyszer kapcsolódj újra, hogy az ütemezett feladatok ne V1-only access tokenre támaszkodjanak.
+
+`SIMKL_V2_ID` nélkül a rendszer AUTH V1-re esik vissza (`/oauth/authorize`) és access tokent tárol. A V1 a tervezett ~2027. áprilisi kivezetésig marad. Hivatalos Simkl referencia: [AUTH V2 áttekintés](https://api.simkl.org/api-reference/auth-v2) és [alkalmazás regisztrálása](https://docs.simkl.org/how-to-use-simkl/for-developers/how-to-register-an-app).
 
 A `MU_NSFW` a MangaUpdates felnőtt tartalmú szűrőjének kapcsolója.
 

@@ -40,7 +40,7 @@ Az egyéb források ugyanazokat a működési módokat és ütemezési lehetős�
 | Forrás | Szükséges adatok | Megjegyzések |
 | --- | --- | --- |
 | Trakt | Nyilvános felhasználónév, zárt API-bejelentkezés (böngészős PKCE az `auth.trakt.tv`-n, vagy eszközkód), vagy webhelyes export ZIP | A zárt belépéshez `TRAKT_API_PKCE` kell (modern Trakt-alkalmazás, secret nélkül). Az eszközkód TV-khez és korlátozott bevitelű eszközökhöz megmarad. A ZIP a Trakt → Beállítások → Export menüből jön (legfeljebb 50 MB). Sérült vagy üres archívumot az import elindítása előtt elutasít a rendszer. A „Csak az új elemek” kihagyja a már meglevő címeket. |
-| Simkl | Közvetlen összekapcsolás gombbal | Új kapcsolások AUTH V2-t használnak, ha a `SIMKL_V2_ID` be van állítva (PKCE). A meglévő AUTH V1 tokenek a V1 kivezetéséig (~2027. április) működnek; előtte állíts V2-t és kapcsolódj újra. |
+| Simkl | Közvetlen összekapcsolás gombbal | Üzemeltetői kulcs kell: új AUTH V2 alkalmazás a [simkl.com/settings/developer](https://simkl.com/settings/developer/) oldalon (V1 azonosító nem frissíthető). Ajánlott: **Server apps & services**, `SIMKL_V2_ID` / `SIMKL_V2_SECRET`, redirect `{URLS}/import/simkl_private`. Lépések: [Környezet → Simkl AUTH V2](runtime.md#simkl-auth-v2--kulcsok-beszerzése-és-kapcsolás). A V1 tokenek ~2027. áprilisig élnek; V2 után kapcsolódj újra. |
 | MyAnimeList | Nyilvános felhasználónév | |
 | AniList | Nyilvános felhasználónév, vagy közvetlen összekapcsolás | Zárt profil eléréséhez saját AniList-alkalmazás regisztrációja szükséges. |
 | Kitsu | A profil hivatkozásában szereplő numerikus azonosító | |
