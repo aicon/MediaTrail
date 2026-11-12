@@ -48,6 +48,27 @@ class FakeNuvio:
         yield from self.delta
 
 
+class HistoryPageFailNuvio(FakeNuvio):
+    """Yield some history rows, then fail like a mid-pagination API error."""
+
+    def __init__(self, history, fail_after, cursor=10):
+        super().__init__(history=history, cursor=cursor)
+        self.fail_after = fail_after
+
+    def iter_history(self):
+        for index, row in enumerate(self.history):
+            if index >= self.fail_after:
+                raise nuvio.NuvioError("Nuvio request failed", 503)
+            yield row
+
+
+class DeltaFailNuvio(FakeNuvio):
+    """Complete history pull, then fail while reading the delta."""
+
+    def iter_delta(self, _since):
+        raise nuvio.NuvioError("Nuvio request failed", 503)
+
+
 def _metadata(media_type, media_id, source, season_numbers=None, episode_number=None):
     if media_type == "tv_with_seasons":
         seasons = season_numbers or [1]
@@ -489,6 +510,82 @@ class NuvioImportTests(TestCase):
         )
         self.assertEqual(removed, {})
         self.assertEqual(Movie.objects.filter(user=self.user).count(), 1)
+        self.account.refresh_from_db()
+        self.assertEqual(self.account.watched_keys, ["movie:550"])
+
+    def test_history_page_error_keeps_prior_watched_keys(self):
+        """A mid-pagination API error must not reconcile or replace watched_keys."""
+        self.user.nuvio_sync_mark_unplayed_enabled = True
+        self.user.save(update_fields=["nuvio_sync_mark_unplayed_enabled"])
+        self._run(
+            FakeNuvio(
+                [_history("tmdb:550", "movie", "Fight Club", nuvio_id="m1")],
+                cursor=5,
+            ),
+        )
+        self.account.refresh_from_db()
+        self.assertEqual(self.account.watched_keys, ["movie:550"])
+        with self.assertRaises(nuvio.MediaImportError):
+            self._run(
+                HistoryPageFailNuvio(
+                    history=[
+                        _history("tmdb:551", "movie", "Other", nuvio_id="m2"),
+                        _history("tmdb:552", "movie", "Later", nuvio_id="m3"),
+                    ],
+                    fail_after=1,
+                    cursor=99,
+                ),
+            )
+        self.account.refresh_from_db()
+        self.assertEqual(self.account.watched_keys, ["movie:550"])
+        self.assertTrue(Movie.objects.filter(user=self.user, item__media_id="550").exists())
+
+    def test_delta_error_keeps_prior_watched_keys(self):
+        """watched_keys updates only after history, delta, and reconcile succeed."""
+        self.user.nuvio_sync_mark_unplayed_enabled = True
+        self.user.save(update_fields=["nuvio_sync_mark_unplayed_enabled"])
+        self._run(
+            FakeNuvio(
+                [_history("tmdb:550", "movie", "Fight Club", nuvio_id="m1")],
+                cursor=5,
+            ),
+        )
+        self.account.refresh_from_db()
+        prior = list(self.account.watched_keys)
+        # Empty remote history would delete 550 if keys were committed before delta.
+        with self.assertRaises(nuvio.MediaImportError):
+            self._run(DeltaFailNuvio(history=[], cursor=99))
+        self.account.refresh_from_db()
+        self.assertEqual(self.account.watched_keys, prior)
+        self.assertEqual(Movie.objects.filter(user=self.user).count(), 1)
+
+    def test_history_apply_failure_keeps_prior_watched_keys(self):
+        self.user.nuvio_sync_mark_unplayed_enabled = True
+        self.user.save(update_fields=["nuvio_sync_mark_unplayed_enabled"])
+        self._run(
+            FakeNuvio(
+                [_history("tmdb:550", "movie", "Fight Club", nuvio_id="m1")],
+                cursor=5,
+            ),
+        )
+        original_apply = nuvio.NuvioImporter._apply
+
+        def fail_second(importer, row, *, operation, event_id):
+            if row.get("id") == "m2":
+                return False
+            return original_apply(importer, row, operation=operation, event_id=event_id)
+
+        with patch.object(nuvio.NuvioImporter, "_apply", fail_second):
+            with self.assertRaises(nuvio.MediaImportError):
+                self._run(
+                    FakeNuvio(
+                        history=[
+                            _history("tmdb:550", "movie", "Fight Club", nuvio_id="m1"),
+                            _history("tmdb:551", "movie", "Other", nuvio_id="m2"),
+                        ],
+                        cursor=99,
+                    ),
+                )
         self.account.refresh_from_db()
         self.assertEqual(self.account.watched_keys, ["movie:550"])
 

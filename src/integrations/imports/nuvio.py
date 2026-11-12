@@ -303,7 +303,11 @@ class NuvioClient:
         return int(payload)
 
     def iter_history(self):
-        """Yield the full watch history, one page at a time."""
+        """Yield the full watch history, one page at a time.
+
+        Any page RPC/network failure raises ``NuvioError`` so callers never treat
+        a truncated pull as a complete snapshot.
+        """
         page = 1
         while True:
             payload = self._rpc(
@@ -495,21 +499,38 @@ class NuvioImporter:
         self._permanent = set(self.account.permanent_ids)
         self._imdb_map = dict(self.account.imdb_map)
         self._watched_keys = set(self.account.watched_keys or [])
+        self._previous_watched_keys = set(self._watched_keys)
+        # While True, _apply keeps watched_keys in memory only; DB commit is deferred
+        # until the full import (history pages + local ops + reconcile) succeeds.
+        self._defer_watched_keys = False
 
     def import_data(self):
         """Read history, then later changes, and store the cursor when it is safe."""
+        self._previous_watched_keys = set(self.account.watched_keys or [])
+        self._watched_keys = set(self._previous_watched_keys)
+        self._defer_watched_keys = True
         try:
             self.client.assert_profile()
             remote_keys, snapshot_complete = self._replay_history()
             self._delta()
-            # Snapshot reconcile only after a full, successful history pull.
+            # Snapshot reconcile only after every history page and local apply succeeded.
             if (
                 self.user.nuvio_sync_mark_unplayed_enabled
                 and snapshot_complete
             ):
                 self._reconcile_unwatched(remote_keys)
+            if snapshot_complete:
+                self._commit_watched_keys(remote_keys)
+            else:
+                self._restore_watched_keys()
         except NuvioError as exc:
+            self._restore_watched_keys()
             self._raise_import_error(exc)
+        except Exception:
+            self._restore_watched_keys()
+            raise
+        finally:
+            self._defer_watched_keys = False
 
         counts = {
             media_type: count for media_type, count in self.created.items() if count
@@ -553,14 +574,17 @@ class NuvioImporter:
         imports, keep the saved cursor so delete events are still visible to
         ``_delta`` (advancing to tip here would skip them forever).
 
-        Returns ``(remote_tmdb_keys, snapshot_complete)``. Reconcile must not
-        run when the snapshot is incomplete (failed pages or unmapped ids).
+        Returns ``(remote_tmdb_keys, snapshot_complete)``. ``snapshot_complete``
+        is True only when every history page was fetched and every row that
+        should map to TMDB did. ``watched_keys`` is not written here — the
+        caller commits them only after delta/reconcile succeed.
         """
         tip = self.client.history_cursor()
-        self._previous_watched_keys = set(self.account.watched_keys or [])
         remote_keys = set()
         unmapped = 0
         logger.info("Nuvio import started")
+        # iter_history raises on mid-pagination API errors; that aborts before
+        # snapshot_complete can become True.
         for index, row in enumerate(self.client.iter_history(), start=1):
             if not self._apply(row, operation="upsert", event_id=None):
                 self._flush_progress()
@@ -584,30 +608,50 @@ class NuvioImporter:
                 "keeping prior watched_keys and skipping reconcile",
                 unmapped,
             )
-            # Undo any mid-snapshot watched_keys writes from _apply.
-            self._watched_keys = set(self._previous_watched_keys)
-            self.account.watched_keys = sorted(self._previous_watched_keys)
-            fields = ["watched_keys"]
             if not self.account.bootstrapped:
                 self.account.cursor = tip
                 self.account.bootstrapped = True
-                fields.extend(["cursor", "bootstrapped"])
-            self._save_account(fields)
+                self._save_account(["cursor", "bootstrapped"])
             return remote_keys, False
 
-        self._watched_keys = set(remote_keys)
-        self.account.watched_keys = sorted(remote_keys)
-        fields = ["watched_keys"]
         if not self.account.bootstrapped:
             self.account.cursor = tip
             self.account.bootstrapped = True
-            fields.extend(["cursor", "bootstrapped"])
-        self._save_account(fields)
+            self._save_account(["cursor", "bootstrapped"])
         logger.info(
             "Nuvio import history checked (%s remote TMDB keys)",
             len(remote_keys),
         )
         return remote_keys, True
+
+    def _commit_watched_keys(self, remote_keys):
+        """Persist the new snapshot keys after a fully successful import."""
+        self._watched_keys = set(remote_keys)
+        self.account.watched_keys = sorted(remote_keys)
+        self._save_account(["watched_keys"])
+
+    def _restore_watched_keys(self):
+        """Keep the last good snapshot when this import did not finish cleanly."""
+        self._watched_keys = set(self._previous_watched_keys)
+        self.account.watched_keys = sorted(self._previous_watched_keys)
+        self._save_account(["watched_keys"])
+
+    def _note_watched_key(self, key, *, present):
+        """Update the in-memory watch set; persist only when not deferred."""
+        if not key:
+            return
+        if present:
+            if key in self._watched_keys:
+                return
+            self._watched_keys.add(key)
+        else:
+            if key not in self._watched_keys:
+                return
+            self._watched_keys.discard(key)
+        if self._defer_watched_keys:
+            return
+        self.account.watched_keys = sorted(self._watched_keys)
+        self._save_account(["watched_keys"])
 
     def _reconcile_unwatched(self, remote_keys):
         """Remove Nuvio-managed local watches missing from a complete snapshot.
@@ -758,11 +802,10 @@ class NuvioImporter:
             self._remember(nuvio_id)
             if action == "delete":
                 self.removed[record["kind"]] += 1
-                key = self._watched_key_from_record(record)
-                if key and key in self._watched_keys:
-                    self._watched_keys.discard(key)
-                    self.account.watched_keys = sorted(self._watched_keys)
-                    self._save_account(["watched_keys"])
+                self._note_watched_key(
+                    self._watched_key_from_record(record),
+                    present=False,
+                )
                 logger.info(
                     "Nuvio sync deleted %s: %s (media_id=%s season=%s episode=%s)",
                     record["kind"],
@@ -809,11 +852,10 @@ class NuvioImporter:
             return True
         self._remember(nuvio_id)
         if action in {"create", "update", "skip"}:
-            key = self._watched_key_from_record(record)
-            if key and key not in self._watched_keys:
-                self._watched_keys.add(key)
-                self.account.watched_keys = sorted(self._watched_keys)
-                self._save_account(["watched_keys"])
+            self._note_watched_key(
+                self._watched_key_from_record(record),
+                present=True,
+            )
         if action in {"create", "update"}:
             logger.info(
                 "Nuvio import %s %s: %s",
