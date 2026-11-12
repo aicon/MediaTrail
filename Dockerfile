@@ -46,6 +46,7 @@ COPY ./nginx.conf /etc/nginx/nginx.conf
 RUN sed 's/listen 8000;/listen 8000; listen [::]:8000;/' /etc/nginx/nginx.conf > /etc/nginx/nginx.ipv6.conf
 
 RUN apk add --no-cache nginx redis shadow \
+    && apk upgrade --no-cache \
     && chmod +x /entrypoint.sh \
     # create user abc for later PUID/PGID mapping
     && useradd -U -M -s /bin/sh abc \

@@ -13,6 +13,7 @@ Do not put these values into the image build. The image is the program. The keys
 | `SECRET` | Session and encryption key. Set a long random value before the site is shared. |
 | `TZ` | Time zone name, such as `Europe/Budapest`. Shown dates use this zone. |
 | `URLS` | Public origins, comma-separated, with `http://` or `https://` and no trailing slash. Required behind a reverse proxy. |
+| `TRUSTED_PROXIES` | Optional. Comma-separated IP addresses or CIDR subnets of upstream reverse proxies (for example `192.168.1.0/24,10.0.0.5`). When set, nginx uses `X-Forwarded-For` only from those proxies. Leave unset to keep the previous behavior. |
 | `ALLOWED_HOSTS` | Hostnames the site answers to. The default is `*`. `localhost` and `127.0.0.1` are always added when you set an explicit list. |
 | `PUID` and `PGID` | User and group that own the `db` folder. The default is `1000`. |
 | `MEDIATRAIL_SOURCE_URL` | Public `http` or `https` address of the exact source that is running. Required when other people use the site. |

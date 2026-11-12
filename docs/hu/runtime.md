@@ -13,6 +13,7 @@ Ezeket az értékeket soha ne ágyazd be a lemezkép építési folyamatába. A 
 | `SECRET` | A munkamenetek hitelesítésére és az adatok titkosítására szolgáló kulcs. Célszerű egy hosszú, véletlenszerű karaktersorozatot megadnod, mielőtt az oldalt mások számára elérhetővé tennéd. |
 | `TZ` | Az időzóna neve (például `Europe/Budapest`). A rendszer ebben az időzónában jeleníti meg a rögzített időpontokat. |
 | `URLS` | A rendszer nyilvános webcímei vesszővel elválasztva, a `http://` vagy `https://` előtaggal, záró perjel nélkül. Fordított proxy mögött kötelezően megadandó. |
+| `TRUSTED_PROXIES` | Opcionális. A felső szintű fordított proxyk IP-címei vagy CIDR-hálózatai vesszővel elválasztva (például `192.168.1.0/24,10.0.0.5`). Beállítva az nginx csak ezektől a proxyktól fogadja az `X-Forwarded-For` fejlécet. Üresen hagyva a korábbi viselkedés marad. |
 | `ALLOWED_HOSTS` | Azok a hosztnevek és domainek, amelyekre a szerver válaszol. Alapértelmezett értéke `*`. Ha egyedi listát adsz meg, a `localhost` és a `127.0.0.1` automatikusan a listához adódik. |
 | `PUID` és `PGID` | A tárolt adatokat őrző `db` mappa tulajdonosi felhasználói és csoportazonosítója. Alapértelmezett értéke `1000`. |
 | `MEDIATRAIL_SOURCE_URL` | A futó változat pontos forráskódjának nyilvános `http` vagy `https` elérhetősége. Kötelező megadnod, ha más felhasználók is elérik az oldalt. |
