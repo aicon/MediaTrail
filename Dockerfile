@@ -105,7 +105,11 @@ COPY --from=builder /mediatrail/.venv /mediatrail/.venv
 # Django app
 COPY src ./
 COPY scripts/verify_pillow_native.py /mediatrail/scripts/verify_pillow_native.py
-RUN python /mediatrail/scripts/verify_pillow_native.py \
+# The base python image may still ship a system pip; the app never needs it.
+RUN rm -rf /usr/local/lib/python*/site-packages/pip \
+           /usr/local/lib/python*/site-packages/pip-*.dist-info \
+           /usr/local/bin/pip /usr/local/bin/pip3 \
+    && python /mediatrail/scripts/verify_pillow_native.py \
     && python manage.py collectstatic --noinput
 
 EXPOSE 8000
