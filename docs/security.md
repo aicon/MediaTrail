@@ -37,21 +37,31 @@ covered by the 28 OAuth/lock tests):
 Hardcover genre-label assertion failure (`Fiction` vs API `Literary Fiction`);
 that path does not use BeautifulSoup. Full suite remains a separate question.
 
-### Open — deployment settings (Compose / proxy audit)
+### Open — deployment settings (live host; 2 items left)
 
-Checked against **shipped** `docker-compose*.yml` + `nginx.conf` in this repo.
-No live production Compose/env with real host values was present on the audit
-machine, so operator confirmation is still required for the running host.
+Live evidence reviewed: MediaTrail Compose service snippet +
+`Nuvio/nginx/vhosts/proxy.mediatrail.lan.776515.xyz.ssl.conf` +
+`Nuvio/nginx/include/proxy.conf`.
 
-| Check | Evidence in repo templates | Implication |
+| Check | Status | Evidence |
 | --- | --- | --- |
-| TLS termination | `nginx.conf` `listen 8000` only; no `ssl_certificate` / `:443` | MediaTrail **does not** terminate TLS. HTTPS must be terminated by an **upstream** reverse proxy (or clients use plain HTTP on `:8000`). |
-| `X-Forwarded-Proto` | `nginx.conf` sets `proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto` | Inside the container nginx **forwards** the incoming proto header to Gunicorn; it does not set `$scheme` from a local TLS listener. Correct only when a trusted upstream sets that header. |
-| `TRUSTED_PROXIES` | **Absent** from `docker-compose.yml`, `docker-compose.local.yml`, `docker-compose.postgres.yml` | Default deploys leave real-ip **unset** → no `set_real_ip_from`. Behind a reverse proxy, set `TRUSTED_PROXIES` to that proxy’s IP/CIDR (and set `URLS`). |
-| `URLS` | Documented in README / `docs/install.md`; empty in Compose examples | Required for public HTTPS origin / OAuth redirects when proxied. |
-| `SECRET` | Compose placeholders: `replace-with-a-long-random-string` / `change-me` (not the Django code default) | Templates force an env override shape, but **this audit could not read a production env** to prove the live value ≠ placeholder and ≠ `settings.py` default. |
+| TLS termination | **OK** | Edge nginx `listen 443 ssl` + `force-ssl`; app backend `192.168.1.80:8082` over HTTP |
+| `X-Forwarded-Proto` overwrite | **OK** | Edge `proxy.conf`: `X-Forwarded-Proto $scheme` (not client header) |
+| `URLS` | **OK** | `https://mediatrail.lan.776515.xyz` |
+| `SECRET` Compose requirement | **OK (mechanism)** | `SECRET: ${SECRET:?err}` — value not inspected/shared; operator confirms ≠ Django default / placeholders |
+| `TRUSTED_PROXIES` on MediaTrail | **Open** | Not set on the MediaTrail service |
+| Host port `8082` bypass | **Open** | Compose publishes host→`8000`; LAN clients can hit HTTP without the TLS vhost |
 
-**Still need from the live host:** the actual Compose (or orchestrator env) showing `SECRET`/`SECRET_FILE`, `URLS`, `TRUSTED_PROXIES`, and where TLS is terminated (e.g. Caddy/Traefik/nginx in front).
+**Close this section only after both:**
+
+1. **`TRUSTED_PROXIES`** = the source address **MediaTrail actually sees** on
+   connections from the reverse proxy (Docker path may differ from the proxy
+   host’s LAN IP). Do not guess from the proxy machine alone — verify from the
+   MediaTrail side (e.g. access/error log or a one-shot dump of the peer
+   address), then trust only that IP or a dedicated proxy subnet.
+2. **`8082` exposure:** if the proxy is on another host, firewall `8082` to that
+   proxy source only; if both share a Docker network, prefer internal reachability
+   over publishing the port.
 
 ## Supported dependency install (reproducible)
 
@@ -130,7 +140,6 @@ entrypoint validator uses an ash-safe character class (no bare `"` inside
 
 ## Open deployment checks (not closed by this image scan)
 
-See **Status → Open — deployment settings** above. Summary: container nginx is
-HTTP-only on `:8000` and forwards `X-Forwarded-Proto`; Compose templates omit
-`TRUSTED_PROXIES`; `SECRET` must be confirmed on the live host (templates are
-placeholders only).
+See **Status → Open — deployment settings**. Remaining: MediaTrail
+`TRUSTED_PROXIES` (peer address as seen by the container) and restricting or
+un-publishing host `8082`.

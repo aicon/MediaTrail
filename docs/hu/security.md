@@ -26,18 +26,28 @@ smoke. Egy tágabb szűrésben a Hardcover genre-assert elbukott (`Fiction` vs
 `Literary Fiction`) — ez nem BeautifulSoup. A teljes suite továbbra is külön
 kérdés.
 
-### Nyitva — éles deployment-beállítások (Compose / proxy audit)
+### Nyitva — éles deployment (élő hoszt; 2 tétel maradt)
 
-A repó **sablon** `docker-compose*.yml` + `nginx.conf` alapján:
+Élő bizonyíték: MediaTrail Compose részlet +
+`Nuvio/nginx/vhosts/proxy.mediatrail.lan.776515.xyz.ssl.conf` +
+`Nuvio/nginx/include/proxy.conf`.
 
-| Tétel | Repó-bizonyíték | Következmény |
-| --- | --- | --- |
-| TLS | nginx csak `listen 8000`; nincs SSL/443 | A MediaTrail konténer **nem** zár TLS-t; HTTPS-t felső proxy kell zárjon (vagy sima HTTP `:8000`). |
-| `X-Forwarded-Proto` | `$http_x_forwarded_proto` továbbítása | Csak akkor helyes, ha a megbízható felső proxy állítja. |
-| `TRUSTED_PROXIES` | a Compose-sablonokban **nincs** | Alapból nincs `set_real_ip_from`; proxy mögött kötelező kitölteni (+ `URLS`). |
-| `SECRET` | sablon: `replace-with-a-long-random-string` / `change-me` | Nem a kódbeli Django default, de **élő production env nem volt elérhető** ezen a gépen — az üzemeltetőnek kell igazolnia a tényleges értéket. |
+| Tétel | Állapot |
+| --- | --- |
+| TLS a külső nginxen; backend `192.168.1.80:8082` | **OK** |
+| `X-Forwarded-Proto $scheme` (nem kliens) | **OK** |
+| `URLS=https://mediatrail.lan.776515.xyz` | **OK** |
+| `SECRET: ${SECRET:?err}` (érték nem közölt) | **OK (mechanizmus)** |
+| MediaTrail `TRUSTED_PROXIES` | **Nyitva** |
+| Hoszt `8082` publish (proxy megkerülés) | **Nyitva** |
 
-**Hiányzik az élő hosztról:** a tényleges Compose/env (`SECRET`/`SECRET_FILE`, `URLS`, `TRUSTED_PROXIES`) és a TLS-lezáró proxy megnevezése.
+**Lezárás feltétele:**
+
+1. `TRUSTED_PROXIES` = a MediaTrail felől **ténylegesen látszó** proxy forráscím
+   (Docker útvonal ≠ feltételezett proxy-LAN-IP) — csak azt / dedikált
+   proxy-alhálózatot bízd meg.
+2. `8082`: másik gépen futó proxynál tűzfal a proxy forrására; közös
+   Docker-hálónál belső elérés a portpublikálás helyett.
 
 ## Támogatott telepítés (reprodukálható)
 
@@ -86,6 +96,6 @@ nincs hivatalos Brotli ≥ 1.2.1 wheel.
 
 ## Nyitott üzemeltetési ellenőrzések (nem zárja le az image scan)
 
-Lásd fent: **Nyitva — éles deployment**. A konténer HTTP `:8000`, a
-`TRUSTED_PROXIES` a sablonokban üres; az élő `SECRET`/`URLS`/TLS-proxy
-igazolása üzemeltetői Compose/env nélkül nem zárható.
+Lásd fent: **Nyitva — éles deployment**. Maradt: MediaTrail
+`TRUSTED_PROXIES` (konténer felől látszó peer) és a hoszt `8082`
+szűkítése / belső hálóra vitele.
