@@ -177,7 +177,10 @@ def refresh_v2_token(encrypted_refresh_token):
 
 def get_token_v1(request):
     """Exchange an AUTH V1 authorization code for an access token."""
-    code = request.GET["code"]
+    code = request.GET.get("code")
+    if not code:
+        msg = "Simkl authorization failed."
+        raise MediaImportError(msg)
     url = f"{SIMKL_API_BASE_URL}/oauth/token"
 
     params = {
@@ -212,9 +215,16 @@ def get_token_v1(request):
     }
 
 
-def get_token(request, code_verifier=None, redirect_uri=None):
-    """Handle Simkl OAuth callback for V2 (preferred) or legacy V1."""
-    if v2_enabled() and code_verifier is not None:
+def get_token(request, code_verifier=None, redirect_uri=None, auth="v1"):
+    """Handle Simkl OAuth callback for V2 or legacy V1.
+
+    ``auth`` comes from the OAuth session state. A V2 session never falls
+    back to the V1 token endpoint, even when the verifier or code is missing.
+    """
+    if auth == "v2":
+        if not code_verifier:
+            msg = "Invalid or expired Simkl authorization request."
+            raise MediaImportError(msg)
         redirect_uri = redirect_uri or app_helpers.build_absolute_app_url(
             request,
             reverse("import_simkl_private"),

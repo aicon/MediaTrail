@@ -179,8 +179,19 @@ A részletes felhasználói kézikönyv, a telepítési útmutató és a konfigu
 
 - **Kézikönyv:** [https://aicon.github.io/mediatrail-docs/hu/](https://aicon.github.io/mediatrail-docs/hu/)
 - **API-dokumentáció:** [API_HU.md](API_HU.md) · [API.md](API.md)
+- **Biztonság / függőségek:** [docs/hu/security.md](docs/hu/security.md)
 
 A kézikönyv fejezetei: *Telepítés, Könyvtár, Live playback / Now Watching, Importálás (benne a Nuvio), Környezet és konfiguráció, Fiókok, Karbantartás és üzemeltetés.*
+
+### Python-függőségek reprodukálása
+
+A published image és a helyi fejlesztés a `uv.lock`-ból telepít (nincs támogatott gyökér `requirements.txt`):
+
+```bash
+uv sync --locked
+```
+
+A konténerbuild Pillowt forrásból épít Alpine Brotli ellen — részletek: `Dockerfile`, `docs/hu/security.md`.
 
 ---
 

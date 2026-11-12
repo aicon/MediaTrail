@@ -12,6 +12,12 @@ repos:
         entry: uv lock --check
         language: system
         pass_filenames: false
+      - id: no-requirements-txt
+        name: no-requirements-txt
+        entry: python -c "import pathlib,sys; p=pathlib.Path('requirements.txt'); sys.exit('requirements.txt is unsupported; use uv.lock / uv sync --locked' if p.exists() else 0)"
+        language: system
+        pass_filenames: false
+        always_run: true
       - id: django-upgrade
         name: django-upgrade
         entry: uv run django-upgrade

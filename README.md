@@ -179,8 +179,19 @@ Comprehensive user guides, installation steps, and configuration examples are ho
 
 - **Manual:** [https://aicon.github.io/mediatrail-docs/](https://aicon.github.io/mediatrail-docs/)
 - **API reference:** [API.md](API.md) · [API_HU.md](API_HU.md)
+- **Security / deps:** [docs/security.md](docs/security.md)
 
 Documentation chapters: *Installation, Library, Live playback / Now Watching, Imports (including Nuvio), Environment Configuration, Accounts, and Maintenance.*
+
+### Reproducing the Python dependency set
+
+The published image and local development resolve packages from `uv.lock` only (no root `requirements.txt`):
+
+```bash
+uv sync --locked
+```
+
+The container build additionally builds Pillow from source against Alpine Brotli — see `Dockerfile` and `docs/security.md`.
 
 ---
 

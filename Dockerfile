@@ -33,14 +33,9 @@ RUN apk add --no-cache \
 COPY ./pyproject.toml ./pyproject.toml
 COPY ./uv.lock ./uv.lock
 
-# The preview API imports rest_framework and drf_spectacular, but this
-# branch's lockfile does not list them. Install them after the locked sync
-# so the docs-group git dependency is not resolved again.
-# Force Pillow from sdist so it links system Brotli instead of wheel.libs 1.2.0.
+# Locked sync only (includes DRF / drf-spectacular). Force Pillow from sdist
+# so it links system Brotli instead of wheel.libs 1.2.0.
 RUN uv sync --locked --no-binary-package pillow \
-    && uv pip install --python /mediatrail/.venv/bin/python \
-        "djangorestframework~=3.18.2" \
-        "drf-spectacular~=0.28.0" \
     # Runtime image never needs pip; strip it from the shipped venv.
     && (uv pip uninstall --python /mediatrail/.venv/bin/python -y pip || true) \
     && rm -rf /mediatrail/.venv/lib/python*/site-packages/pip \

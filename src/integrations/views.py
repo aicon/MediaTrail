@@ -433,17 +433,19 @@ def import_simkl_private(request):
             return redirect("import_data")
 
     redirect_uri = state.get("redirect_uri")
+    session_auth = state.get("auth") or "v1"
     try:
         oauth_callback = simkl.get_token(
             request,
             code_verifier=code_verifier,
             redirect_uri=redirect_uri,
+            auth=session_auth,
         )
     except helpers.MediaImportError as error:
         messages.error(request, str(error))
         return redirect("import_data")
 
-    auth = oauth_callback.get("auth") or state.get("auth") or "v1"
+    auth = oauth_callback.get("auth") or session_auth
     if auth == "v2":
         enc_token = helpers.encrypt(oauth_callback["refresh_token"])
     else:

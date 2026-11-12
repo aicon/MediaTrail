@@ -4,18 +4,39 @@
 
 Verified against built images, not PyPI version numbers alone.
 
-## Status: security round closed (`8f7af77`)
+## Status: pending rescan (post–Simkl/DRF/lock fixes)
 
-Image: `ghcr.io/aicon/mediatrail:dev` @ `8f7af77`  
-Workflow: https://github.com/aicon/MediaTrail/actions/runs/43234875929  
+The previous clean Trivy result on `8f7af77` /
+`ghcr.io/aicon/mediatrail@sha256:1276ce57482c2578a4ad8e70dde1c41cb723b2ac4dfeedb3e4cdb3ce6061477e`
+does **not** cover the unpushed Simkl fail-closed, DRF-in-lock, and
+`requirements.txt` removal changes. Re-close only after a new image digest is
+built from this tree and Trivy + `verify_pillow_native` pass on that digest.
 
-Trivy (`--severity CRITICAL,HIGH,MEDIUM,LOW`): **0 findings** (Alpine + Python).
+## Supported dependency install (reproducible)
 
-Pillow/Brotli gate on the same build:
+MediaTrail does **not** ship or support a root `requirements.txt`. The only
+supported paths:
 
-- `Pillow 13.0.0` built from source (`--no-binary-package pillow`)
-- `BrotliDecoderVersion=1.2.1`
-- `verify_pillow_native: OK`
+| Path | Command |
+| --- | --- |
+| Runtime image | `Dockerfile` → `uv sync --locked --no-binary-package pillow` |
+| Local / CI Python env | `uv sync --locked` (add `--group test` / `--group dev` as needed) |
+| Lock freshness | `uv lock --check` (pre-commit) |
+
+Reproduce a local env matching the image Python deps:
+
+```bash
+uv sync --locked
+```
+
+Pillow in the **image** is still built from sdist against Alpine Brotli 1.2.1
+(`--no-binary-package pillow` + `scripts/verify_pillow_native.py`). A plain
+local `uv sync` may install a PyPI wheel and is not a substitute for that gate.
+
+Final locked pins of note (from `uv.lock`): `PyJWT==2.15.1`, `multidict==7.2.1`,
+`apprise==1.11.0`, `djangorestframework==3.18.3`, `drf-spectacular==0.28.0`,
+`pillow==13.0.0`, `soupsieve==4.1`. Alpine pins in the Dockerfile:
+`zlib=1.4-r0`, `brotli-libs=1.2.1-r0`, `krb5-libs=1.22.3-r0`.
 
 ## Pillow and Brotli
 

@@ -16,6 +16,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Reject unsupported requirements.txt
+        run: |
+          if [ -f requirements.txt ]; then
+            echo "requirements.txt is not a supported install path; use uv.lock / uv sync --locked" >&2
+            exit 1
+          fi
+
+      - name: Verify lock includes DRF and Pillow 13
+        run: |
+          grep -q 'name = "djangorestframework"' uv.lock
+          grep -q 'name = "drf-spectacular"' uv.lock
+          grep -E 'name = "pillow"' -A1 uv.lock | grep -q 'version = "13\.'
+          grep -q 'uv sync --locked' Dockerfile
+          if grep -q 'uv pip install' Dockerfile; then
+            echo "Dockerfile must not uv pip install packages outside the lock" >&2
+            exit 1
+          fi
+
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io

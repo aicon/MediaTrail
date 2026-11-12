@@ -4,18 +4,33 @@
 
 Az ellenőrzés a buildelt image-en történik, nem csupán a PyPI verziószámokon.
 
-## Állapot: biztonsági kör lezárva (`8f7af77`)
+## Állapot: újrascan vár (Simkl/DRF/lock javítások után)
 
-Image: `ghcr.io/aicon/mediatrail:dev` @ `8f7af77`  
-Workflow: https://github.com/aicon/MediaTrail/actions/runs/43234875929  
+A korábbi tiszta Trivy az `8f7af77` digesten **nem** igazolja a még nem
+image-elt Simkl fail-closed, DRF-lock és `requirements.txt`-törlés
+változásait. Új image digest + Trivy + `verify_pillow_native` kell a lezáráshoz.
 
-Trivy (CRITICAL+HIGH+MEDIUM+LOW): **0 találat** (Alpine + Python).
+## Támogatott telepítés (reprodukálható)
 
-Ugyanazon a builden a Pillow/Brotli gate:
+Nincs támogatott gyökér `requirements.txt`. Hivatalos útvonalak:
 
-- Pillow **13.0.0** forrásból
-- `BrotliDecoderVersion=1.2.1`
-- `verify_pillow_native: OK`
+| Útvonal | Parancs |
+| --- | --- |
+| Runtime image | `Dockerfile` → `uv sync --locked --no-binary-package pillow` |
+| Helyi / CI Python | `uv sync --locked` (szükség szerint `--group test` / `dev`) |
+| Lock ellenőrzés | `uv lock --check` (pre-commit) |
+
+```bash
+uv sync --locked
+```
+
+A image Pillow forrásbuild + Alpine Brotli 1.2.1 gate-je nem helyettesíthető
+puszta helyi wheel `uv sync`-kel.
+
+Lock pinék (többek között): `PyJWT==2.15.1`, `multidict==7.2.1`,
+`apprise==1.11.0`, `djangorestframework==3.18.3`, `drf-spectacular==0.28.0`,
+`pillow==13.0.0`, `soupsieve==4.1`; Alpine: `zlib=1.4-r0`,
+`brotli-libs=1.2.1-r0`, `krb5-libs=1.22.3-r0`.
 
 ## Pillow és Brotli
 
