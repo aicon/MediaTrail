@@ -13,17 +13,17 @@
              data-journal-entry-day="{{ day.day_iso }}"
              x-data="{ confirmOpen: false }"
              class="group relative flex gap-4 bg-[#2a2f35] rounded-xl p-3 ring-1 ring-white/5 hover:ring-indigo-500/40 hover:bg-[#30363d] transition-all duration-200">
-      {# self-start: badge anchors to poster box, not stretched card height #}
-      <a href="{{ entry.item|media_url }}" class="block shrink-0 self-start">
-        <span class="relative block w-30">
+      {# self-start: poster box only as tall as the image (not stretched card) #}
+      <a href="{{ entry.item|media_url }}" class="journal-poster-link">
+        <span class="journal-poster">
           {% if entry.item.image and entry.item.image != IMG_NONE %}
             <img alt="{{ entry.item.title }}"
-                 class="w-30 aspect-2/3 rounded-lg object-cover bg-[#3e454d] shadow-md group-hover:opacity-90 transition-opacity"
+                 class="journal-poster-img shadow-md group-hover:opacity-90 transition-opacity"
                  src="{{ entry.item.image }}"
                  loading="lazy">
           {% else %}
             <img alt="{{ entry.item.title }}"
-                 class="w-30 aspect-2/3 rounded-lg bg-[#3e454d] shadow-md"
+                 class="journal-poster-img shadow-md"
                  src="{{ IMG_NONE }}">
           {% endif %}
           {% include "app/components/journal_badge.html" with accent=entry.accent %}
