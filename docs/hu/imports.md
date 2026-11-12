@@ -39,7 +39,7 @@ Az egyéb források ugyanazokat a működési módokat és ütemezési lehetős�
 
 | Forrás | Szükséges adatok | Megjegyzések |
 | --- | --- | --- |
-| Trakt | Nyilvános felhasználónév, API-bejelentkezés (eszközkóddal is), vagy webhelyes export ZIP | Zárt API-import saját Trakt-alkalmazást igényel. A ZIP a Trakt → Beállítások → Export menüből jön (legfeljebb 50 MB). Sérült vagy üres archívumot az import elindítása előtt elutasít a rendszer. A „Csak az új elemek” kihagyja a már meglevő címeket. |
+| Trakt | Nyilvános felhasználónév, zárt API-bejelentkezés (böngészős PKCE az `auth.trakt.tv`-n, vagy eszközkód), vagy webhelyes export ZIP | A zárt belépéshez `TRAKT_API_PKCE` kell (modern Trakt-alkalmazás, secret nélkül). Az eszközkód TV-khez és korlátozott bevitelű eszközökhöz megmarad. A ZIP a Trakt → Beállítások → Export menüből jön (legfeljebb 50 MB). Sérült vagy üres archívumot az import elindítása előtt elutasít a rendszer. A „Csak az új elemek” kihagyja a már meglevő címeket. |
 | Simkl | Közvetlen összekapcsolás gombbal | Saját alkalmazás használata esetén külön Simkl-azonosító és titkos kulcs szükséges a beépített kliens felülbírálásához. |
 | MyAnimeList | Nyilvános felhasználónév | |
 | AniList | Nyilvános felhasználónév, vagy közvetlen összekapcsolás | Zárt profil eléréséhez saját AniList-alkalmazás regisztrációja szükséges. |

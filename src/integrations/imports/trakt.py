@@ -1,6 +1,9 @@
+import base64
+import hashlib
 import json
 import logging
 import re
+import secrets
 import zipfile
 from collections import defaultdict
 from io import BytesIO
@@ -21,6 +24,11 @@ from integrations.imports.helpers import MediaImportError, MediaImportUnexpected
 logger = logging.getLogger(__name__)
 
 TRAKT_API_BASE_URL = "https://api.trakt.tv"
+TRAKT_AUTH_BASE_URL = "https://auth.trakt.tv"
+TRAKT_AUTHORIZE_URL = f"{TRAKT_AUTH_BASE_URL}/oauth/authorize"
+TRAKT_TOKEN_URL = f"{TRAKT_API_BASE_URL}/oauth/token"
+# Modern browser + device logins share the secret-less client id (TRAKT_API_PKCE).
+MODERN_TRAKT_AUTH = frozenset({"device", "pkce"})
 BULK_PAGE_SIZE = 1000
 DEVICE_CLIENT_ID = re.compile(r"^[A-Za-z0-9_-]{20,128}$")
 DEVICE_TERMINAL_ERRORS = {
@@ -57,11 +65,24 @@ ENDPOINTS_TO_FILES = {
 
 
 def device_client_id():
-    """Return the configured client ID for a new Trakt app."""
+    """Return the configured client ID for a new Trakt app (PKCE / device)."""
     client_id = str(getattr(settings, "TRAKT_API_PKCE", "") or "").strip()
     if DEVICE_CLIENT_ID.fullmatch(client_id):
         return client_id
     return ""
+
+
+def make_pkce_pair():
+    """Return ``(code_verifier, code_challenge)`` for S256 PKCE."""
+    verifier = (
+        base64.urlsafe_b64encode(secrets.token_bytes(32)).rstrip(b"=").decode("ascii")
+    )
+    challenge = (
+        base64.urlsafe_b64encode(hashlib.sha256(verifier.encode("ascii")).digest())
+        .rstrip(b"=")
+        .decode("ascii")
+    )
+    return verifier, challenge
 
 
 def _trakt_headers(client_id):
@@ -181,20 +202,34 @@ def poll_device_login(device_code):
     }
 
 
-def handle_oauth_callback(request, redirect_uri=None):
-    """View for getting the Trakt OAuth2 token."""
-    code = request.GET["code"]
+def handle_oauth_callback(request, redirect_uri=None, code_verifier=None):
+    """Exchange a browser authorization code (PKCE) for Trakt tokens.
 
-    url = "https://api.trakt.tv/oauth/token"
+    Uses the secret-less ``TRAKT_API_PKCE`` client. ``code_verifier`` is
+    single-use and must match the challenge sent to ``auth.trakt.tv``.
+    """
+    code = request.GET.get("code")
+    if not code:
+        msg = "Trakt authorization failed."
+        raise MediaImportError(msg)
+    if not code_verifier:
+        msg = "Invalid or expired Trakt authorization request."
+        raise MediaImportError(msg)
+
+    client_id = device_client_id()
+    if not client_id:
+        msg = "The new Trakt API is not configured on this server."
+        raise MediaImportError(msg)
+
     redirect_uri = redirect_uri or app_helpers.build_absolute_app_url(
         request,
         reverse("import_trakt_private"),
     )
 
     params = {
-        "client_id": settings.TRAKT_API,
-        "client_secret": settings.TRAKT_API_SECRET,
+        "client_id": client_id,
         "code": code,
+        "code_verifier": code_verifier,
         "grant_type": "authorization_code",
         "redirect_uri": redirect_uri,
     }
@@ -203,18 +238,25 @@ def handle_oauth_callback(request, redirect_uri=None):
         token_response = app.providers.services.api_request(
             "TRAKT",
             "POST",
-            url,
+            TRAKT_TOKEN_URL,
             params=params,
+            headers=_trakt_headers(client_id),
         )
     except services.ProviderAPIError as error:
         if error.status_code == requests.codes.unauthorized:
-            msg = "Invalid Trakt secret key."
+            msg = "Invalid Trakt client configuration."
             raise MediaImportError(msg) from error
         raise
 
+    access_token = token_response.get("access_token")
+    refresh_token = token_response.get("refresh_token")
+    if not access_token or not refresh_token:
+        msg = "Trakt did not return a token."
+        raise MediaImportError(msg)
+
     return {
-        "refresh_token": token_response["refresh_token"],
-        "username": get_username_from_oauth(token_response["access_token"]),
+        "refresh_token": refresh_token,
+        "username": get_username_from_oauth(access_token, client_id=client_id),
     }
 
 
@@ -246,12 +288,15 @@ def get_username_from_oauth(access_token, client_id=None):
 
 
 def get_access_token(encrypted_refresh_token, redirect_uri=None, auth="legacy"):
-    """Get access token from encrypted refresh token."""
-    url = "https://api.trakt.tv/oauth/token"
+    """Get access token from encrypted refresh token.
 
+    ``auth`` in ``device`` / ``pkce`` refreshes with the secret-less modern
+    client id. ``legacy`` keeps the old client-id + secret path so existing
+    scheduled imports continue until the user reconnects.
+    """
     decrypted_token = helpers.decrypt(encrypted_refresh_token)
     headers = None
-    if auth == "device":
+    if auth in MODERN_TRAKT_AUTH:
         client_id = device_client_id()
         if not client_id:
             msg = "The new Trakt API is not configured on this server."
@@ -280,13 +325,17 @@ def get_access_token(encrypted_refresh_token, redirect_uri=None, auth="legacy"):
         request = app.providers.services.api_request(
             "TRAKT",
             "POST",
-            url,
+            TRAKT_TOKEN_URL,
             params=params,
             headers=headers,
         )
     except services.ProviderAPIError as error:
         if error.status_code == requests.codes.unauthorized:
-            msg = "Invalid Trakt secret key."
+            msg = (
+                "Invalid Trakt client configuration."
+                if auth in MODERN_TRAKT_AUTH
+                else "Invalid Trakt secret key."
+            )
             raise MediaImportError(msg) from error
         raise
 
@@ -452,7 +501,9 @@ class TraktImporter:
     def _make_api_request(self, url):
         """Make a request to the Trakt API with proper headers."""
         client_id = (
-            device_client_id() if self.auth == "device" else settings.TRAKT_API
+            device_client_id()
+            if self.auth in MODERN_TRAKT_AUTH
+            else settings.TRAKT_API
         )
         headers = {
             "Content-Type": "application/json",

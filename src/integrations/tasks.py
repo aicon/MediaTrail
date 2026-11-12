@@ -335,7 +335,8 @@ def import_trakt(
     """Celery task for importing media data from Trakt.
 
     Can import using OAuth, public username, device auth, or a website export ZIP.
-    auth "device" refreshes the token with the new Trakt API.
+    auth ``device`` / ``pkce`` refreshes with the modern secret-less client id.
+    auth ``legacy`` keeps old client-id + secret refresh for existing schedules.
     """
     return import_media(
         trakt.importer,

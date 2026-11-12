@@ -534,7 +534,7 @@ TRAKT_API_SECRET = config(
     ),
 )
 
-# Client ID of a new Trakt app. Those apps do not issue a client secret.
+# Client ID of a modern Trakt app (no secret). Browser PKCE + device login.
 TRAKT_API_PKCE = config(
     "TRAKT_API_PKCE",
     default=secret(

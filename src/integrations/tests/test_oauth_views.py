@@ -32,9 +32,12 @@ class TraktOAuthViewTests(TestCase):
         self.user = get_user_model().objects.create_user(**credentials)
         self.client.login(**credentials)
 
-    @override_settings(URLS=["https://yamtrack.example.com:8924"], TRAKT_API="client")
-    def test_trakt_oauth_uses_configured_public_url(self):
-        """Test Trakt authorization uses the configured public URL."""
+    @override_settings(
+        URLS=["https://mediatrail.example.com:8924"],
+        TRAKT_API_PKCE="pkce-client-id-1234567890",
+    )
+    def test_trakt_oauth_uses_auth_host_and_pkce(self):
+        """Browser login goes to auth.trakt.tv with S256 PKCE."""
         response = self.client.post(
             reverse("trakt_oauth"),
             {"mode": "new", "frequency": "once", "time": "14:30"},
@@ -44,20 +47,33 @@ class TraktOAuthViewTests(TestCase):
         redirect = urlparse(response["Location"])
         query = parse_qs(redirect.query)
         self.assertEqual(redirect.scheme, "https")
-        self.assertEqual(redirect.netloc, "trakt.tv")
-        self.assertEqual(query["client_id"], ["client"])
+        self.assertEqual(redirect.netloc, "auth.trakt.tv")
+        self.assertEqual(redirect.path, "/oauth/authorize")
+        self.assertEqual(query["client_id"], ["pkce-client-id-1234567890"])
+        self.assertEqual(query["code_challenge_method"], ["S256"])
+        self.assertTrue(query["code_challenge"][0])
         self.assertEqual(
             query["redirect_uri"],
-            ["https://yamtrack.example.com:8924/import/trakt/private"],
+            ["https://mediatrail.example.com:8924/import/trakt/private"],
         )
 
         state = self.client.session[query["state"][0]]
         self.assertEqual(
             state["redirect_uri"],
-            "https://yamtrack.example.com:8924/import/trakt/private",
+            "https://mediatrail.example.com:8924/import/trakt/private",
         )
+        self.assertTrue(state["code_verifier"])
 
-    @override_settings(URLS=["https://yamtrack.example.com:8924"])
+    @override_settings(TRAKT_API_PKCE="")
+    def test_trakt_oauth_requires_pkce_client(self):
+        """Browser login stays unavailable until TRAKT_API_PKCE is set."""
+        response = self.client.post(
+            reverse("trakt_oauth"),
+            {"mode": "new", "frequency": "once", "time": "14:30"},
+        )
+        self.assertRedirects(response, reverse("import_data"))
+
+    @override_settings(URLS=["https://mediatrail.example.com:8924"])
     @patch("integrations.views.tasks.import_trakt.delay")
     @patch("integrations.views.trakt.handle_oauth_callback")
     def test_trakt_callback_reuses_stored_redirect_uri(
@@ -65,14 +81,15 @@ class TraktOAuthViewTests(TestCase):
         mock_oauth_callback,
         mock_import_trakt,
     ):
-        """Test the token exchange and import task reuse the original redirect URI."""
-        redirect_uri = "https://yamtrack.example.com:8924/import/trakt/private"
+        """Token exchange and import reuse the original redirect URI and PKCE verifier."""
+        redirect_uri = "https://mediatrail.example.com:8924/import/trakt/private"
         session = self.client.session
         session["state-token"] = {
             "mode": "new",
             "frequency": "once",
             "time": "14:30",
             "redirect_uri": redirect_uri,
+            "code_verifier": "verifier-value",
         }
         session.save()
         mock_oauth_callback.return_value = {
@@ -91,18 +108,35 @@ class TraktOAuthViewTests(TestCase):
             mock_oauth_callback.call_args.kwargs["redirect_uri"],
             redirect_uri,
         )
+        self.assertEqual(
+            mock_oauth_callback.call_args.kwargs["code_verifier"],
+            "verifier-value",
+        )
         mock_import_trakt.assert_called_once()
+        self.assertEqual(mock_import_trakt.call_args.kwargs["auth"], "pkce")
         self.assertEqual(
             mock_import_trakt.call_args.kwargs["redirect_uri"],
             redirect_uri,
         )
+        self.assertNotIn("state-token", self.client.session)
 
     @patch("integrations.views.trakt.handle_oauth_callback")
     def test_trakt_callback_rejects_missing_state(self, mock_oauth_callback):
-        """Test missing OAuth state is handled without a server error."""
+        """Missing OAuth state is handled without a server error."""
         response = self.client.get(
             reverse("import_trakt_private"),
             {"code": "code"},
+        )
+
+        self.assertRedirects(response, reverse("import_data"))
+        mock_oauth_callback.assert_not_called()
+
+    @patch("integrations.views.trakt.handle_oauth_callback")
+    def test_trakt_callback_rejects_state_mismatch(self, mock_oauth_callback):
+        """Unknown state token aborts before the code exchange."""
+        response = self.client.get(
+            reverse("import_trakt_private"),
+            {"code": "code", "state": "not-in-session"},
         )
 
         self.assertRedirects(response, reverse("import_data"))

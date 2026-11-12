@@ -69,28 +69,35 @@ def import_nuvio(request):
 
 @require_POST
 def trakt_oauth(request):
-    """View for initiating Trakt OAuth2 authorization flow."""
+    """Start Trakt browser OAuth (auth.trakt.tv + PKCE S256)."""
+    if not trakt.device_client_id():
+        messages.error(request, "The new Trakt API is not configured on this server.")
+        return redirect("import_data")
+
     redirect_uri = app_helpers.build_absolute_app_url(
         request,
         reverse("import_trakt_private"),
     )
-    url = "https://trakt.tv/oauth/authorize"
+    code_verifier, code_challenge = trakt.make_pkce_pair()
     state = {
         "mode": request.POST["mode"],
         "frequency": request.POST["frequency"],
         "time": request.POST["time"],
         "redirect_uri": redirect_uri,
+        "code_verifier": code_verifier,
     }
     state_token = secrets.token_urlsafe(32)
     request.session[state_token] = state
     return redirect(
-        f"{url}?{
+        f"{trakt.TRAKT_AUTHORIZE_URL}?{
             urlencode(
                 {
-                    'client_id': settings.TRAKT_API,
+                    'client_id': trakt.device_client_id(),
                     'redirect_uri': redirect_uri,
                     'response_type': 'code',
                     'state': state_token,
+                    'code_challenge': code_challenge,
+                    'code_challenge_method': 'S256',
                 }
             )
         }",
@@ -99,12 +106,15 @@ def trakt_oauth(request):
 
 @require_GET
 def import_trakt_private(request):
-    """View for handling Trakt OAuth2 callback and scheduling private import."""
+    """Handle Trakt PKCE callback and schedule a private import."""
     state_token = request.GET.get("state")
-    state = request.session.get(state_token)
+    state = request.session.pop(state_token, None) if state_token else None
     if not state:
         messages.error(request, "Invalid or expired Trakt authorization request.")
         return redirect("import_data")
+
+    # One-shot verifier: never reuse even if the token exchange fails.
+    code_verifier = state.pop("code_verifier", None)
 
     if not request.GET.get("code"):
         messages.error(request, "Trakt authorization failed.")
@@ -114,15 +124,23 @@ def import_trakt_private(request):
         request,
         reverse("import_trakt_private"),
     )
-    oauth_callback = trakt.handle_oauth_callback(request, redirect_uri=redirect_uri)
+    try:
+        oauth_callback = trakt.handle_oauth_callback(
+            request,
+            redirect_uri=redirect_uri,
+            code_verifier=code_verifier,
+        )
+    except helpers.MediaImportError as error:
+        messages.error(request, str(error))
+        return redirect("import_data")
+
     _queue_trakt_import(
         request,
         username=oauth_callback["username"],
         refresh_token=oauth_callback["refresh_token"],
         state=state,
-        auth="legacy",
+        auth="pkce",
     )
-    request.session.pop(state_token, None)
     return redirect("import_data")
 
 

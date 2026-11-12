@@ -126,7 +126,7 @@
 
         {# Trakt #}
         <div class="bg-[#39404b] p-4 rounded-lg"
-             x-data="{ traktSource: 'public', traktLogin: 'current' }">
+             x-data="{ traktSource: 'public', traktLogin: 'browser' }">
           <div class="flex items-center mb-3">{% source_display "trakt" %}</div>
           <p class="text-sm text-gray-400 mb-3">{% translate "Import TV shows and movies" %}</p>
 
@@ -154,13 +154,16 @@
               <select id="trakt-login"
                       x-model="traktLogin"
                       class="w-full py-2 px-3 bg-[#2a2f35] rounded-md text-white text-sm border border-gray-600 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 appearance-none">
-                <option value="current">{% translate "Current login" %}</option>
-                <option value="device">{% translate "New API (device code)" %}</option>
+                <option value="browser">{% translate "Browser login (PKCE)" %}</option>
+                <option value="device">{% translate "Device code (TV / limited input)" %}</option>
               </select>
               {% include "app/icons/chevron-down.svg" with classes="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" %}
             </div>
+            <p class="mt-2 text-xs text-gray-500" x-show="traktLogin === 'browser'">
+              {% translate "Opens Trakt sign-in on auth.trakt.tv with PKCE. Needs TRAKT_API_PKCE (same app as device login). A free Trakt account can connect only two applications." %}
+            </p>
             <p class="mt-2 text-xs text-gray-500" x-show="traktLogin === 'device'">
-              {% translate "Trakt shows a code to enter at trakt.tv/activate. A free account can connect only two applications." %}
+              {% translate "Trakt shows a code to enter at trakt.tv/activate. Needs TRAKT_API_PKCE. A free account can connect only two applications." %}
             </p>
           </div>
 
@@ -198,8 +201,8 @@
 
             <button type="submit"
                     class="w-full px-4 py-2 text-sm rounded-md transition-colors cursor-pointer bg-indigo-600 text-white hover:bg-indigo-700">
-              <span x-show="traktLogin !== 'device'">{% translate "Connect with Trakt & Import" %}</span>
-              <span x-show="traktLogin === 'device'" x-cloak>{% translate "Connect with the new Trakt API" %}</span>
+              <span x-show="traktLogin === 'browser'">{% translate "Connect with Trakt & Import" %}</span>
+              <span x-show="traktLogin === 'device'" x-cloak>{% translate "Connect with device code" %}</span>
             </button>
           </form>
 
