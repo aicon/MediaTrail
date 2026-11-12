@@ -4,7 +4,7 @@
 
 A self-hosted personal media tracker and digital logbook for everything you watch, read, and play.
 
-[![Release](https://img.shields.io/badge/version-0.26.3-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Release](https://img.shields.io/badge/version-0.26.4-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Documentation](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/)
@@ -151,7 +151,7 @@ MediaTrail is an independent, unofficial fork and is **not affiliated with, main
 ### Background
 MediaTrail diverged from Yamtrack `dev` post-`v0.25.3` (specifically the July 12, 2026 tabbed detail view), incorporating PR `#1378` (REST API preview) and PR `#1608` (Episode history).
 
-MediaTrail continues with small patch releases after `0.26.3`, prioritizing stability, self-contained deployment, and its own integrations (Nuvio, journal, statistics, and import tools).
+MediaTrail continues with small patch releases after `0.26.4`, prioritizing stability, self-contained deployment, and its own integrations (Nuvio, journal, statistics, and import tools).
 
 | Feature | Upstream Yamtrack (Stable) | MediaTrail |
 | :--- | :---: | :---: |

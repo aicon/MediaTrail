@@ -466,6 +466,12 @@ msgstr "Linkek"
 msgid "Source code"
 msgstr "Forráskód"
 
+msgid "User manual"
+msgstr "Felhasználói kézikönyv"
+
+msgid "External links"
+msgstr "Külső hivatkozások"
+
 msgid "MediaTrail documentation"
 msgstr "MediaTrail dokumentáció"
 

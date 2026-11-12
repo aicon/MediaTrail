@@ -1,5 +1,6 @@
 {% load static %}
 {% load app_tags %}
+{% load user_tags %}
 {% load i18n %}
 
 <!DOCTYPE html>
@@ -200,6 +201,28 @@
 
                       {% endif %}
                       <span>{% translate "Calendar" %}</span>
+                    </a>
+                  </li>
+                </ul>
+                <ul class="space-y-1 border-t border-[#2c3136] mt-4 pt-4"
+                    aria-label="{% translate "External links" %}">
+                  <li>
+                    <a href="https://github.com/aicon/MediaTrail"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="flex items-center space-x-3 px-4 py-2 rounded-md transition-colors duration-200 text-sm text-gray-400 hover:text-white hover:bg-[#23272b]">
+                      {% include "app/icons/github.svg" with classes="w-5 h-5" %}
+                      <span>{% translate "Source code" %}</span>
+                    </a>
+                  </li>
+                  <li>
+                    {% docs_url as manual_url %}
+                    <a href="{{ manual_url }}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="flex items-center space-x-3 px-4 py-2 rounded-md transition-colors duration-200 text-sm text-gray-400 hover:text-white hover:bg-[#23272b]">
+                      {% include "app/icons/book-open.svg" with classes="w-5 h-5" %}
+                      <span>{% translate "User manual" %}</span>
                     </a>
                   </li>
                 </ul>
