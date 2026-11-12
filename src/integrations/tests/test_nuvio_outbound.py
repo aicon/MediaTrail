@@ -160,8 +160,8 @@ class NuvioOutboundTests(TestCase):
         }
         self.assertTrue(nuvio_outbound.is_pending_outbound(self.user.id, delete_row))
 
-    def test_watch_then_unwatch_keeps_both_echo_pendings(self):
-        """MT mark then unmark must skip both outbound echoes when they return together."""
+    def test_watch_then_unwatch_clears_stale_upsert_pending(self):
+        """After MT unwatch, a later Nuvio→MT watch must not hit a stale upsert echo."""
         self.user.nuvio_sync_mark_played_enabled = True
         self.user.nuvio_sync_mark_unplayed_enabled = True
         self.user.save(
@@ -187,7 +187,7 @@ class NuvioOutboundTests(TestCase):
             "content_type": "movie",
             "title": "Fight Club",
         }
-        self.assertTrue(nuvio_outbound.is_pending_outbound(self.user.id, upsert_row))
+        self.assertFalse(nuvio_outbound.is_pending_outbound(self.user.id, upsert_row))
         self.assertTrue(nuvio_outbound.is_pending_outbound(self.user.id, delete_row))
 
     def test_client_push_handles_204(self):

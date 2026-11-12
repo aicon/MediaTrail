@@ -162,8 +162,15 @@ def sync_nuvio_watch_history():
                 account.cursor,
             )
             with disable_fetch_releases():
+                user = account.user
+                user.refresh_from_db(
+                    fields=[
+                        "nuvio_sync_mark_played_enabled",
+                        "nuvio_sync_mark_unplayed_enabled",
+                    ],
+                )
                 nuvio.NuvioImporter(
-                    account.user,
+                    user,
                     mode="new",
                     gate_upserts=True,
                 ).sync_delta()

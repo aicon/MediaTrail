@@ -28,11 +28,10 @@ def enqueue_watched_upsert(user, media):
     if not items:
         return
     for item in items:
-        # Keep upsert and delete pendings independent. Clearing the opposite
-        # key lets an older outbound upsert echo re-apply after a later local
-        # delete already cleared that pending, while the delete echo is still
-        # skipped — recreating the title. Op-scoped keys already let a genuine
-        # inbound delete through while an upsert is pending.
+        # Clear the opposite pending so a later genuine inbound delete is not
+        # paired with a stale upsert echo flag. Same-poll upsert+delete echoes
+        # are handled by delta last-write-wins coalesce in the importer.
+        _clear_pending(user.id, item, operation="delete")
         _mark_pending(user.id, item, operation="upsert")
     logger.info(
         "Queue Nuvio watched push for %s (%s)",
@@ -55,6 +54,9 @@ def enqueue_watched_delete(user, media):
         return
     progress_keys = _progress_keys_from_delete_keys(keys)
     for key in keys:
+        # Drop stale upsert pending: otherwise a later Nuvio→MT watch for the
+        # same title is skipped as an outbound echo for up to OUTBOUND_TTL.
+        _clear_pending(user.id, key, operation="upsert")
         _mark_pending(user.id, key, operation="delete")
     logger.info(
         "Queue Nuvio watched delete keys %s progress %s",
@@ -220,6 +222,13 @@ def _mark_pending(user_id, payload, *, operation):
     key = _cache_key(user_id, identity, operation=operation)
     if key:
         cache.set(key, True, OUTBOUND_TTL_SECONDS)
+
+
+def _clear_pending(user_id, payload, *, operation):
+    identity = _identity_from_payload(payload)
+    key = _cache_key(user_id, identity, operation=operation)
+    if key:
+        cache.delete(key)
 
 
 def _identity_from_payload(payload):
