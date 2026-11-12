@@ -124,6 +124,62 @@
               </div>
               <p class="text-sm text-gray-300">{% translate "Play a movie or episode. Each device gets its own Now Watching strip on the home page; you can rename the strip. A finished watch is saved when you stop at 90 percent or more." %}</p>
             </div>
+            <div class="bg-[#262a2f] p-4 rounded-md mt-4">
+              <h4 class="text-sm font-medium mb-3">{% translate "Sync events" %}</h4>
+              <p class="text-gray-400 mb-4 text-sm">
+                {% translate "Player events always update Now Watching. Enable these to keep watch history in sync both ways with your linked Nuvio account." %}
+              </p>
+              <form method="post"
+                    action="{% url 'update_nuvio_sync_events' %}"
+                    class="space-y-3">
+                {% csrf_token %}
+                <div class="flex items-center justify-between p-3 bg-[#39404b] rounded-md">
+                  <div class="flex-1">
+                    <div class="flex items-center text-gray-200 mb-1">
+                      {% include "app/icons/circle-check.svg" with classes="w-5 h-5 mr-2" %}
+                      <span class="text-sm font-medium">{% translate "Sync mark-watched" %}</span>
+                    </div>
+                    <p class="text-xs text-gray-400 ml-7">
+                      {% translate "When media is marked watched in Nuvio or MediaTrail, apply the change on the other side." %}
+                    </p>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer ml-4">
+                    <input class="sr-only peer"
+                           type="checkbox"
+                           name="nuvio_sync_mark_played_enabled"
+                           {% if user.nuvio_sync_mark_played_enabled %}checked{% endif %}>
+                    <div class="w-9 h-5 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-px after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-indigo-600">
+                    </div>
+                  </label>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-[#39404b] rounded-md">
+                  <div class="flex-1">
+                    <div class="flex items-center text-gray-200 mb-1">
+                      {% include "app/icons/error.svg" with classes="w-5 h-5 mr-2 text-amber-400" %}
+                      <span class="text-sm font-medium">{% translate "Sync mark-unwatched" %}</span>
+                    </div>
+                    <p class="text-xs text-gray-400 ml-7">
+                      {% translate "When media is marked unwatched in Nuvio or MediaTrail, remove matching watch history on the other side. This can delete media from MediaTrail." %}
+                    </p>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer ml-4">
+                    <input class="sr-only peer"
+                           type="checkbox"
+                           name="nuvio_sync_mark_unplayed_enabled"
+                           {% if user.nuvio_sync_mark_unplayed_enabled %}checked{% endif %}>
+                    <div class="w-9 h-5 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-px after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-indigo-600">
+                    </div>
+                  </label>
+                </div>
+                <div class="pt-1">
+                  <button type="submit"
+                          class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm cursor-pointer">
+                    {% include "app/icons/save.svg" with classes="w-4 h-4 mr-2" %}
+                    {% translate "Save Changes" %}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
         <div x-cloak x-show="activeIntegration === 'jellyfin'" role="tabpanel">

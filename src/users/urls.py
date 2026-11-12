@@ -40,4 +40,9 @@ urlpatterns = [
         views.update_jellyfin_webhook_events,
         name="update_jellyfin_webhook_events",
     ),
+    path(
+        "update_nuvio_sync_events",
+        views.update_nuvio_sync_events,
+        name="update_nuvio_sync_events",
+    ),
 ]

@@ -410,6 +410,26 @@ def update_jellyfin_webhook_events(request):
 
 
 @require_POST
+def update_nuvio_sync_events(request):
+    """Update optional Nuvio watch-history sync for the user."""
+    request.user.nuvio_sync_mark_played_enabled = (
+        "nuvio_sync_mark_played_enabled" in request.POST
+    )
+    request.user.nuvio_sync_mark_unplayed_enabled = (
+        "nuvio_sync_mark_unplayed_enabled" in request.POST
+    )
+    request.user.save(
+        update_fields=[
+            "nuvio_sync_mark_played_enabled",
+            "nuvio_sync_mark_unplayed_enabled",
+        ],
+    )
+    messages.success(request, _("Nuvio sync settings updated successfully"))
+
+    return redirect("integrations")
+
+
+@require_POST
 def clear_search_cache(request):
     """Clear all cached search entries."""
     deleted = cache.delete_pattern("search_*") or 0

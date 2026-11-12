@@ -744,6 +744,27 @@ msgstr "A Plex-felhasználónevek mentve."
 msgid "Jellyfin webhook settings updated successfully"
 msgstr "A Jellyfin webhook-beállítások mentve."
 
+msgid "Sync events"
+msgstr "Szinkron-események"
+
+msgid "Player events always update Now Watching. Enable these to keep watch history in sync both ways with your linked Nuvio account."
+msgstr "A lejátszási események mindig frissítik a Most nézem sávot. Kapcsold be ezeket, ha a megtekintési előzményeket két irányban is szinkronban szeretnéd tartani a kapcsolt Nuvio-fiókkal."
+
+msgid "Sync mark-watched"
+msgstr "Megnézett jelölés szinkronizálása"
+
+msgid "When media is marked watched in Nuvio or MediaTrail, apply the change on the other side."
+msgstr "Ha a média megtekintettnek van jelölve a Nuvióban vagy a MediaTrailben, a változás a másik oldalon is érvényesül."
+
+msgid "Sync mark-unwatched"
+msgstr "Nem megtekintett jelölés szinkronizálása"
+
+msgid "When media is marked unwatched in Nuvio or MediaTrail, remove matching watch history on the other side. This can delete media from MediaTrail."
+msgstr "Ha a média nem megtekintettnek van jelölve a Nuvióban vagy a MediaTrailben, a megfelelő megtekintési előzmény a másik oldalon törlődik. Ez médiát törölhet a MediaTrailből."
+
+msgid "Nuvio sync settings updated successfully"
+msgstr "A Nuvio szinkron-beállítások mentve."
+
 msgid "Back up your data or export it for use with other services."
 msgstr "Mentsd az adataidat, vagy exportáld más szolgáltatásokhoz."
 

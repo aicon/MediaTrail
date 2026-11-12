@@ -438,6 +438,14 @@ class User(AbstractUser):
         default=False,
         help_text="Process Jellyfin MarkUnplayed webhook events",
     )
+    nuvio_sync_mark_played_enabled = models.BooleanField(
+        default=False,
+        help_text="Sync Nuvio mark-watched changes with MediaTrail watch history",
+    )
+    nuvio_sync_mark_unplayed_enabled = models.BooleanField(
+        default=False,
+        help_text="Sync Nuvio mark-unwatched changes with MediaTrail watch history",
+    )
 
     class Meta:
         """Meta options for the model."""
