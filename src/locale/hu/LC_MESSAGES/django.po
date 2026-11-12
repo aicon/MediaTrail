@@ -759,8 +759,8 @@ msgstr "Ha a média megtekintettnek van jelölve a Nuvióban vagy a MediaTrailbe
 msgid "Sync mark-unwatched"
 msgstr "Nem megtekintett jelölés szinkronizálása"
 
-msgid "When media is marked unwatched in Nuvio or MediaTrail, remove matching watch history on the other side. On import, Nuvio history is the watched list for TMDB titles—local watches missing there are removed."
-msgstr "Ha a média nem megtekintettnek van jelölve a Nuvióban vagy a MediaTrailben, a megfelelő megtekintési előzmény a másik oldalon törlődik. Importnál a Nuvio előzmény a TMDB-címek megtekintett listája — a helyben megmaradt, de ott hiányzó megtekintések törlődnek."
+msgid "When media is marked unwatched in Nuvio or MediaTrail, remove matching watch history on the other side. Import only removes watches previously synced from Nuvio, and only after a complete Nuvio history snapshot."
+msgstr "Ha a média nem megtekintettnek van jelölve a Nuvióban vagy a MediaTrailben, a megfelelő megtekintési előzmény a másik oldalon törlődik. Az import csak a korábban Nuvióból szinkronizált megtekintéseket törli, és csak teljes Nuvio-előzmény snapshot után."
 
 msgid "Nuvio sync settings updated successfully"
 msgstr "A Nuvio szinkron-beállítások mentve."

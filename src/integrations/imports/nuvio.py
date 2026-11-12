@@ -500,10 +500,14 @@ class NuvioImporter:
         """Read history, then later changes, and store the cursor when it is safe."""
         try:
             self.client.assert_profile()
-            remote_keys = self._replay_history()
-            if self.user.nuvio_sync_mark_unplayed_enabled:
-                self._reconcile_unwatched(remote_keys)
+            remote_keys, snapshot_complete = self._replay_history()
             self._delta()
+            # Snapshot reconcile only after a full, successful history pull.
+            if (
+                self.user.nuvio_sync_mark_unplayed_enabled
+                and snapshot_complete
+            ):
+                self._reconcile_unwatched(remote_keys)
         except NuvioError as exc:
             self._raise_import_error(exc)
 
@@ -548,10 +552,14 @@ class NuvioImporter:
         On first bootstrap, capture the tip cursor after the snapshot. On later
         imports, keep the saved cursor so delete events are still visible to
         ``_delta`` (advancing to tip here would skip them forever).
+
+        Returns ``(remote_tmdb_keys, snapshot_complete)``. Reconcile must not
+        run when the snapshot is incomplete (failed pages or unmapped ids).
         """
         tip = self.client.history_cursor()
         self._previous_watched_keys = set(self.account.watched_keys or [])
         remote_keys = set()
+        unmapped = 0
         logger.info("Nuvio import started")
         for index, row in enumerate(self.client.iter_history(), start=1):
             if not self._apply(row, operation="upsert", event_id=None):
@@ -564,9 +572,30 @@ class NuvioImporter:
             key = self._watched_key_from_row(row)
             if key:
                 remote_keys.add(key)
+            elif self._row_expects_tmdb_key(row):
+                unmapped += 1
             if index % 25 == 0:
                 self._log_progress(index)
         self._flush_progress()
+        snapshot_complete = unmapped == 0
+        if not snapshot_complete:
+            logger.warning(
+                "Nuvio snapshot incomplete (%s rows without TMDB key); "
+                "keeping prior watched_keys and skipping reconcile",
+                unmapped,
+            )
+            # Undo any mid-snapshot watched_keys writes from _apply.
+            self._watched_keys = set(self._previous_watched_keys)
+            self.account.watched_keys = sorted(self._previous_watched_keys)
+            fields = ["watched_keys"]
+            if not self.account.bootstrapped:
+                self.account.cursor = tip
+                self.account.bootstrapped = True
+                fields.extend(["cursor", "bootstrapped"])
+            self._save_account(fields)
+            return remote_keys, False
+
+        self._watched_keys = set(remote_keys)
         self.account.watched_keys = sorted(remote_keys)
         fields = ["watched_keys"]
         if not self.account.bootstrapped:
@@ -574,20 +603,24 @@ class NuvioImporter:
             self.account.bootstrapped = True
             fields.extend(["cursor", "bootstrapped"])
         self._save_account(fields)
-        logger.info("Nuvio import history checked (%s remote keys)", len(remote_keys))
-        return remote_keys
+        logger.info(
+            "Nuvio import history checked (%s remote TMDB keys)",
+            len(remote_keys),
+        )
+        return remote_keys, True
 
     def _reconcile_unwatched(self, remote_keys):
-        """Remove local TMDB watches missing from the Nuvio snapshot.
+        """Remove Nuvio-managed local watches missing from a complete snapshot.
 
-        With mark-unwatched sync enabled, the Nuvio history snapshot is the
-        watched list: local TMDB movie/episode rows not present there are
-        removed (including deletes already skipped by a jumped cursor).
+        Eligible keys are only those previously stored from a successful Nuvio
+        snapshot (``watched_keys``). Other MediaTrail watches (Trakt, manual,
+        etc.) are left alone even when absent from the remote snapshot.
         """
-        stale = self._all_local_tmdb_watch_keys() - remote_keys
+        managed = set(self._previous_watched_keys)
+        stale = managed - set(remote_keys)
         logger.info(
-            "Nuvio reconcile unwatched: local=%s remote=%s stale=%s",
-            len(self._all_local_tmdb_watch_keys()),
+            "Nuvio reconcile unwatched: managed=%s remote=%s stale=%s",
+            len(managed),
             len(remote_keys),
             len(stale),
         )
@@ -596,27 +629,14 @@ class NuvioImporter:
                 kind = key.split(":", 1)[0]
                 if kind in self.removed:
                     self.removed[kind] += 1
-                    logger.info("Nuvio reconcile removed %s", key)
+                    logger.info("Nuvio reconcile removed managed key %s", key)
 
-    def _all_local_tmdb_watch_keys(self):
-        keys = set()
-        for movie in app.models.Movie.objects.filter(
-            user=self.user,
-            item__source=Sources.TMDB.value,
-        ).select_related("item"):
-            keys.add(f"movie:{movie.item.media_id}")
-        for episode in app.models.Episode.objects.filter(
-            related_season__user=self.user,
-            item__source=Sources.TMDB.value,
-        ).select_related("item"):
-            keys.add(
-                "episode:"
-                f"{episode.item.media_id}:"
-                f"{episode.item.season_number}:"
-                f"{episode.item.episode_number}",
-            )
-        return keys
     def _watched_key_from_row(self, row):
+        """Return a normalized TMDB watch key, or None if it cannot be resolved.
+
+        IMDb and ``tmdb:`` content ids both resolve here so snapshot compare
+        never treats the same title as missing under a different id form.
+        """
         try:
             record = record_from_nuvio(row, operation="upsert", event_id=None)
         except RecordError:
@@ -626,7 +646,20 @@ class NuvioImporter:
             if not mapped:
                 return None
             record = mapped
+        if record["source"] != Sources.TMDB.value:
+            return None
         return self._watched_key_from_record(record)
+
+    def _row_expects_tmdb_key(self, row):
+        """True when this history row should resolve to a TMDB watch key."""
+        try:
+            record = record_from_nuvio(row, operation="upsert", event_id=None)
+        except RecordError:
+            return False
+        return record["kind"] in {
+            MediaTypes.MOVIE.value,
+            MediaTypes.EPISODE.value,
+        }
 
     def _watched_key_from_record(self, record):
         if record["kind"] == MediaTypes.MOVIE.value:

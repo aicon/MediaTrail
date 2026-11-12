@@ -391,6 +391,24 @@ class NuvioImportTests(TestCase):
         counts, _warnings, removed = self._run(FakeNuvio(history, cursor=5))
         self.assertEqual(Episode.objects.count(), 2)
         self.assertEqual(removed, {})
+        self.account.refresh_from_db()
+        self.assertIn("episode:1532:2:21", self.account.watched_keys)
+        # Unrelated local watch must survive reconcile.
+        other = Item.objects.create(
+            media_id="999",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.MOVIE.value,
+            title="Local Only",
+            image="https://example.test/other.jpg",
+        )
+        with patch("app.models.providers.services.get_media_metadata", _metadata):
+            Movie.objects.create(
+                item=other,
+                user=self.user,
+                status=Status.COMPLETED.value,
+                progress=1,
+                end_date=datetime.now(timezone.utc),
+            )
         # Nuvio unwatched E21; snapshot only has E20. Cursor tip already past deletes.
         _counts, _warnings, removed = self._run(
             FakeNuvio(
@@ -413,6 +431,66 @@ class NuvioImportTests(TestCase):
         }
         self.assertEqual(seasons_eps, {(2, 20)})
         self.assertEqual(removed.get(MediaTypes.EPISODE.value), 1)
+        self.assertTrue(Movie.objects.filter(user=self.user, item__media_id="999").exists())
+
+    def test_reconcile_skips_incomplete_snapshot(self):
+        self.user.nuvio_sync_mark_unplayed_enabled = True
+        self.user.save(update_fields=["nuvio_sync_mark_unplayed_enabled"])
+        self._run(
+            FakeNuvio(
+                [_history("tmdb:550", "movie", "Fight Club", nuvio_id="m1")],
+                cursor=5,
+            ),
+        )
+        self.assertEqual(Movie.objects.filter(user=self.user).count(), 1)
+        # Incomplete: rows are present but cannot resolve to TMDB keys.
+        # An empty history is a valid complete snapshot and must not be used here.
+        with patch.object(
+            nuvio.NuvioImporter,
+            "_watched_key_from_row",
+            return_value=None,
+        ), patch.object(
+            nuvio.NuvioImporter,
+            "_row_expects_tmdb_key",
+            return_value=True,
+        ):
+            _counts, _warnings, removed = self._run(
+                FakeNuvio(
+                    history=[
+                        _history("tmdb:550", "movie", "Fight Club", nuvio_id="m1"),
+                    ],
+                    cursor=99,
+                ),
+            )
+        self.assertEqual(removed, {})
+        self.assertEqual(Movie.objects.filter(user=self.user).count(), 1)
+        self.account.refresh_from_db()
+        self.assertIn("movie:550", self.account.watched_keys)
+
+    def test_reconcile_normalizes_imdb_content_id_to_tmdb_key(self):
+        """Same title via tt… must not look missing against a prior tmdb: key."""
+        self.user.nuvio_sync_mark_unplayed_enabled = True
+        self.user.save(update_fields=["nuvio_sync_mark_unplayed_enabled"])
+        self._run(
+            FakeNuvio(
+                [_history("tmdb:550", "movie", "Fight Club", nuvio_id="m1")],
+                cursor=5,
+            ),
+        )
+        self.account.refresh_from_db()
+        self.assertIn("movie:550", self.account.watched_keys)
+        self.account.imdb_map = {"tt0137523": "550"}
+        self.account.save(update_fields=["imdb_map"])
+        _counts, _warnings, removed = self._run(
+            FakeNuvio(
+                [_history("tt0137523", "movie", "Fight Club", nuvio_id="m1")],
+                cursor=5,
+            ),
+        )
+        self.assertEqual(removed, {})
+        self.assertEqual(Movie.objects.filter(user=self.user).count(), 1)
+        self.account.refresh_from_db()
+        self.assertEqual(self.account.watched_keys, ["movie:550"])
 
     def test_delete_removes_episode_when_toggle_on(self):
         self.user.nuvio_sync_mark_unplayed_enabled = True
