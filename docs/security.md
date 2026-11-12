@@ -37,11 +37,21 @@ covered by the 28 OAuth/lock tests):
 Hardcover genre-label assertion failure (`Fiction` vs API `Literary Fiction`);
 that path does not use BeautifulSoup. Full suite remains a separate question.
 
-### Open — deployment settings (not closed by package scan)
+### Open — deployment settings (Compose / proxy audit)
 
-1. TLS / `X-Forwarded-Proto` (who terminates TLS?)
-2. `TRUSTED_PROXIES` (+ `URLS`) when a reverse proxy is in front
-3. Production `SECRET` / `SECRET_FILE` ≠ repository default
+Checked against **shipped** `docker-compose*.yml` + `nginx.conf` in this repo.
+No live production Compose/env with real host values was present on the audit
+machine, so operator confirmation is still required for the running host.
+
+| Check | Evidence in repo templates | Implication |
+| --- | --- | --- |
+| TLS termination | `nginx.conf` `listen 8000` only; no `ssl_certificate` / `:443` | MediaTrail **does not** terminate TLS. HTTPS must be terminated by an **upstream** reverse proxy (or clients use plain HTTP on `:8000`). |
+| `X-Forwarded-Proto` | `nginx.conf` sets `proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto` | Inside the container nginx **forwards** the incoming proto header to Gunicorn; it does not set `$scheme` from a local TLS listener. Correct only when a trusted upstream sets that header. |
+| `TRUSTED_PROXIES` | **Absent** from `docker-compose.yml`, `docker-compose.local.yml`, `docker-compose.postgres.yml` | Default deploys leave real-ip **unset** → no `set_real_ip_from`. Behind a reverse proxy, set `TRUSTED_PROXIES` to that proxy’s IP/CIDR (and set `URLS`). |
+| `URLS` | Documented in README / `docs/install.md`; empty in Compose examples | Required for public HTTPS origin / OAuth redirects when proxied. |
+| `SECRET` | Compose placeholders: `replace-with-a-long-random-string` / `change-me` (not the Django code default) | Templates force an env override shape, but **this audit could not read a production env** to prove the live value ≠ placeholder and ≠ `settings.py` default. |
+
+**Still need from the live host:** the actual Compose (or orchestrator env) showing `SECRET`/`SECRET_FILE`, `URLS`, `TRUSTED_PROXIES`, and where TLS is terminated (e.g. Caddy/Traefik/nginx in front).
 
 ## Supported dependency install (reproducible)
 
@@ -120,9 +130,7 @@ entrypoint validator uses an ash-safe character class (no bare `"` inside
 
 ## Open deployment checks (not closed by this image scan)
 
-These need operator evidence, not another dependency bump:
-
-1. **TLS / `X-Forwarded-Proto`:** Does MediaTrail nginx terminate TLS, or a trusted
-   upstream proxy? Only then choose `$scheme` vs forwarding `$http_x_forwarded_proto`.
-2. **`TRUSTED_PROXIES`:** Set when a reverse proxy sits in front of `:8000` (with `URLS`).
-3. **Production `SECRET` / `SECRET_FILE`:** Must not be the repository default.
+See **Status → Open — deployment settings** above. Summary: container nginx is
+HTTP-only on `:8000` and forwards `X-Forwarded-Proto`; Compose templates omit
+`TRUSTED_PROXIES`; `SECRET` must be confirmed on the live host (templates are
+placeholders only).

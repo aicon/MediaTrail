@@ -26,11 +26,18 @@ smoke. Egy tágabb szűrésben a Hardcover genre-assert elbukott (`Fiction` vs
 `Literary Fiction`) — ez nem BeautifulSoup. A teljes suite továbbra is külön
 kérdés.
 
-### Nyitva — éles deployment-beállítások
+### Nyitva — éles deployment-beállítások (Compose / proxy audit)
 
-1. TLS / `X-Forwarded-Proto`
-2. `TRUSTED_PROXIES` (+ `URLS`)
-3. Production `SECRET` / `SECRET_FILE` ≠ repo default
+A repó **sablon** `docker-compose*.yml` + `nginx.conf` alapján:
+
+| Tétel | Repó-bizonyíték | Következmény |
+| --- | --- | --- |
+| TLS | nginx csak `listen 8000`; nincs SSL/443 | A MediaTrail konténer **nem** zár TLS-t; HTTPS-t felső proxy kell zárjon (vagy sima HTTP `:8000`). |
+| `X-Forwarded-Proto` | `$http_x_forwarded_proto` továbbítása | Csak akkor helyes, ha a megbízható felső proxy állítja. |
+| `TRUSTED_PROXIES` | a Compose-sablonokban **nincs** | Alapból nincs `set_real_ip_from`; proxy mögött kötelező kitölteni (+ `URLS`). |
+| `SECRET` | sablon: `replace-with-a-long-random-string` / `change-me` | Nem a kódbeli Django default, de **élő production env nem volt elérhető** ezen a gépen — az üzemeltetőnek kell igazolnia a tényleges értéket. |
+
+**Hiányzik az élő hosztról:** a tényleges Compose/env (`SECRET`/`SECRET_FILE`, `URLS`, `TRUSTED_PROXIES`) és a TLS-lezáró proxy megnevezése.
 
 ## Támogatott telepítés (reprodukálható)
 
@@ -79,7 +86,6 @@ nincs hivatalos Brotli ≥ 1.2.1 wheel.
 
 ## Nyitott üzemeltetési ellenőrzések (nem zárja le az image scan)
 
-1. **TLS / `X-Forwarded-Proto`:** a MediaTrail nginx zárja-e a TLS-t, vagy egy
-   megbízható előtte álló proxy?
-2. **`TRUSTED_PROXIES`:** reverse proxy mögött be van-e állítva (+ `URLS`)?
-3. **Production `SECRET` / `SECRET_FILE`:** nem a repo default.
+Lásd fent: **Nyitva — éles deployment**. A konténer HTTP `:8000`, a
+`TRUSTED_PROXIES` a sablonokban üres; az élő `SECRET`/`URLS`/TLS-proxy
+igazolása üzemeltetői Compose/env nélkül nem zárható.
