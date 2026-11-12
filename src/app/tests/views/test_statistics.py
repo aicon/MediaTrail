@@ -206,6 +206,8 @@ class StatisticsViewTests(TestCase):
         self.assertIn("rated_percent", response.context)
         self.assertNotContains(response, "Activity History")
         self.assertContains(response, "chart_i18n")
+        self.assertContains(response, "lg:grid-cols-4")
+        self.assertNotContains(response, "xl:grid-cols-4")
 
     def test_statistics_view_custom_date_range(self):
         """Test the statistics view with custom date range."""
