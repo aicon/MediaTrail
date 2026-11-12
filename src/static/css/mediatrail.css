@@ -1,3 +1,24 @@
+/* Journal utilities present in Yamtrack's compiled Tailwind but missing here. */
+.col-span-full {
+  grid-column: 1 / -1;
+}
+
+.w-30 {
+  width: calc(var(--spacing) * 30);
+}
+
+@media (width >= 64rem) {
+  .lg\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (width >= 80rem) {
+  .xl\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 .mt-sponsor {
   display: flex;
   align-items: center;

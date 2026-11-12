@@ -256,14 +256,16 @@ class JournalViewTests(TestCase):
         self.assertContains(response, "Today")
         # Day headers live outside the card grid so they never share columns.
         self.assertContains(response, 'data-journal-day="')
-        self.assertContains(response, 'data-journal-day-grid="')
-        self.assertNotContains(response, "col-span-full")
+        self.assertContains(response, "col-span-full")
         self.assertContains(response, "xl:grid-cols-4")
+        self.assertContains(response, "lg:grid-cols-3")
+        self.assertContains(response, "w-30")
+        self.assertContains(response, "aspect-2/3")
         self.assertContains(response, "<time")
         self.assertRegex(response.content.decode(), r"<time[^>]+datetime=")
 
-    def test_journal_day_headers_are_outside_card_grid(self):
-        """Date headers are siblings of day grids, not grid children."""
+    def test_journal_day_headers_span_full_grid_width(self):
+        """Date headers use col-span-full so they never sit in a card column."""
         older = timezone.now() - datetime.timedelta(days=2)
         item = Item.objects.create(
             media_id="older-1",
@@ -282,13 +284,14 @@ class JournalViewTests(TestCase):
         html = response.content.decode()
 
         self.assertGreaterEqual(len(response.context["journal_days"]), 2)
-        # Header for a day must appear before that day's grid, not inside it.
         for day in response.context["journal_days"]:
-            header = f'data-journal-day="{day["day_iso"]}"'
-            grid = f'data-journal-day-grid="{day["day_iso"]}"'
-            self.assertIn(header, html)
-            self.assertIn(grid, html)
-            self.assertLess(html.index(header), html.index(grid))
+            header_marker = f'data-journal-day="{day["day_iso"]}"'
+            entry_marker = f'data-journal-entry-day="{day["day_iso"]}"'
+            self.assertIn(header_marker, html)
+            self.assertIn(entry_marker, html)
+            header_idx = html.index(header_marker)
+            self.assertIn("col-span-full", html[header_idx - 120 : header_idx + 80])
+            self.assertLess(header_idx, html.index(entry_marker))
 
     def test_journal_day_header_not_repeated_across_pages(self):
         """A day continued on the next page suppresses its repeated header."""

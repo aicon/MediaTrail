@@ -1205,7 +1205,7 @@ msgid "Average Rating"
 msgstr "Átlagos értékelés"
 
 msgid "% Rated"
-msgstr "Értékeltek aránya"
+msgstr "Értékelt elemek aránya"
 
 msgid "Consumption"
 msgstr "Fogyasztás"

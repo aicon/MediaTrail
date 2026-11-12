@@ -198,9 +198,10 @@
     </div>
   </div>
 
-  <!-- Activity feed: day headers sit outside each day's card grid -->
+  <!-- Activity feed (Yamtrack layout: one grid, full-width day headers via col-span-full) -->
   {% if activity_total %}
-    <div id="journal-feed">
+    <div id="journal-feed"
+         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-3">
       {% include "app/components/journal_items.html" %}
     </div>
 
@@ -247,17 +248,12 @@
   <script src="{% static 'js/date-range.js' %}{% get_static_file_mtime 'js/date-range.js' %}"
           data-date-format="{{ user.date_format }}"></script>
   <script>
-    // Drop a day header/grid once its last entry is deleted from the feed.
+    // Drop a day separator once its last entry is deleted from the feed.
     function pruneEmptyJournalDays() {
       document.querySelectorAll("[data-journal-day]").forEach((header) => {
         const day = header.getAttribute("data-journal-day");
         if (!document.querySelector('[data-journal-entry-day="' + day + '"]')) {
           header.remove();
-        }
-      });
-      document.querySelectorAll("[data-journal-day-grid]").forEach((grid) => {
-        if (!grid.querySelector("[data-journal-entry-day]")) {
-          grid.remove();
         }
       });
     }
