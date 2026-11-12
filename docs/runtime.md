@@ -46,8 +46,6 @@ Movie, series, anime, game, book, comic, and board-game lookups work with the cl
 | `HARDCOVER_API` | Books. The value has to start with `Bearer` followed by a space. |
 | `COMICVINE_API` | Comics. |
 | `BGG_API_TOKEN` | Board games. |
-| `TRAKT_API` | Trakt API key used as `trakt-api-key` on public / legacy API calls. |
-| `TRAKT_API_SECRET` | Only needed to refresh older private-import schedules that still use the legacy client. New logins do not use it. |
 | `TRAKT_API_PKCE` | Client ID of a modern Trakt app (no secret). Used for private Import via the activate code at `trakt.tv/activate`. A free Trakt account can connect only two applications. |
 | `ANILIST_ID` and `ANILIST_SECRET` | Your own AniList application, for a private import. |
 | `SIMKL_ID` and `SIMKL_SECRET` | Simkl AUTH V1 app (deprecated; planned retirement ~April 2027). Still used for existing V1 tokens and as fallback when V2 is unset. A V1 `client_id` **cannot** be upgraded to V2. |

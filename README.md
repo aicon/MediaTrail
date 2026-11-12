@@ -89,6 +89,8 @@ services:
       URLS:
       ADMIN_ENABLED: false
       REGISTRATION: false
+      # Uncomment and set if you use private Trakt import (activate code):
+      # TRAKT_API_PKCE:
       # Simkl AUTH V2 (preferred for new connections; PKCE)
       # SIMKL_V2_ID:
       # SIMKL_V2_SECRET:

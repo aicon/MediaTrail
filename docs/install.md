@@ -21,6 +21,8 @@ services:
     environment:
       TZ: Europe/Budapest
       SECRET: replace-with-a-long-random-string
+      # Uncomment and set if you use private Trakt import (activate code):
+      # TRAKT_API_PKCE:
     volumes:
       - ./db:/mediatrail/db
 ```

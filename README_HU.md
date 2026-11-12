@@ -89,6 +89,8 @@ services:
       URLS:
       ADMIN_ENABLED: false
       REGISTRATION: false
+      # Vedd ki a kommentjelet, ha zárt Trakt importot használsz (aktiváló kód):
+      # TRAKT_API_PKCE:
       # Simkl AUTH V2 (új kapcsolásokhoz, PKCE)
       # SIMKL_V2_ID:
       # SIMKL_V2_SECRET:

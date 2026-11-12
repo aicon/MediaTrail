@@ -46,8 +46,6 @@ A filmek, sorozatok, animék, videojátékok, könyvek, képregények és társa
 | `HARDCOVER_API` | Könyvek metaadatai. Az értéknek a `Bearer ` előtaggal és egy szóközzel kell kezdődnie. |
 | `COMICVINE_API` | Képregények adatai. |
 | `BGG_API_TOKEN` | BoardGameGeek társasjáték-adatok. |
-| `TRAKT_API` | Trakt API-kulcs a nyilvános / legacy hívások `trakt-api-key` fejlécéhez. |
-| `TRAKT_API_SECRET` | Csak a régi, secret-es ügyféllel létrehozott ütemezett importok tokenfrissítéséhez kell. Az új belépések nem használják. |
 | `TRAKT_API_PKCE` | Modern Trakt-alkalmazás ügyfélazonosítója (nincs secret). Zárt Importnál a `trakt.tv/activate` aktiváló kódhoz kell. Az ingyenes Trakt-fiókok legfeljebb két csatlakoztatott alkalmazást engedélyeznek. |
 | `ANILIST_ID` és `ANILIST_SECRET` | Saját AniList-alkalmazás zárt profilok eléréséhez. |
 | `SIMKL_ID` és `SIMKL_SECRET` | Simkl AUTH V1 alkalmazás (elavult; tervezett kivezetés ~2027. április). Meglévő V1 tokenekhez és V2 nélküli tartalékként. A V1 `client_id` **nem** frissíthető V2-re. |

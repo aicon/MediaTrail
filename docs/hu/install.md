@@ -21,6 +21,8 @@ services:
     environment:
       TZ: Europe/Budapest
       SECRET: ide-hosszu-veletlen-sor
+      # Vedd ki a kommentjelet, ha zárt Trakt importot használsz (aktiváló kód):
+      # TRAKT_API_PKCE:
     volumes:
       - ./db:/mediatrail/db
 ```
