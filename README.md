@@ -129,7 +129,7 @@ SIMKL_V2_SECRET=your-v2-client-secret
 
 5. Recreate the container, then **Import → Connect with Simkl**. Existing AUTH V1 tokens keep working until Simkl retires V1 (~April 2027); reconnect after enabling V2 so schedules store a V2 refresh token.
 
-Full walkthrough: [Runtime → Simkl AUTH V2](https://aicon.github.io/mediatrail-docs/runtime/#simkl-auth-v2-get-keys-and-connect).
+Full walkthrough: [Runtime → Simkl AUTH V2](https://aicon.github.io/mediatrail-docs/runtime/#simkl-auth-v2-get-keys-and-connect). For the full settings list see [Runtime](https://aicon.github.io/mediatrail-docs/runtime/).
 
 Start the container:
 

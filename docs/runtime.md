@@ -54,7 +54,7 @@ Movie, series, anime, game, book, comic, and board-game lookups work with the cl
 | `SIMKL_V2_ID` | Simkl AUTH V2 client id for new connections (PKCE). Register callback `…/import/simkl_private`. |
 | `SIMKL_V2_SECRET` | V2 client secret when the Simkl app type is **Server apps & services** (required for that type). Leave unset for a public client type. Never commit; prefer `*_FILE` mounts. |
 
-### Simkl AUTH V2 — get keys and connect
+### Simkl AUTH V2: get keys and connect
 
 MediaTrail runs the OAuth callback and token exchange on your server. Prefer a **new** AUTH V2 app; V1 credentials do not work on `/oauth2/*`.
 

@@ -129,7 +129,7 @@ SIMKL_V2_SECRET=sajat-v2-titok
 
 5. Hozd létre újra a konténert, majd **Import → Simkl összekapcsolás**. A V1 tokenek ~2027. áprilisig élnek; V2 után kapcsolódj újra, hogy az ütemezés V2 refresh tokent tároljon.
 
-Részletes lépések: [Környezet → Simkl AUTH V2](https://aicon.github.io/mediatrail-docs/hu/runtime/#simkl-auth-v2-kulcsok-beszerzese-es-kapcsolas).
+Részletes lépések: [Környezet → Simkl AUTH V2](https://aicon.github.io/mediatrail-docs/hu/runtime/#simkl-auth-v2-kulcsok-beszerzese-es-kapcsolas). A teljes lista: [Környezet](https://aicon.github.io/mediatrail-docs/hu/runtime/).
 
 Indítsd el a konténert:
 

@@ -54,7 +54,7 @@ A filmek, sorozatok, animék, videojátékok, könyvek, képregények és társa
 | `SIMKL_V2_ID` | Simkl AUTH V2 ügyfélazonosító az új kapcsolásokhoz (PKCE). Callback: `…/import/simkl_private`. |
 | `SIMKL_V2_SECRET` | V2 titok, ha a Simkl alkalmazástípus **Server apps & services** (ehhez a típushoz kötelező). Nyilvános kliensnél hagyd üresen. Ne kerüljön a repóba; inkább `*_FILE`. |
 
-### Simkl AUTH V2 — kulcsok beszerzése és kapcsolás
+### Simkl AUTH V2: kulcsok beszerzése és kapcsolás
 
 A MediaTrail a visszatérő OAuth-hívást és a token cseréjét a te szervereden intézi. Új AUTH V2 alkalmazást regisztrálj; a V1 hitelesítő adatok nem működnek a `/oauth2/*` végpontokon.
 
