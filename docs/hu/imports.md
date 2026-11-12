@@ -39,7 +39,7 @@ Az egyéb források ugyanazokat a működési módokat és ütemezési lehetős�
 
 | Forrás | Szükséges adatok | Megjegyzések |
 | --- | --- | --- |
-| Trakt | Nyilvános felhasználónév, zárt API-bejelentkezés (böngészős PKCE az `auth.trakt.tv`-n, vagy eszközkód), vagy webhelyes export ZIP | A zárt belépéshez `TRAKT_API_PKCE` kell (modern Trakt-alkalmazás, secret nélkül). Az eszközkód TV-khez és korlátozott bevitelű eszközökhöz megmarad. A ZIP a Trakt → Beállítások → Export menüből jön (legfeljebb 50 MB). Sérült vagy üres archívumot az import elindítása előtt elutasít a rendszer. A „Csak az új elemek” kihagyja a már meglevő címeket. |
+| Trakt | Nyilvános felhasználónév, zárt API-bejelentkezés (új Trakt API aktiváló kód), vagy webhelyes export ZIP | A zárt belépéshez `TRAKT_API_PKCE` kell (modern Trakt-alkalmazás, secret nélkül). A MediaTrail kódot ad, azt a `trakt.tv/activate` oldalon kell beírni. A ZIP a Trakt → Beállítások → Export menüből jön (legfeljebb 50 MB). Sérült vagy üres archívumot az import elindítása előtt elutasít a rendszer. A „Csak az új elemek” kihagyja a már meglevő címeket. |
 | Simkl | Közvetlen összekapcsolás gombbal | Üzemeltetői kulcs kell: új AUTH V2 alkalmazás a [simkl.com/settings/developer](https://simkl.com/settings/developer/) oldalon (V1 azonosító nem frissíthető). Ajánlott: **Server apps & services**, `SIMKL_V2_ID` / `SIMKL_V2_SECRET`, redirect `{URLS}/import/simkl_private`. Lépések: [Környezet → Simkl AUTH V2](runtime.md#simkl-auth-v2-kulcsok-beszerzese-es-kapcsolas). A V1 tokenek ~2027. áprilisig élnek; V2 után kapcsolódj újra. |
 | MyAnimeList | Nyilvános felhasználónév | |
 | AniList | Nyilvános felhasználónév, vagy közvetlen összekapcsolás | Zárt profil eléréséhez saját AniList-alkalmazás regisztrációja szükséges. |

@@ -48,7 +48,7 @@ A filmek, sorozatok, animék, videojátékok, könyvek, képregények és társa
 | `BGG_API_TOKEN` | BoardGameGeek társasjáték-adatok. |
 | `TRAKT_API` | Trakt API-kulcs a nyilvános / legacy hívások `trakt-api-key` fejlécéhez. |
 | `TRAKT_API_SECRET` | Csak a régi, secret-es ügyféllel létrehozott ütemezett importok tokenfrissítéséhez kell. Az új belépések nem használják. |
-| `TRAKT_API_PKCE` | Modern Trakt-alkalmazás ügyfélazonosítója (nincs secret). Böngészős PKCE-belépéshez (`auth.trakt.tv`) és eszközkódos belépéshez. Az alkalmazásnál állítsd be a MediaTrail callback URL-t (`…/import/trakt/private`). Az ingyenes Trakt-fiókok legfeljebb két csatlakoztatott alkalmazást engedélyeznek. |
+| `TRAKT_API_PKCE` | Modern Trakt-alkalmazás ügyfélazonosítója (nincs secret). Zárt Importnál a `trakt.tv/activate` aktiváló kódhoz kell. Az ingyenes Trakt-fiókok legfeljebb két csatlakoztatott alkalmazást engedélyeznek. |
 | `ANILIST_ID` és `ANILIST_SECRET` | Saját AniList-alkalmazás zárt profilok eléréséhez. |
 | `SIMKL_ID` és `SIMKL_SECRET` | Simkl AUTH V1 alkalmazás (elavult; tervezett kivezetés ~2027. április). Meglévő V1 tokenekhez és V2 nélküli tartalékként. A V1 `client_id` **nem** frissíthető V2-re. |
 | `SIMKL_V2_ID` | Simkl AUTH V2 ügyfélazonosító az új kapcsolásokhoz (PKCE). Callback: `…/import/simkl_private`. |

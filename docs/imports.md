@@ -60,7 +60,7 @@ These sources use the same mode and frequency controls.
 
 | Source | What you provide | Notes |
 | --- | --- | --- |
-| Trakt | A public username, private API login (browser PKCE on `auth.trakt.tv`, or device code), or a website export ZIP | Private login needs `TRAKT_API_PKCE` (modern Trakt app, no secret). Device code stays available for TVs and limited-input devices. The ZIP comes from Trakt → Settings → Export (max 50 MB). Corrupt or empty archives are rejected before the import starts. “Only new items” skips titles you already have. |
+| Trakt | A public username, private API login (new Trakt API activate code), or a website export ZIP | Private login needs `TRAKT_API_PKCE` (modern Trakt app, no secret). MediaTrail shows a code to enter at `trakt.tv/activate`. The ZIP comes from Trakt → Settings → Export (max 50 MB). Corrupt or empty archives are rejected before the import starts. “Only new items” skips titles you already have. |
 | Simkl | A connect button | Needs operator keys: register a **new** AUTH V2 app at [simkl.com/settings/developer](https://simkl.com/settings/developer/) (V1 ids cannot upgrade). Prefer **Server apps & services**, set `SIMKL_V2_ID` / `SIMKL_V2_SECRET`, redirect `{URLS}/import/simkl_private`. Step-by-step: [Runtime → Simkl AUTH V2](runtime.md#simkl-auth-v2-get-keys-and-connect). Existing V1 tokens work until ~April 2027; reconnect after enabling V2. |
 | MyAnimeList | A public username | |
 | AniList | A public username, or a connect button | A private profile needs your own AniList application. |

@@ -1071,35 +1071,25 @@ msgstr "Nyilvános Trakt-felhasználónév"
 msgid "Import"
 msgstr "Importálás"
 
-msgid "Connect with Trakt & Import"
-msgstr "Csatlakozás a Trakthoz és importálás"
-
-msgid "Trakt login"
-msgstr "Trakt belépés"
-
-msgid "Browser login (PKCE)"
-msgstr "Böngészős belépés (PKCE)"
-
-msgid "Device code (TV / limited input)"
-msgstr "Eszközkód (TV / korlátozott bevitel)"
+msgid "Private profile (new Trakt API)"
+msgstr "Zárt profil (új Trakt API)"
 
 msgid ""
-"Opens Trakt sign-in on auth.trakt.tv with PKCE. Needs TRAKT_API_PKCE (same "
-"app as device login). A free Trakt account can connect only two applications."
+"Uses the new Trakt API (TRAKT_API_PKCE). You get a code to enter at "
+"trakt.tv/activate. A free Trakt account can connect only two applications."
 msgstr ""
-"A Trakt belépést az auth.trakt.tv-n nyitja meg PKCE-vel. Kell a "
-"TRAKT_API_PKCE (ugyanaz az alkalmazás, mint az eszközkódnál). Az ingyenes "
-"Trakt-fiók csak két alkalmazást enged bekötni."
+"Az új Trakt API-t használja (TRAKT_API_PKCE). Kódot kapsz, amit a "
+"trakt.tv/activate oldalon kell beírni. Az ingyenes Trakt-fiók csak két "
+"alkalmazást enged bekötni."
+
+msgid "Connect with the new Trakt API"
+msgstr "Csatlakozás az új Trakt API-hoz"
 
 msgid ""
-"Trakt shows a code to enter at trakt.tv/activate. Needs TRAKT_API_PKCE. A "
-"free account can connect only two applications."
+"Use Connect with the new Trakt API and enter the code at trakt.tv/activate."
 msgstr ""
-"A Trakt egy kódot ad, azt a trakt.tv/activate oldalon kell beírni. Kell a "
-"TRAKT_API_PKCE. Az ingyenes fiók csak két alkalmazást enged bekötni."
-
-msgid "Connect with device code"
-msgstr "Csatlakozás eszközkóddal"
+"Használd a „Csatlakozás az új Trakt API-hoz” gombot, és írd be a kódot a "
+"trakt.tv/activate oldalon."
 
 msgid "Waiting for approval on Trakt."
 msgstr "Várakozás a Trakt jóváhagyására."
