@@ -86,13 +86,15 @@ Percent = `floor(100 * clamp(position,0,duration) / duration)` when `duration_ms
 - `POST /now-watching/dismiss/` — body `device_id` (optional)
 - `POST /now-watching/rename/` — body `device_id`, `custom_name`
 
-**REST preview (still useful for tools):**
+**REST preview (token auth; not what the companion apps use):**
 
-- `PUT /api/v1/playback/`
-- `GET /api/v1/playback/`
-- `GET /api/v1/playback/now/` → 204 if none
+- `PUT /api/v1/playback/` — upsert; currently lands in the legacy device bucket (no `deviceId` in the request body yet)
+- `GET /api/v1/playback/` — list live rows for the user
+- `GET /api/v1/playback/now/` → latest row, or 204 if none
 - `DELETE /api/v1/playback/` — clear one title without completing
 - `DELETE /api/v1/playback/now/` — clear every live row for the user
+
+For multi-device Now Watching, prefer the built-in `/nuvio/…` addon path above.
 
 ## Episode title sources
 

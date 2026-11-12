@@ -4,7 +4,7 @@
 
 Saját üzemeltetésű személyes médiakatalógus és napló mindarról, amit megnézel, elolvasol vagy végigjátszol.
 
-[![Verzió](https://img.shields.io/badge/verzió-0.25.22-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Verzió](https://img.shields.io/badge/verzió-0.25.23-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![Licenc: AGPL v3](https://img.shields.io/badge/Licenc-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Dokumentáció](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/hu/)
@@ -21,23 +21,25 @@ A projekt a [Yamtrack](https://github.com/FuzzyGrim/Yamtrack) független forkjak
 ## Főbb funkciók
 
 - **Napló mindenhez:** Filmek, sorozatok, anime, manga, videojátékok, könyvek, képregények és társasjátékok. Pontszám, állapot, haladás, ismétlések, kezdő- és záródátum, jegyzet.
-- **Évadok, és minden megtekintés:** Minden évad külön követhető. Egy epizódhoz több megtekintés is rögzíthető, saját dátummal és jegyzettel. A filmek és a sorozatok külön maradnak.
-- **A változtatások előzménye:** Megmarad, mikor vetted fel a tételt, mikor kezdted el, és mikor nézted vagy olvastad újra.
-- **Ami nincs a katalógusban:** Kézi tétel, ha egyik támogatott forrás sem ismeri.
-- **Közös listák:** Személyes lista bármilyen célra, más fiókok meghívásával.
-- **Közelgő megjelenések:** Naptár a soron következőkről, iCalendar (`.ics`) hivatkozással más naptárprogramokhoz. Értesítés Apprise-on (Discord, Telegram, ntfy, Slack, e-mail és mások).
-- **Külön fiókok:** Mindenkinek saját könyvtára van. A belépés lehet a MediaTrail sajátja, vagy OIDC és közösségi szolgáltató (Google, GitHub, Discord és mások) a django-allauthon keresztül.
-- **Magyar és angol felület:** A nyelv fiókonként választható. A TMDB címei a `TMDB_LANG` beállítást követik.
-- **Import, benne a Nuvio:** A Nuvio csak az új tételeket veheti fel, vagy a már követetteket frissítheti, titkosított hitelesítő adatokkal és ütemezéssel. A Trakt, a SIMKL, a MyAnimeList, az AniList és a Kitsu szintén ütemezhető. Az ingyenes Trakt-fiók csak két alkalmazást enged az API-ra kötni. A zárt import meghagyja a jelenlegi Trakt-belépést, és választható mellé az új, eszközkódos API (`TRAKT_API_PKCE`). A teljes könyvtár CSV-be menthető és vissza is tölthető; IMDb-, Goodreads-, Steam- és HowLongToBeat-lista is behozható.
-- **Lejátszás, benne a Nuvio:** A kezdőlapon élő „Most nézem” sávok jelennek meg (eszközönként egy), pozícióval, eltelt és hátralévő idővel, amikor egy [Nuvio-s társalkalmazás](#kapcsolódó-alkalmazások) jelzi, mit játszol. A sávok átnevezhetők. A Jellyfin, a Plex és az Emby a frissen megnézett médiát magától is be tudja jelölni.
-- **REST API (Preview):** Modern API a `/api/v1/`, OpenAPI séma a `/api/schema/`, valamint interaktív Swagger dokumentáció a `/api/docs/` címen. Írott leírás: [API_HU.md](API_HU.md) ([English](API.md)).
-- **Egy konténer:** Docker Compose, SQLite vagy PostgreSQL. A Redis a képen belül fut, az adat egy csatolt mappában marad.
+- **Évadok, és minden megtekintés:** Minden évad külön követhető. Egy epizódhoz több megtekintés is rögzíthető, saját dátummal és jegyzettel. A filmek és a sorozatok külön kezelhetők.
+- **A változtatások előzménye:** Pontosan visszakövethető, mikor vetted fel a tételt, mikor kezdted el nézni/olvasni, és mikor fejezted be vagy nézted újra.
+- **Kézi tételek:** Egyedi elem rögzítése, ha a támogatott online források egyike sem tartalmazza.
+- **Közös listák:** Egyéni listák létrehozása tetszőleges célra, más fiókok bevonásával.
+- **Közelgő megjelenések:** Beépített naptár a várható epizódokról és megjelenésekről, iCalendar (`.ics`) hivatkozással és Apprise értesítésekkel (Discord, Telegram, ntfy, Slack, e-mail stb.).
+- **Több felhasználó saját könyvtárral:** Minden fiók teljesen elkülönített gyűjteménnyel rendelkezik. Helyi regisztráció vagy OIDC / közösségi bejelentkezés (Google, GitHub, Discord) a django-allauthon keresztül.
+- **Magyar és angol felület:** A felület nyelve fiókonként választható a Beállításokban. A TMDB metaadatok nyelve külön szabályozható a `TMDB_LANG` változóval.
+- **Importálás, benne a Nuvio:** Nuvio profilok importálása (csak új tételek hozzáadása vagy meglévők frissítése) titkosított adatokkal és ütemezéssel. Automatikus szinkronizáció érhető el Trakt, SIMKL, MyAnimeList, AniList és Kitsu fiókokhoz is. Teljes könyvtárexport/import CSV-ben, valamint IMDb, Goodreads, Steam és HowLongToBeat listák importja.
+- **Beépített Scrobbler (Nuvio és médiaszerverek):** A MediaTrail közvetlenül tartalmazza a Stremio-protokollú addon végpontot, amely külön segédkonténer nélkül fogadja a lejátszási eseményeket a támogatott Nuvio appokból. Élő „Most nézem” sávokat biztosít és automatikusan bejegyzi a befejezéseket. A Jellyfin, Plex és Emby szerverek webhookon keresztül szinkronizálhatók.
+- **REST API (Preview):** Modern API a `/api/v1/`, OpenAPI séma a `/api/schema/`, valamint interaktív Swagger felület a `/api/docs/` címen. Részletes dokumentáció: [API_HU.md](API_HU.md) ([English](API.md)).
+- **Egyetlen konténeres működés:** Docker Compose telepítés beépített belső Redis-szel. Minden adat egyetlen csatolt mappában (`db`) marad.
 
 ---
 
-## Előnézet: „Most nézem” sáv
+## Előnézet: „Most nézem” és a beépített Scrobbler
 
-A MediaTrail a kezdőlapon élő **„Most nézem”** sávokat mutat. Minden társalkalmazás-példány (telefon, több tévé) saját sávot kap, így párhuzamos lejátszásnál nem írják felül egymást.
+A MediaTrail egy beépített Stremio-protokollú scrobbler szolgáltatást tartalmaz. **Nem streamel és nem játszik le médiát, valamint nem szolgáltat katalógust.** Kizárólag eseményfogadóként működik: fogadja a lejátszó állapotváltozásait (`start`, `pause`, `progress`, `stop`), és valós időben megjeleníti azokat a felületen.
+
+Minden csatlakoztatott eszköz (telefon, nappali tévé, hálószobai tévé) saját, különálló sávot kap a kezdőlapon, így az egyidejű lejátszások nem írják felül egymást:
 
 ![Now Watching Banner](docs/screenshots/now-watching-desktop.png)
 
@@ -45,19 +47,19 @@ A MediaTrail a kezdőlapon élő **„Most nézem”** sávokat mutat. Minden t�
 
 ![Now Watching Compact](docs/screenshots/now-watching-narrow.png)
 
-A sávok a kezdőlap tetején vannak, a könyvtár fölött:
+A sávok közvetlenül a kezdőlap tetején láthatók:
 
 ![A Most nézem sáv a kezdőlapon](docs/screenshots/now-watching-desktop2.png)
 
-**Több eszközös működés**
+### Hogyan működik a lejátszáskövetés?
 
-- Minden [kapcsolódó alkalmazásban](#kapcsolódó-alkalmazások) add hozzá a MediaTrail addon címét (Beállítások → Bővítmények). Külön scrobbler konténer nem kell.
-- Minden telepítés stabil `deviceId`-t és automatikus nevet küld, például `telefon · Pixel 8` vagy `TV · Shield`.
-- A kezdőlapon a sáv neve átírható; az egyéni név eszközönként megmarad stop / elvetés után is.
-- A `pause` és a `stop` csak az adott eszköz sávját érinti. A frissítést nem kapó sávokat a watching / paused idle TTL takarítja el.
-- A befejezett nézés **90%-nál** mentődik. Seek után is megy progress, hogy a sáv ne maradjon le.
-
-> **Megjegyzés:** A „Most nézem” sávhoz [kapcsolódó alkalmazás](#kapcsolódó-alkalmazások) kell. Akkor jelenik meg, amikor az alkalmazás jelzi, mit játszol.
+- **Szükséges társalkalmazások:** Mivel a hivatalos Nuvio alkalmazások jelenleg nem küldenek lejátszási eseményeket, a szinkronizációhoz a kifejezetten erre felkészített klienseink kellenek: **[NuvioTV-MT](https://github.com/aicon/NuvioTV-MT)** (Android TV) és **[NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT)** (Android telefon / táblagép).
+- **Nincs külön scrobbler konténer:** A scrobbler közvetlenül a MediaTrail része; nem kell külön hídprogramot vagy segédkonténert futtatnod.
+- **Egyszerű beállítás:** Elég a MediaTrail addon manifest hivatkozását bemásolni a kliensben a **Beállítások → Bővítmények** menüpont alatt.
+- **Eszközök elkülönítése:** Minden kliens stabil `deviceId`-t és automatikus nevet küld (pl. `TV · Shield` vagy `telefon · Pixel 8`).
+- **Egyéni elnevezés:** A sáv neve a kezdőlapon tetszés szerint átírható; az elnevezés eszközönként megmarad stop vagy bezárás után is.
+- **Befejezés stopnál:** Ha a kliens `stop` eseményt küld, és a haladás legalább **90%**, a MediaTrail egy befejezett megtekintést ír az előzménybe. A 90% átlépése lejátszás közben önmagában nem zárja le a címet.
+- **Automatikus lecsengés:** A szüneteltetés és a leállítás csak az adott eszköz sávját érinti. Ha az alkalmazást bezárják `stop` esemény nélkül, az inaktív sávot az időzítő automatikusan eltávolítja.
 
 ---
 
@@ -97,15 +99,15 @@ Nyisd meg a Compose fájlt, és cseréld le a példa titkot:
 SECRET=longstring
 ```
 
-A `SECRET` legyen hosszú, véletlen érték. Ha a MediaTrail fordított proxy mögött fut, a `URLS` a nyilvános cím:
+A `SECRET` legyen egy hosszú, véletlenszerű karaktersorozat. Ha a MediaTrail fordított proxy (reverse proxy) mögött fut, a `URLS` változóban add meg a nyilvános elérést:
 
 ```text
-URLS=https://mediatrail.example.com
+URLS=https://mediatrail.pelda.hu
 ```
 
-A cím tartalmazza a protokollt (`https` vagy `http`), és ne legyen a végén perjel vagy alkalmazásútvonal. Több cím vesszővel választható el.
+A cím mindig tartalmazza a protokollt (`https` vagy `http`), és ne legyen a végén perjel vagy almappa. Több cím vesszővel választható el.
 
-A támogatott beállítások teljes listája: [Környezet](https://aicon.github.io/mediatrail-docs/hu/runtime/).
+A támogatott beállítások teljes listája a kézikönyvben található: [Környezet](https://aicon.github.io/mediatrail-docs/hu/runtime/).
 
 Indítsd el a konténert:
 
@@ -116,7 +118,7 @@ docker compose up -d
 Nyisd meg a böngészőben a `http://localhost:8000` címet.
 
 > **Yamtrackről váltasz?**  
-> A MediaTrail konténeren belüli adatútvonala a korábbi `/yamtrack/db` helyett `/mediatrail/db`. Elég a meglévő helyi adatkönyvtáradat átcsatolni a fent látható módon: `./db:/mediatrail/db`.
+> A MediaTrail konténeren belüli adatútvonala a korábbi `/yamtrack/db` helyett `/mediatrail/db`. Elég a meglévő helyi adatkönyvtáradat átcsatolni: `./db:/mediatrail/db`.
 
 ---
 
@@ -133,7 +135,7 @@ Amikor a hivatalos Yamtrack átállt a `0.26`-os ágra, a MediaTrail szándékos
 | :--- | :---: | :---: |
 | **REST API** (`/api/v1/`) | Nincs | Van |
 | **Többszöri Epizód-előzmény** | Nincs | Van |
-| **Élő „Most nézem” (több eszköz)** | Nincs | Van |
+| **Beépített Scrobbler & Több eszközös „Most nézem”** | Nincs | Van |
 | **Nuvio szinkronizáció / import** | Nincs | Van |
 | **Magyar nyelvű felület** | Nincs | Van |
 | **Beépített belső Redis** | Nincs *(Külön Redis kell)* | Van *(A konténerben fut)* |
@@ -143,12 +145,12 @@ Amikor a hivatalos Yamtrack átállt a `0.26`-os ágra, a MediaTrail szándékos
 
 ## Kapcsolódó alkalmazások
 
-A MediaTrailhez külön segédprogramok érhetők el a lejátszási események automatikus szinkronizálásához (scrobble):
+A MediaTrail beépített scrobbleréhez az alábbi társalkalmazások biztosítják a valós idejű lejátszási adatokat:
 
 | Név | Leírás |
 | :--- | :--- |
-| **[NuvioTV-MT](https://github.com/aicon/NuvioTV-MT)** | Android TV / Google TV kliens, amely a lejátszást a MediaTrailnek jelenti (több eszközös „Most nézem”). |
-| **[NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT)** | Telefon / táblagép kliens, amely a lejátszást a MediaTrailnek jelenti (több eszközös „Most nézem”). |
+| **[NuvioTV-MT](https://github.com/aicon/NuvioTV-MT)** | Android TV / Google TV kliens beépített MediaTrail scrobbler-támogatással. |
+| **[NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT)** | Android telefon / táblagép kliens beépített MediaTrail scrobbler-támogatással. |
 
 ---
 
@@ -159,7 +161,7 @@ A részletes felhasználói kézikönyv külön felületen érhető el:
 - **Kézikönyv:** [https://aicon.github.io/mediatrail-docs/hu/](https://aicon.github.io/mediatrail-docs/hu/)
 - **API-leírás:** [API_HU.md](API_HU.md) · [API.md](API.md)
 
-A kézikönyv fejezetei: *Telepítés, Könyvtár, Import (benne a Nuvio), Környezet, Fiókok, Karbantartás.*
+A kézikönyv fejezetei: *Telepítés, Könyvtár, Live playback / Now Watching, Import (benne a Nuvio), Környezet, Fiókok, Karbantartás.*
 
 ---
 

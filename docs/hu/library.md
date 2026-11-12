@@ -4,7 +4,7 @@
 
 A kezdőlap és az oldalsáv a könyvtár. A filmeknek, a sorozatoknak, az évadoknak és a többi típusnak külön listája van. A lista keresője annak a személynek a bejegyzéseiben keres.
 
-Lejátszás vagy szünet közben a kezdőlap tetején **„Most nézem”** sávok lehetnek — eszközönként egy (telefon, minden tévé külön). A sávon a cím, az epizód, a már megnézett rész, a hátralévő idő és egy átnevezhető eszköznév látszik. Egy eszköz stopja vagy elvetése a többit nem törli. A MediaTrail addon a befejezett nézést 90%-nál menti. A kép a magyar felület.
+Lejátszás vagy szünet közben a kezdőlap tetején **„Most nézem”** sávok lehetnek — eszközönként egy (telefon, minden tévé külön). A sávon a cím, az epizód, a már megnézett rész, a hátralévő idő és egy átnevezhető eszköznév látszik. Egy eszköz stopja vagy elvetése a többit nem törli. Ha a társalkalmazás `stop` eseményt küld, és a haladás legalább **90%**, a MediaTrail addon egy befejezett megtekintést ment. A kép a magyar felület.
 
 ![A Most nézem sáv a kezdőlapon](../screenshots/now-watching-desktop2.png)
 

@@ -268,6 +268,12 @@ Authorization: Bearer <token>
 
 ---
 
+## Élő lejátszás vs. a Nuvio addon
+
+A több eszközös **„Most nézem”** a NuvioMobile-MT / NuvioTV-MT felől **nem** ezen a REST API-n jön. A társalkalmazások a beépített MediaTrail addont telepítik, és a `/nuvio/manifest.json` plusz `/nuvio/player/…` útvonalakat hívják `deviceId` / `deviceName` paraméterekkel. Lásd: [docs/LIVE_PLAYBACK_NOW_WATCHING.md](docs/LIVE_PLAYBACK_NOW_WATCHING.md).
+
+A `/api/v1/playback/` alatti REST végpontok tokenes előnézet eszközöknek. A `PUT` jelenleg a legacy eszközkosárba ír (a kérésben még nincs eszközönkénti azonosító). A befejezett nézés az addonon `stop`nál, **legalább 90%**nál kerül be — nem önmagában ezeken a REST hívásokon.
+
 ## Fontos Tanácsok Kliensfejlesztőknek
 
 1. **Deduplikáció:** Mivel a `POST .../history/` hívás minden alkalommal új megtekintést hoz létre, a hálózati hibák miatti automatikus újrapróbálkozásokat a kliens oldalon érdemes kiszűrni, elkerülve a téves duplikációkat.

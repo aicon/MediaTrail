@@ -37,6 +37,8 @@ docker compose up -d
 
 Open `http://localhost:8000` and create an account. Registration is open unless you turn it off. See [Accounts](accounts.md).
 
+For live Now Watching from Nuvio companion apps, open **Settings → Integrations → Nuvio**, copy the addon address into each companion under Addons, and remove any old scrobbler URL. Details: [Live playback / Now Watching](LIVE_PLAYBACK_NOW_WATCHING.md).
+
 On the first seconds of a start, the health check can fail once because the application is not listening yet. A following check that returns success means the start finished. See [Looking after it](care.md).
 
 ## A public address

@@ -4,7 +4,7 @@
 
 A self-hosted personal media tracker and digital logbook for everything you watch, read, and play.
 
-[![Release](https://img.shields.io/badge/version-0.25.22-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Release](https://img.shields.io/badge/version-0.25.23-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Documentation](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/)
@@ -14,30 +14,32 @@ A self-hosted personal media tracker and digital logbook for everything you watc
 
 MediaTrail is an independent, self-hosted web application to track movies, TV shows, seasons, episodes, anime, manga, video games, books, comics, and board games in one place. Organize your library, log dates, assign ratings, track your progress, build custom lists, and explore your personal viewing statistics.
 
-MediaTrail originates as an independent fork of [Yamtrack](https://github.com/FuzzyGrim/Yamtrack), adding essential capabilities such as an integrated REST API, rich episode watch histories, live playback status, Nuvio integration, and native Hungarian localization.
+MediaTrail originates as an independent fork of [Yamtrack](https://github.com/FuzzyGrim/Yamtrack), adding essential capabilities such as an integrated REST API, rich episode watch histories, live playback tracking, Nuvio integration, and native Hungarian localization.
 
 ---
 
 ## Features
 
-- **A record for every title:** Movies, TV shows, anime, manga, video games, books, comics, and board games. Save a score, status, and progress, count repeats, set start and end dates, and write a note.
-- **Seasons, and every time you watched:** Follow each season on its own. An episode can keep several watch records, each with its own date and note. Movies and series stay separate.
-- **A history of the changes:** The log keeps the steps themselves: when you added a title, when you started it, and when you watched or read it again.
-- **Titles the catalogs do not have:** Add a custom entry when none of the supported sources lists it.
-- **Lists with other people:** Build a personal list for any purpose and add other accounts as collaborators.
-- **Upcoming releases:** A calendar of what is coming up, plus an iCalendar (`.ics`) link for other calendar apps. Release notices can go out through Apprise (Discord, Telegram, ntfy, Slack, email, and others).
-- **Separate accounts:** Each person has their own library. Sign-in can stay on MediaTrail, or use OIDC and social providers such as Google, GitHub, and Discord through django-allauth.
-- **English and Hungarian:** The interface language is chosen per account. TMDB titles follow `TMDB_LANG`.
-- **Imports, including Nuvio:** Nuvio can add only new items or refresh items you already track, with encrypted credentials and a schedule. Trakt, SIMKL, MyAnimeList, AniList, and Kitsu can run on a schedule too. A free Trakt account can connect only two applications to the API. Private import can keep the current Trakt login or use the new device-code API (`TRAKT_API_PKCE`). Export the library to CSV and import that file back, or bring in IMDb, Goodreads, Steam, and HowLongToBeat lists.
-- **Playback, including Nuvio:** The home page shows live Now Watching strips (one per device) with position, elapsed time, and time remaining when a [Nuvio companion app](#companion-apps) reports what is playing. Each strip can be renamed. Jellyfin, Plex, and Emby can mark newly watched media on their own.
-- **REST API (Preview):** Full REST API at `/api/v1/`, OpenAPI schema at `/api/schema/`, and interactive Swagger documentation at `/api/docs/`. Written reference: [API.md](API.md) ([magyar](API_HU.md)).
-- **One container:** Docker Compose, with SQLite or PostgreSQL. Redis runs inside the image, and all data stays in a single mounted folder.
+- **A record for every title:** Movies, TV shows, anime, manga, video games, books, comics, and board games. Save a score, status, and progress, count repeats, set start and end dates, and write notes.
+- **Seasons and complete rewatch history:** Follow each season independently. An episode can keep several watch records, each with its own timestamp and note. Movies and TV series stay cleanly separated.
+- **Detailed change logs:** Keep track of the steps themselves: when an item was added, when you started watching/reading it, and when you completed or rewatched it.
+- **Manual custom entries:** Add custom entries when none of the supported online databases lists a title.
+- **Collaborative lists:** Build personal lists for any purpose and invite other accounts to collaborate.
+- **Upcoming releases & calendar:** Keep an eye on upcoming releases with an exportable iCalendar (`.ics`) link and automated Apprise notifications (Discord, Telegram, ntfy, Slack, email, etc.).
+- **Multi-user with separate libraries:** Each user manages an isolated library. Authenticate locally or via social/OIDC providers (Google, GitHub, Discord) through django-allauth.
+- **English and Hungarian localization:** Switch interface languages per user account. Metadata from TMDB follows `TMDB_LANG`.
+- **Imports, including Nuvio:** Import profiles directly from Nuvio (add missing items or update existing ones) with encrypted credentials and scheduling. Automated sync is also available for Trakt, SIMKL, MyAnimeList, AniList, and Kitsu. Export/import your full library via CSV, or bring in data from IMDb, Goodreads, Steam, and HowLongToBeat.
+- **Built-in Playback Scrobbler (Nuvio & Media Servers):** MediaTrail includes a native Stremio-protocol addon endpoint that captures playback events from companion apps without requiring a separate scrobbler container. Displays live "Now Watching" strips on your dashboard and automatically records completions. Jellyfin, Plex, and Emby can also scrobble via webhooks.
+- **Preview REST API:** Full REST API at `/api/v1/`, OpenAPI schema at `/api/schema/`, and interactive Swagger documentation at `/api/docs/`. Written reference: [API.md](API.md) ([magyar](API_HU.md)).
+- **Self-contained single container:** Ready-to-run Docker Compose image with embedded Redis. All data stays inside a single mounted directory.
 
 ---
 
-## Preview: Now Watching
+## Preview: Now Watching & Built-in Scrobbler
 
-MediaTrail shows live **Now Watching** strips on the home page. Each companion device gets its own strip, so a phone and two TVs can appear at the same time without overwriting each other.
+MediaTrail includes a built-in Stremio-protocol scrobbler service. **It does not host or stream media content, nor does it provide catalogs.** It simply acts as an event sink listening for player state changes (`start`, `pause`, `progress`, `stop`) emitted by playback clients, updating your dashboard in real time.
+
+Each companion device gets its own dedicated strip on the home page, allowing phones and multiple TVs to report active playback concurrently without overwriting each other:
 
 ![Now Watching Banner](docs/screenshots/now-watching-desktop.png)
 
@@ -45,19 +47,19 @@ MediaTrail shows live **Now Watching** strips on the home page. Each companion d
 
 ![Now Watching Compact](docs/screenshots/now-watching-narrow.png)
 
-The strips sit at the top of the home page, above the library:
+The strips sit prominently at the top of your dashboard:
 
 ![Now Watching on the home page](docs/screenshots/now-watching-desktop2.png)
 
-**How multi-device Now Watching works**
+### How Playback Tracking Works
 
-- Install the MediaTrail addon address in each [companion app](#companion-apps) (Settings → Addons). No separate scrobbler container.
-- Every install sends a stable `deviceId` plus an automatic label such as `telefon · Pixel 8` or `TV · Shield`.
-- Rename a strip on the home page; the custom name is stored per device and survives stop / dismiss.
-- `pause` and `stop` only clear that device’s strip. Idle strips age out with the watching / paused stale timers.
-- A finished watch is saved at **90%**. Seek also sends progress so the strip stays in sync.
-
-> **Note:** Now Watching needs a [Companion App](#companion-apps). Strips appear when that app reports what is playing.
+- **Requires Companion Apps:** Because official upstream Nuvio apps do not emit player events, scrobbling requires our dedicated companion apps: **[NuvioTV-MT](https://github.com/aicon/NuvioTV-MT)** (Android TV) and **[NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT)** (Android phone/tablet).
+- **Zero Extra Containers:** The scrobbler is embedded directly into MediaTrail. No separate bridge or scrobbler container is needed.
+- **Simple Setup:** Simply add your MediaTrail addon manifest URL inside the companion app under **Settings → Addons**.
+- **Multi-Device Isolation:** Each client sends a stable `deviceId` alongside an automatic label (e.g. `TV · Shield` or `telefon · Pixel 8`).
+- **Custom Naming:** Rename any strip directly on the home page; custom names persist across stops and dismissals.
+- **Completion on stop:** When the client sends `stop` and progress is at least **90%**, MediaTrail writes one completed watch into history. Crossing 90% while still playing does not finish the title by itself.
+- **Graceful Timeouts:** `pause` and `stop` only affect that specific device's strip. If a player abruptly closes without sending a stop event, stale strips are automatically cleared after an inactivity timer.
 
 ---
 
@@ -97,7 +99,7 @@ Open the Compose file and replace the example secret:
 SECRET=longstring
 ```
 
-Use a long random value for `SECRET`. If you are running MediaTrail behind a reverse proxy, also set `URLS` to the public origin:
+Use a long random value for `SECRET`. If you are running MediaTrail behind a reverse proxy, set `URLS` to your public origin:
 
 ```text
 URLS=https://mediatrail.example.com
@@ -105,7 +107,7 @@ URLS=https://mediatrail.example.com
 
 The URL must include the protocol (`https` or `http`) and should not include a trailing slash or application path. Multiple origins can be separated with commas.
 
-For the full list of supported settings, see [Runtime](https://aicon.github.io/mediatrail-docs/runtime/).
+For the full list of supported settings, see [Runtime Documentation](https://aicon.github.io/mediatrail-docs/runtime/).
 
 Start the container:
 
@@ -133,7 +135,7 @@ When upstream Yamtrack adopted the `0.26` architecture, MediaTrail intentionally
 | :--- | :---: | :---: |
 | **REST API** (`/api/v1/`) | No | Yes |
 | **Multi-record Episode History** | No | Yes |
-| **Live "Now Watching" (multi-device)** | No | Yes |
+| **Built-in Scrobbler & Multi-device Now Watching** | No | Yes |
 | **Nuvio Sync / Import** | No | Yes |
 | **Hungarian Localization** | No | Yes |
 | **Embedded Redis Container** | No *(Requires separate Redis)* | Yes *(Included in image)* |
@@ -143,12 +145,12 @@ When upstream Yamtrack adopted the `0.26` architecture, MediaTrail intentionally
 
 ## Companion Apps
 
-MediaTrail connects with dedicated companion applications to automatically scrobble your viewing activity:
+MediaTrail relies on dedicated companion apps to capture playback events and feed the built-in scrobbler:
 
 | Project | Description |
 | :--- | :--- |
-| **[NuvioTV-MT](https://github.com/aicon/NuvioTV-MT)** | Android TV / Google TV client that reports playback to MediaTrail (multi-device Now Watching). |
-| **[NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT)** | Phone / tablet client that reports playback to MediaTrail (multi-device Now Watching). |
+| **[NuvioTV-MT](https://github.com/aicon/NuvioTV-MT)** | Android TV / Google TV client with native MediaTrail scrobbler support. |
+| **[NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT)** | Phone / tablet client with native MediaTrail scrobbler support. |
 
 ---
 
@@ -159,7 +161,7 @@ Comprehensive user guides, installation steps, and configuration examples are ho
 - **Manual:** [https://aicon.github.io/mediatrail-docs/](https://aicon.github.io/mediatrail-docs/)
 - **API reference:** [API.md](API.md) · [API_HU.md](API_HU.md)
 
-Documentation chapters: *Installation, Library, Imports (including Nuvio), Environment Configuration, Accounts, and Maintenance.*
+Documentation chapters: *Installation, Library, Live playback / Now Watching, Imports (including Nuvio), Environment Configuration, Accounts, and Maintenance.*
 
 ---
 
@@ -168,7 +170,6 @@ Documentation chapters: *Installation, Library, Imports (including Nuvio), Envir
 If you enjoy MediaTrail and want to support its maintenance and ongoing development:
 
 [![Buy Me a Coffee](https://img.shields.io/badge/Ko--fi-Buy%20me%20a%20coffee-ff5e5b?style=for-the-badge&logo=ko-fi)](https://ko-fi.com/aiconwg)
-
 
 ---
 

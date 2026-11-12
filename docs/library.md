@@ -4,7 +4,7 @@
 
 The home page and the sidebar are the library. Movies, series, seasons, and the other types each have their own list. Search on a list looks through that person's entries.
 
-While a title is playing or paused, **Now Watching** strips can sit at the top of the home page — one strip per companion device (phone, each TV). Each strip shows the title, the episode, how much is already watched, the time left, and a device label you can rename. Dismiss or stop on one device leaves the others alone. Finished watches from the MediaTrail addon are saved at 90%. The picture is the Hungarian interface.
+While a title is playing or paused, **Now Watching** strips can sit at the top of the home page — one strip per companion device (phone, each TV). Each strip shows the title, the episode, how much is already watched, the time left, and a device label you can rename. Dismiss or stop on one device leaves the others alone. When the companion sends `stop` at **90%** or more, the MediaTrail addon saves one finished watch. The picture is the Hungarian interface.
 
 ![Now Watching on the home page](screenshots/now-watching-desktop2.png)
 
