@@ -4,13 +4,21 @@
 
 Verified against built images, not PyPI version numbers alone.
 
-## Status: pending rescan (post–Simkl/DRF/lock fixes)
+## Status: security round closed (`f75f118`)
 
-The previous clean Trivy result on `8f7af77` /
-`ghcr.io/aicon/mediatrail@sha256:1276ce57482c2578a4ad8e70dde1c41cb723b2ac4dfeedb3e4cdb3ce6061477e`
-does **not** cover the unpushed Simkl fail-closed, DRF-in-lock, and
-`requirements.txt` removal changes. Re-close only after a new image digest is
-built from this tree and Trivy + `verify_pillow_native` pass on that digest.
+Verified runtime artifact (not merely the moving `:dev` tag):
+
+- Commit: `f75f118`
+- Workflow: https://github.com/aicon/MediaTrail/actions/runs/43251480942
+- Image digest: `ghcr.io/aicon/mediatrail@sha256:b2578814843384541a8cb219c5f8d04c1c9ca4007b183e2efaf9284716573545`
+- Image ID (config): `sha256:0b6f8ebe19f8ae664334cf463fa5139a5d55ba837d21c1b2e1e459a10bad2e6e`
+- Build gate: `verify_pillow_native: OK` (in image build log)
+- Trivy (`--severity CRITICAL,HIGH,MEDIUM,LOW`, `--scanners vuln`): **0 findings**
+- Runtime inventory on that digest: **no `pip`**; `djangorestframework==3.18.3`, `pillow==13.0.0`, `soupsieve==4.1` from the locked venv
+
+Targeted OAuth / lock tests before push: `SimklOAuthViewTests` 13/13,
+`TraktOAuthViewTests` 11/11, `LockedDependencyInstallTests` 4/4. Full suite was
+not re-run end-to-end in this round.
 
 ## Supported dependency install (reproducible)
 
@@ -86,3 +94,12 @@ entrypoint validator uses an ash-safe character class (no bare `"` inside
 - `django-allauth` is on **65.22** (needed for oauthlib 4); smoke-test SSO if used.
 - Future Trivy hits on a newer base image need a new pin + rescan before claiming
   closure again.
+
+## Open deployment checks (not closed by this image scan)
+
+These need operator evidence, not another dependency bump:
+
+1. **TLS / `X-Forwarded-Proto`:** Does MediaTrail nginx terminate TLS, or a trusted
+   upstream proxy? Only then choose `$scheme` vs forwarding `$http_x_forwarded_proto`.
+2. **`TRUSTED_PROXIES`:** Set when a reverse proxy sits in front of `:8000` (with `URLS`).
+3. **Production `SECRET` / `SECRET_FILE`:** Must not be the repository default.

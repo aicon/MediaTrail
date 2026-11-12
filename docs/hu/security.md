@@ -4,11 +4,18 @@
 
 Az ellenőrzés a buildelt image-en történik, nem csupán a PyPI verziószámokon.
 
-## Állapot: újrascan vár (Simkl/DRF/lock javítások után)
+## Állapot: biztonsági kör lezárva (`f75f118`)
 
-A korábbi tiszta Trivy az `8f7af77` digesten **nem** igazolja a még nem
-image-elt Simkl fail-closed, DRF-lock és `requirements.txt`-törlés
-változásait. Új image digest + Trivy + `verify_pillow_native` kell a lezáráshoz.
+Ellenőrzött runtime artifact:
+
+- Commit: `f75f118`
+- Workflow: https://github.com/aicon/MediaTrail/actions/runs/43251480942
+- Image digest: `ghcr.io/aicon/mediatrail@sha256:b2578814843384541a8cb219c5f8d04c1c9ca4007b183e2efaf9284716573545`
+- Build gate: `verify_pillow_native: OK`
+- Trivy (CRITICAL+HIGH+MEDIUM+LOW, vuln): **0 találat**; runtime: **nincs pip**; DRF 3.18.3 / Pillow 13.0.0 a lockból
+
+Célzott tesztek push előtt: Simkl 13/13, Trakt OAuth 11/11, lock tesztek 4/4.
+A teljes suite ebben a körben nem futott végig.
 
 ## Támogatott telepítés (reprodukálható)
 
@@ -54,3 +61,10 @@ nincs hivatalos Brotli ≥ 1.2.1 wheel.
   BusyBox szintaxishibát okozott).
 - Pillow forrásbuild és az allauth 65.22 SSO smoke-test továbbra is
   üzemeltetési megjegyzés, nem nyitott CVE-lista.
+
+## Nyitott üzemeltetési ellenőrzések (nem zárja le az image scan)
+
+1. **TLS / `X-Forwarded-Proto`:** a MediaTrail nginx zárja-e a TLS-t, vagy egy
+   megbízható előtte álló proxy?
+2. **`TRUSTED_PROXIES`:** reverse proxy mögött be van-e állítva (+ `URLS`)?
+3. **Production `SECRET` / `SECRET_FILE`:** nem a repo default.
