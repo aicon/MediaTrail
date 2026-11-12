@@ -747,8 +747,8 @@ msgstr "A Jellyfin webhook-beállítások mentve."
 msgid "Sync events"
 msgstr "Szinkron-események"
 
-msgid "Player events always update Now Watching. Enable these to keep watch history in sync both ways with your linked Nuvio account."
-msgstr "A lejátszási események mindig frissítik a Most nézem sávot. Kapcsold be ezeket, ha a megtekintési előzményeket két irányban is szinkronban szeretnéd tartani a kapcsolt Nuvio-fiókkal."
+msgid "Player events always update Now Watching. Enable these to keep watch history in sync both ways with your linked Nuvio account. MediaTrail polls Nuvio about every 30 seconds in the background, and runs a deeper history check about every 15 minutes—no manual import needed after the first successful Nuvio import."
+msgstr "A lejátszási események mindig frissítik a Most nézem sávot. Kapcsold be ezeket, ha a megtekintési előzményeket két irányban is szinkronban szeretnéd tartani a kapcsolt Nuvio-fiókkal. A MediaTrail kb. 30 másodpercenként lekéri a Nuviótól a változásokat a háttérben, és kb. 15 percenként mélyebb előzmény-ellenőrzést is futtat — az első sikeres Nuvio-import után nem kell kézzel indítanod az importot."
 
 msgid "Sync mark-watched"
 msgstr "Megnézett jelölés szinkronizálása"

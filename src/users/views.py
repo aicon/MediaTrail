@@ -424,6 +424,14 @@ def update_nuvio_sync_events(request):
             "nuvio_sync_mark_unplayed_enabled",
         ],
     )
+    if (
+        request.user.nuvio_sync_mark_played_enabled
+        or request.user.nuvio_sync_mark_unplayed_enabled
+    ):
+        from integrations.tasks import sync_nuvio_watch_history_for_user
+
+        # Pull any pending Nuvio delta right away instead of waiting for beat.
+        sync_nuvio_watch_history_for_user.delay(request.user.id)
     messages.success(request, _("Nuvio sync settings updated successfully"))
 
     return redirect("integrations")

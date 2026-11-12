@@ -116,25 +116,75 @@ def sync_nuvio_playback():
             logger.exception("Nuvio playback sync failed for %s", account.user_id)
 
 
-@shared_task(name="Sync Nuvio watch history")
-def sync_nuvio_watch_history():
-    """Apply Nuvio watched-history delta for accounts with sync toggles on."""
+def _nuvio_sync_accounts():
+    """Bootstrapped accounts that opted into interactive watch-history sync."""
     from django.db.models import Q
 
     from integrations.models import NuvioAccount
 
-    accounts = NuvioAccount.objects.select_related("user").filter(
+    return NuvioAccount.objects.select_related("user").filter(
         bootstrapped=True,
         cursor__isnull=False,
     ).filter(
         Q(user__nuvio_sync_mark_played_enabled=True)
         | Q(user__nuvio_sync_mark_unplayed_enabled=True),
     )
-    for account in accounts:
+
+
+@shared_task(name="Sync Nuvio watch history")
+def sync_nuvio_watch_history():
+    """Apply only the Nuvio watched-history delta (fast interactive poll)."""
+    for account in _nuvio_sync_accounts():
         try:
             with disable_fetch_releases():
-                # Full snapshot + delta so unwatches are reconciled even when the
-                # cursor was previously advanced past delete events.
+                nuvio.NuvioImporter(
+                    account.user,
+                    mode="new",
+                    gate_upserts=True,
+                ).sync_delta()
+        except Exception:
+            logger.exception(
+                "Nuvio watch-history delta sync failed for %s",
+                account.user_id,
+            )
+
+
+@shared_task(name="Sync Nuvio watch history for user")
+def sync_nuvio_watch_history_for_user(user_id):
+    """Queueable one-shot delta sync after toggles are saved."""
+    user = get_user_model().objects.filter(id=user_id).first()
+    if user is None:
+        return
+    if not (
+        user.nuvio_sync_mark_played_enabled
+        or user.nuvio_sync_mark_unplayed_enabled
+    ):
+        return
+    from integrations.models import NuvioAccount
+
+    try:
+        account = user.nuvio_account
+    except NuvioAccount.DoesNotExist:
+        return
+    if not account.bootstrapped or account.cursor is None:
+        return
+    try:
+        with disable_fetch_releases():
+            nuvio.NuvioImporter(
+                user,
+                mode="new",
+                gate_upserts=True,
+            ).sync_delta()
+    except Exception:
+        logger.exception("Nuvio watch-history delta sync failed for %s", user_id)
+
+
+@shared_task(name="Reconcile Nuvio watch history")
+def reconcile_nuvio_watch_history():
+    """Full history snapshot + delta so missed unwatches are reconciled."""
+    for account in _nuvio_sync_accounts():
+        try:
+            with disable_fetch_releases():
                 nuvio.NuvioImporter(
                     account.user,
                     mode="new",
@@ -142,7 +192,7 @@ def sync_nuvio_watch_history():
                 ).import_data()
         except Exception:
             logger.exception(
-                "Nuvio watch-history sync failed for %s",
+                "Nuvio watch-history reconcile failed for %s",
                 account.user_id,
             )
 

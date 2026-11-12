@@ -42,7 +42,7 @@ Turn it on under **Settings → Integrations → Nuvio**:
 | **Sync mark-watched** | Upserts from history import and from the watched-history delta | Queues `sync_push_watched_items` when you mark something watched |
 | **Sync mark-unwatched** | Applies delta deletes, and after a full successful history snapshot can remove local watches that Nuvio no longer has | Queues `sync_delete_watched_items` (and matching watch-progress keys) when you mark unwatched or delete history |
 
-With either toggle on, MediaTrail also polls the Nuvio delta on a short schedule so interactive changes show up without waiting for a manual import. Manual Import → Nuvio still runs a full history check, then the delta.
+With either toggle on, MediaTrail polls the Nuvio delta about every **30 seconds** in the background, and runs a full history snapshot reconcile about every **15 minutes**. Saving the toggles also queues an immediate delta pull. You still need one successful manual Import → Nuvio first (so the account is bootstrapped); after that, interactive mark/unmark should appear without starting Import by hand.
 
 Safety rules for unwatched / snapshot reconcile:
 
