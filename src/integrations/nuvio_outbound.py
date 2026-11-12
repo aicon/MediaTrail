@@ -28,9 +28,11 @@ def enqueue_watched_upsert(user, media):
     if not items:
         return
     for item in items:
-        # Upsert and delete echoes must not share a key: a recent push must not
-        # suppress an inbound unwatch for the same title.
-        _clear_pending(user.id, item, operation="delete")
+        # Keep upsert and delete pendings independent. Clearing the opposite
+        # key lets an older outbound upsert echo re-apply after a later local
+        # delete already cleared that pending, while the delete echo is still
+        # skipped — recreating the title. Op-scoped keys already let a genuine
+        # inbound delete through while an upsert is pending.
         _mark_pending(user.id, item, operation="upsert")
     logger.info(
         "Queue Nuvio watched push for %s (%s)",
@@ -53,7 +55,6 @@ def enqueue_watched_delete(user, media):
         return
     progress_keys = _progress_keys_from_delete_keys(keys)
     for key in keys:
-        _clear_pending(user.id, key, operation="upsert")
         _mark_pending(user.id, key, operation="delete")
     logger.info(
         "Queue Nuvio watched delete keys %s progress %s",
@@ -219,13 +220,6 @@ def _mark_pending(user_id, payload, *, operation):
     key = _cache_key(user_id, identity, operation=operation)
     if key:
         cache.set(key, True, OUTBOUND_TTL_SECONDS)
-
-
-def _clear_pending(user_id, payload, *, operation):
-    identity = _identity_from_payload(payload)
-    key = _cache_key(user_id, identity, operation=operation)
-    if key:
-        cache.delete(key)
 
 
 def _identity_from_payload(payload):
