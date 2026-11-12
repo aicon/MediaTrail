@@ -55,7 +55,7 @@ With several MediaTrail users, each person must install **their own** Integratio
 
 Watched threshold: **90%** (`WATCHED_THRESHOLD = 0.9`). Clearing live playback never changes Episode/Movie history or tracked status.
 
-Nuvio **Sync / import** is separate: history import must not wipe per-device player strips (legacy bucket only).
+Nuvio **watch-history import / two-way interactive sync** is separate (Settings → Import and Settings → Integrations → Nuvio). That path updates movie/episode history; it must not wipe per-device Now Watching strips. Details: [Imports → Nuvio](imports.md#nuvio).
 
 ## Stale sessions
 

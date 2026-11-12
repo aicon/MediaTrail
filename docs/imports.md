@@ -13,9 +13,7 @@ The history list below the sources shows the last seven days. A task that says i
 
 ## Nuvio
 
-Nuvio is the first source. It reads movies and episodes from one Nuvio profile. Two-way watch-history sync is optional under Settings → Integrations → Nuvio: mark-watched / mark-unwatched toggles apply Nuvio delta changes locally and queue matching `sync_push_watched_items` / `sync_delete_watched_items` calls when you mark or delete history in MediaTrail.
-
-Live **Now Watching** from the companion apps is separate: the built-in MediaTrail addon receives `player` events with a per-device id. History import does not replace those device strips. See [Library](library.md) and [Live playback / Now Watching](LIVE_PLAYBACK_NOW_WATCHING.md).
+Nuvio is the first source. It reads movies and episodes from one Nuvio profile. Optional **two-way interactive watch-history sync** is configured under Settings → Integrations → Nuvio (see below). Live **Now Watching** from the companion apps is a separate path: the built-in MediaTrail addon receives `player` events with a per-device id. History import and watch-history sync do not replace those device strips. See [Library](library.md) and [Live playback / Now Watching](LIVE_PLAYBACK_NOW_WATCHING.md).
 
 Credentials, cursor, and imported rows belong to the signed-in MediaTrail user only (`NuvioAccount` is one per account). Another MediaTrail user on the same site keeps a separate Nuvio login and library.
 
@@ -29,9 +27,30 @@ What a run does:
 - In overwrite, the existing movie, or the latest row of that episode, gets the Nuvio watch time. The rest of the row stays.
 - If you remove an episode in MediaTrail and Nuvio still has that watch, the next import adds it again. "Only new items" means missing locally, even when that Nuvio event was imported before.
 - A series row that has no season number or no episode number is skipped and remembered, so later runs do not keep reporting it.
-- A delete event from Nuvio is ignored unless **Sync mark-unwatched** is enabled on Integrations. With that toggle on, matching local movie or episode history is removed.
+- A delete event from Nuvio is ignored unless **Sync mark-unwatched** is on (see two-way sync below).
 
 The profile number is the Nuvio profile, not a MediaTrail user. Most people have one profile, numbered 1.
+
+### Two-way interactive sync
+
+This mirrors Jellyfin-style mark played / mark unplayed between Nuvio Cloud watch history and MediaTrail movie/episode rows. It is **not** remote pause or Now Watching scrobble.
+
+Turn it on under **Settings → Integrations → Nuvio**:
+
+| Toggle | Nuvio → MediaTrail | MediaTrail → Nuvio |
+| --- | --- | --- |
+| **Sync mark-watched** | Upserts from history import and from the watched-history delta | Queues `sync_push_watched_items` when you mark something watched |
+| **Sync mark-unwatched** | Applies delta deletes, and after a full successful history snapshot can remove local watches that Nuvio no longer has | Queues `sync_delete_watched_items` (and matching watch-progress keys) when you mark unwatched or delete history |
+
+With either toggle on, MediaTrail also polls the Nuvio delta on a short schedule so interactive changes show up without waiting for a manual import. Manual Import → Nuvio still runs a full history check, then the delta.
+
+Safety rules for unwatched / snapshot reconcile:
+
+- Content ids are normalized to TMDB watch keys before compare (`tmdb:…` and IMDb `tt…` for the same title count as one item).
+- Snapshot reconcile runs only after every history page was fetched and every row that should map to TMDB did. A mid-import API or apply failure does not start deletes.
+- Only watches previously recorded from Nuvio sync are eligible for snapshot removal. Watches from Trakt, manual entry, or other sources stay.
+- The saved delta cursor advances only when every event in that run applied successfully. On failure the cursor stays put so the next run retries the batch (at-least-once; upsert and delete are idempotent).
+- The stored Nuvio watch-key set updates only after that full successful import path finishes.
 
 ## Other sources
 

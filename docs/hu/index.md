@@ -13,7 +13,7 @@ Ez a könyv a MediaTrail kézikönyve.
 - A [Telepítés](install.md) a konténerről, az adatkönyvtárról és az első indulásról szól.
 - A [Könyvtár](library.md) a követésről, a listákról, a naptárról, az egyéni bejegyzésről és a több eszközös „Most nézem” sávokról szól.
 - A [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md) az eszközönkénti sávokról, az addon eseményekről, az átnevezésről és az idle TTL-ekről szól.
-- Az [Import](imports.md) a már meglévő előzmény behozataláról szól, benne a Nuvióval.
+- Az [Import](imports.md) a már meglévő előzmény behozataláról szól, benne a Nuvióval és az opcionális kétirányú, interaktív megtekintési-előzmény szinkronnal.
 - A [Környezet](runtime.md) azokat a beállításokat írja le, amelyek a futtató gépen vannak, nem egy fiókban.
 - A [Fiókok](accounts.md) a belépésről, a regisztrációról és az adminfelületről szól.
 - A [Karbantartás](care.md) a frissítésről, a mentésről és az állapotvizsgálatról szól.

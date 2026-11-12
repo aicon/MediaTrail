@@ -13,9 +13,7 @@ A források alatti történet az elmúlt hét napot mutatja. A „most fut” á
 
 ## Nuvio
 
-A Nuvio az első forrás. Egy Nuvio-profil filmjeit és epizódjait olvassa. A kétirányú megtekintési-előzmény szinkron opcionális a Beállítások → Integrációk → Nuvio alatt: a megnézett / nem megtekintett kapcsolók a Nuvio deltát helyben alkalmazzák, és a MediaTrailben történő megjelölésnél vagy törlésnél a `sync_push_watched_items` / `sync_delete_watched_items` hívásokat indítják.
-
-Az élő **„Most nézem”** sáv más út: a beépített MediaTrail addon a társalkalmazások `player` eseményeit kapja, eszközönkénti azonosítóval. Az előzményimport ezeket a sávokat nem írja felül. Lásd a [Könyvtár](library.md) oldalt és a [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md) leírást.
+A Nuvio az első forrás. Egy Nuvio-profil filmjeit és epizódjait olvassa. Az opcionális **kétirányú, interaktív megtekintési-előzmény szinkron** a Beállítások → Integrációk → Nuvio alatt kapcsolható (lásd lent). Az élő **„Most nézem”** sáv más út: a beépített MediaTrail addon a társalkalmazások `player` eseményeit kapja, eszközönkénti azonosítóval. Az előzményimport és a megtekintési-előzmény szinkron ezeket a sávokat nem írja felül. Lásd a [Könyvtár](library.md) oldalt és a [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md) leírást.
 
 A bejelentkezési adatok, a kurzor és az importált sorok a bejelentkezett MediaTrail-felhasználóhoz tartoznak (`NuvioAccount` fiókonként egy). Ugyanazon a MediaTrailen egy másik felhasználónak külön Nuvio-belépése és könyvtára van.
 
@@ -29,9 +27,30 @@ Egy futás ezt csinálja:
 - Felülírásnál a meglévő film, vagy az epizód legutóbbi sora megkapja a Nuvio idejét. A sor többi mezője marad.
 - Ha egy epizódot a MediaTrailben kiveszel, a Nuvio pedig még őrzi a megtekintést, a következő import visszateszi. A „csak az új elemek” a helyben hiányzót jelenti, akkor is, ha az az esemény egyszer már bejött.
 - Az a sorozatsor, amelyen nincs évadszám vagy nincs epizódszám, kimarad, és megjegyződik, hogy a későbbi futások ne jelentsék újra.
-- A Nuvio törlési eseményét a program figyelmen kívül hagyja, kivéve ha az Integrációkon a **Nem megtekintett jelölés szinkronizálása** be van kapcsolva. Ilyenkor a megfelelő helyi film- vagy epizód-előzmény törlődik.
+- A Nuvio törlési eseményét a program figyelmen kívül hagyja, kivéve ha a **Nem megtekintett jelölés szinkronizálása** be van kapcsolva (lásd a kétirányú szinkront lent).
 
 A profilszám a Nuvio profilja, nem egy MediaTrail-felhasználó. A legtöbb fióknak egy profilja van, az 1-es.
+
+### Kétirányú interaktív szinkron
+
+Ez a Jellyfin-szerű „megnézett / nem megtekintett” jelölést köti össze a Nuvio Cloud megtekintési előzménye és a MediaTrail film-/epizódsorai között. Nem távoli szüneteltetés, és nem a „Most nézem” scrobble.
+
+Kapcsolók: **Beállítások → Integrációk → Nuvio**:
+
+| Kapcsoló | Nuvio → MediaTrail | MediaTrail → Nuvio |
+| --- | --- | --- |
+| **Megnézett jelölés szinkronizálása** | Upsert az előzményimportból és a megtekintési-előzmény deltából | `sync_push_watched_items` sorba állítása, ha helyben megtekintettnek jelölsz |
+| **Nem megtekintett jelölés szinkronizálása** | Delta-törlések alkalmazása; teljes, sikeres history snapshot után a Nuvióban már nem lévő, korábban szinkronizált helyi megtekintések is törlődhetnek | `sync_delete_watched_items` (és a hozzá tartozó watch-progress kulcsok) sorba állítása nem megtekintett jelölésnél vagy előzménytörlésnél |
+
+Ha bármelyik kapcsoló be van kapcsolva, a MediaTrail rövid időközönként lekéri a Nuvio deltát is, így az interaktív változások kézi import nélkül is megjelennek. A kézi Adatimport → Nuvio továbbra is teljes előzmény-ellenőrzést futtat, majd a deltát.
+
+A nem megtekintett / snapshot-összevetés szabályai:
+
+- Azonosítók összehasonlítás előtt TMDB megtekintési kulcsra egységesülnek (`tmdb:…` és IMDb `tt…` ugyanarra a címre egynek számít).
+- Snapshot-reconcile csak akkor fut, ha minden history-oldal megjött, és minden TMDB-re várható sor feloldódott. Köztes API- vagy alkalmazási hiba nem indít törlést.
+- Snapshotból csak a korábban Nuvióból szinkronizált megtekintések törölhetők. A Trakt, kézi vagy más forrású helyi megtekintések megmaradnak.
+- A mentett delta-kurzor csak akkor lép előre, ha az adott futás minden eseménye sikeresen alkalmazódott. Hibánál a kurzor a futás elején marad, a következő futás újra megpróbálja a batch-et (at-least-once; az upsert és a törlés idempotens).
+- A tárolt Nuvio megtekintési-kulcs készlet csak a teljes, sikeres importút után frissül.
 
 ## További források
 

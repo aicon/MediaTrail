@@ -8,7 +8,7 @@ Lejátszás vagy szünet közben a kezdőlap tetején **„Most nézem”** sáv
 
 ![A Most nézem sáv a kezdőlapon](../screenshots/now-watching-desktop2.png)
 
-A MediaTrail addon címét a Beállítások → Integrációk → Nuvio alól add hozzá minden [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) vagy [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) klienshez. Részletek: [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md).
+A MediaTrail addon címét a Beállítások → Integrációk → Nuvio alól add hozzá minden [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) vagy [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) klienshez. Részletek: [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md). A kétirányú megtekintési-előzmény szinkron (megnézett / nem megtekintett) ugyanezen az Integrációk oldalon kapcsolható; lásd: [Import → Nuvio](imports.md#nuvio).
 
 Egy cím megnyitása a katalógus adatait és a követő űrlapot mutatja. Az állapot, a pontszám, a haladás, a kezdő és záró dátum, valamint a jegyzet ehhez a bejegyzéshez tartozik. Egy befejezett cím újrakezdése új kört ír a történetbe. A sorozat szülő: az évadok és az epizódok külön sorok, ezért egy epizód bejelölése nem írja felül az egész műsort.
 
