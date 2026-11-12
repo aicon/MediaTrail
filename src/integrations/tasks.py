@@ -35,18 +35,30 @@ def format_media_type_display(count, media_type):
     return f"{count} {app_tags.media_type_readable_plural(media_type)}"
 
 
-def format_import_message(imported_counts, warning_messages=None):
+def format_import_message(imported_counts, warning_messages=None, removed_counts=None):
     """Format the import result message based on counts and warnings."""
-    parts = [
+    imported_parts = [
         format_media_type_display(count, media_type)
-        for media_type, count in imported_counts.items()
+        for media_type, count in (imported_counts or {}).items()
     ]
-    parts = [p for p in parts if p is not None]
+    imported_parts = [part for part in imported_parts if part is not None]
+    removed_parts = [
+        format_media_type_display(count, media_type)
+        for media_type, count in (removed_counts or {}).items()
+    ]
+    removed_parts = [part for part in removed_parts if part is not None]
 
-    if not parts:
-        info_message = "No media was imported."
+    if imported_parts and removed_parts:
+        info_message = (
+            f"Imported {helpers.join_with_commas_and(imported_parts)}. "
+            f"Removed {helpers.join_with_commas_and(removed_parts)}."
+        )
+    elif imported_parts:
+        info_message = f"Imported {helpers.join_with_commas_and(imported_parts)}."
+    elif removed_parts:
+        info_message = f"Removed {helpers.join_with_commas_and(removed_parts)}."
     else:
-        info_message = f"Imported {helpers.join_with_commas_and(parts)}."
+        info_message = "No media was imported."
 
     if warning_messages:
         return f"{info_message} {ERROR_TITLE} {warning_messages}"
@@ -66,14 +78,14 @@ def import_media(
 
     with disable_fetch_releases():
         if oauth_username is None:
-            imported_counts, warnings = importer_func(
+            result = importer_func(
                 identifier,
                 user,
                 mode,
                 **kwargs,
             )
         else:
-            imported_counts, warnings = importer_func(
+            result = importer_func(
                 identifier,
                 user,
                 mode,
@@ -81,9 +93,15 @@ def import_media(
                 **kwargs,
             )
 
+    removed_counts = None
+    if isinstance(result, tuple) and len(result) == 3:
+        imported_counts, warnings, removed_counts = result
+    else:
+        imported_counts, warnings = result
+
     events.tasks.reload_calendar.delay()
 
-    return format_import_message(imported_counts, warnings)
+    return format_import_message(imported_counts, warnings, removed_counts)
 
 
 @shared_task(name="Sync Nuvio playback")

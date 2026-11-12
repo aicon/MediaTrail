@@ -150,10 +150,15 @@ class NuvioImportTests(TestCase):
             patch("integrations.imports.nuvio.services.get_media_metadata", _metadata),
             patch("app.models.providers.services.get_media_metadata", _metadata),
         ):
-            return nuvio.NuvioImporter(self.user, client).import_data()
+            result = nuvio.NuvioImporter(self.user, client).import_data()
+            # Support both legacy 2-tuple callers and (counts, warnings, removed).
+            if len(result) == 2:
+                counts, warnings = result
+                return counts, warnings, {}
+            return result
 
     def test_creates_missing_movie_and_saves_cursor(self):
-        counts, warnings = self._run(
+        counts, warnings, _removed = self._run(
             FakeNuvio([_history("tmdb:550", "movie", "Fight Club", nuvio_id="m1")]),
         )
         self.assertEqual(counts[MediaTypes.MOVIE.value], 1)
@@ -217,7 +222,7 @@ class NuvioImportTests(TestCase):
         self.assertEqual(Movie.objects.filter(user=self.user).count(), 1)
 
     def test_creates_missing_episode(self):
-        counts, _warnings = self._run(
+        counts, _warnings, _removed = self._run(
             FakeNuvio(
                 [
                     _history(
@@ -286,7 +291,7 @@ class NuvioImportTests(TestCase):
         ]
         self._run(FakeNuvio(history))
         Episode.objects.all().delete()
-        counts, _warnings = self._run(FakeNuvio(history))
+        counts, _warnings, _removed = self._run(FakeNuvio(history))
         self.assertEqual(counts[MediaTypes.EPISODE.value], 1)
         self.assertEqual(Episode.objects.count(), 1)
 
@@ -362,11 +367,9 @@ class NuvioImportTests(TestCase):
         )
         self.assertEqual(Movie.objects.filter(user=self.user).count(), 0)
 
-    def test_reconcile_removes_mapped_episode_missing_from_snapshot(self):
+    def test_reconcile_removes_episode_missing_from_snapshot(self):
         self.user.nuvio_sync_mark_unplayed_enabled = True
         self.user.save(update_fields=["nuvio_sync_mark_unplayed_enabled"])
-        self.account.imdb_map = {"tt0072567": "1532"}
-        self.account.save(update_fields=["imdb_map"])
         history = [
             _history(
                 "tmdb:1532",
@@ -385,10 +388,11 @@ class NuvioImportTests(TestCase):
                 nuvio_id="e20",
             ),
         ]
-        self._run(FakeNuvio(history, cursor=5))
+        counts, _warnings, removed = self._run(FakeNuvio(history, cursor=5))
         self.assertEqual(Episode.objects.count(), 2)
+        self.assertEqual(removed, {})
         # Nuvio unwatched E21; snapshot only has E20. Cursor tip already past deletes.
-        self._run(
+        _counts, _warnings, removed = self._run(
             FakeNuvio(
                 [
                     _history(
@@ -408,6 +412,7 @@ class NuvioImportTests(TestCase):
             for ep in Episode.objects.all()
         }
         self.assertEqual(seasons_eps, {(2, 20)})
+        self.assertEqual(removed.get(MediaTypes.EPISODE.value), 1)
 
     def test_delete_removes_episode_when_toggle_on(self):
         self.user.nuvio_sync_mark_unplayed_enabled = True
