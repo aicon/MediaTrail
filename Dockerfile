@@ -10,13 +10,34 @@ ENV UV_LINK_MODE=copy
 
 WORKDIR /mediatrail
 
+# Imaging build deps for a from-source Pillow that links Alpine Brotli 1.2.1
+# (PyPI musllinux/manylinux 12.3.0 and 13.0.0 wheels embed Brotli 1.2.0).
+# Pin brotli* so a rebuild cannot silently pick another Brotli revision.
+RUN apk add --no-cache \
+    build-base \
+    freetype-dev \
+    fribidi-dev \
+    harfbuzz-dev \
+    jpeg-dev \
+    lcms2-dev \
+    libimagequant-dev \
+    libpng-dev \
+    libwebp-dev \
+    libxcb-dev \
+    openjpeg-dev \
+    tiff-dev \
+    zlib-dev \
+    brotli-dev=1.2.1-r0 \
+    brotli-libs=1.2.1-r0
+
 COPY ./pyproject.toml ./pyproject.toml
 COPY ./uv.lock ./uv.lock
 
 # The preview API imports rest_framework and drf_spectacular, but this
 # branch's lockfile does not list them. Install them after the locked sync
 # so the docs-group git dependency is not resolved again.
-RUN uv sync --locked \
+# Force Pillow from sdist so it links system Brotli instead of wheel.libs 1.2.0.
+RUN uv sync --locked --no-binary-package pillow \
     && uv pip install --python /mediatrail/.venv/bin/python \
         "djangorestframework~=3.16.1" \
         "drf-spectacular~=0.28.0"
@@ -45,8 +66,26 @@ COPY ./nginx.conf /etc/nginx/nginx.conf
 # Generate a copy of the nginx config with IPv6 support.
 RUN sed 's/listen 8000;/listen 8000; listen [::]:8000;/' /etc/nginx/nginx.conf > /etc/nginx/nginx.ipv6.conf
 
-RUN apk add --no-cache nginx redis shadow \
-    && apk upgrade --no-cache \
+# Runtime packages are version-pinned where security-relevant. Do not add a
+# blanket `apk upgrade`: it floats unrelated package revisions between builds
+# of the same Git commit. Add new pins only after scanning a built image.
+RUN apk add --no-cache \
+    nginx \
+    redis \
+    shadow \
+    freetype \
+    fribidi \
+    harfbuzz \
+    libjpeg-turbo \
+    lcms2 \
+    libimagequant \
+    libpng \
+    libwebp \
+    libxcb \
+    openjpeg \
+    tiff \
+    zlib \
+    brotli-libs=1.2.1-r0 \
     && chmod +x /entrypoint.sh \
     # create user abc for later PUID/PGID mapping
     && useradd -U -M -s /bin/sh abc \
@@ -59,7 +98,9 @@ COPY --from=builder /mediatrail/.venv /mediatrail/.venv
 
 # Django app
 COPY src ./
-RUN python manage.py collectstatic --noinput
+COPY scripts/verify_pillow_native.py /mediatrail/scripts/verify_pillow_native.py
+RUN python /mediatrail/scripts/verify_pillow_native.py \
+    && python manage.py collectstatic --noinput
 
 EXPOSE 8000
 

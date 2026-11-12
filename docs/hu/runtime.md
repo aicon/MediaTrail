@@ -6,6 +6,8 @@ Az alábbi paraméterek a konténer környezeti változói, amelyeket nem a webe
 
 Ezeket az értékeket soha ne ágyazd be a lemezkép építési folyamatába. A konténerkép magát a programot testesíti meg, míg a hitelesítési kulcsok és adatok biztonságosan azon a kiszolgálón maradnak, amely a rendszert futtatja.
 
+A függőségi és reverse-proxy keményítés részletei (Pillow/Brotli ellenőrzés, pinelt Alpine csomagok, `TRUSTED_PROXIES`) a [security.md](security.md) oldalon találhatók.
+
 ## Gyakran használt alapbeállítások
 
 | Változó | Szerepe és rendeltetése |

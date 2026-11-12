@@ -6,6 +6,8 @@ These are environment variables on the container. They are not the Preferences p
 
 Do not put these values into the image build. The image is the program. The keys stay on the machine that runs it.
 
+Dependency and reverse-proxy hardening details (Pillow/Brotli verification, pinned Alpine packages, `TRUSTED_PROXIES`) are in [security.md](security.md).
+
 ## The ones you usually set
 
 | Variable | Role |
