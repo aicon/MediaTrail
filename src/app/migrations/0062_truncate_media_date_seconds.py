@@ -1,3 +1,5 @@
+from datetime import UTC
+
 from django.db import migrations
 from django.db.models.functions import TruncMinute
 
@@ -14,17 +16,22 @@ MEDIA_MODELS_WITH_START_AND_END_DATE = [
 
 
 def truncate_date_seconds(apps, _schema_editor):
-    """Strip seconds/microseconds from start_date/end_date, imported with full precision."""
+    """Strip seconds/microseconds from start_date/end_date, imported with full precision.
+
+    TruncMinute must use UTC. Without tzinfo, non-UTC deployments rewrite the
+    local wall time as if it were UTC (fixed in Yamtrack v0.26.1 / #1633).
+    Already-applied buggy runs are repaired by 0070_restore_tz_shifted_media_dates.
+    """
     for model_name in MEDIA_MODELS_WITH_START_AND_END_DATE:
         model = apps.get_model("app", model_name)
         for field in ("start_date", "end_date"):
             model.objects.filter(**{f"{field}__isnull": False}).update(
-                **{field: TruncMinute(field)},
+                **{field: TruncMinute(field, tzinfo=UTC)},
             )
 
     Episode = apps.get_model("app", "Episode")
     Episode.objects.filter(end_date__isnull=False).update(
-        end_date=TruncMinute("end_date"),
+        end_date=TruncMinute("end_date", tzinfo=UTC),
     )
 
 

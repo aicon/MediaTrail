@@ -25,6 +25,8 @@ Amennyiben ugyanez a hibaüzenet körülbelül 45 másodpercenként folyamatosan
 
 Állítsd le a futó konténert, majd készíts másolatot a `db` mappáról. Ez a biztonsági mentés tartalmazza a SQLite adatbázisállományt és a Redis állapotmentését is. A helyreállítás fordított sorrendben történik: helyezd vissza a mentett mappát az eredeti helyére, majd indítsd el a konténert. A SQLite adatbázisfájl futás közbeni másolása csonka vagy sérült fájlt eredményezhet, a konténer előzetes leállítása ezt a kockázatot küszöböli ki.
 
+Egyes frissítések a tárolt megtekintési dátumokat is átírják (például a korábbi, nem UTC időzónán futó perc-csonkítás javítása). Ilyen kiadás előtt készíts mentést a `db` mappáról — PostgreSQL használata esetén pedig az adatbázisról is, mert az a compose `db` mappán kívül él.
+
 A `SECRET` környezeti változó értéke nem ebben a mappában tárolódik. A visszaállított gyűjtemény zökkenőmentes használatához – a meglévő bejelentkezési munkamenetek és a titkosított Nuvio-jelszavak megőrzése érdekében – pontosan ugyanazt a `SECRET` értéket kell biztosítanod. Ha a titkosítási kulcs megváltozik, a felhasználóknak újra be kell lépniük, és a mentett Nuvio-jelszót ismét be kell írniuk.
 
 ## A forráskód közzététele

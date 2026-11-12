@@ -25,6 +25,8 @@ If the same line repeats about every 45 seconds, the application did not stay up
 
 Stop the container and copy the `db` folder. That copy includes the SQLite file and the Redis snapshot. Restoring is the reverse: put the folder back, then start the container. Copying the SQLite file while the container is writing can produce a half-written file. Stopping first avoids that.
 
+Some upgrades rewrite stored watch dates (for example the repair for an earlier minute-truncation bug on non-UTC timezones). Take a `db` backup before those releases, especially on PostgreSQL where the library lives outside the compose `db` folder.
+
 `SECRET` is not in that folder. A restored library still needs the same `SECRET` if you want existing sessions and the encrypted Nuvio password to keep working. If the secret changes, people sign in again, and a saved Nuvio password has to be typed once more.
 
 ## Source offer
