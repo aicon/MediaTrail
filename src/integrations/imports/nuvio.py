@@ -863,6 +863,13 @@ class NuvioImporter:
             record = mapped
         if record["operation"] == "delete":
             if not self.user.nuvio_sync_mark_unplayed_enabled:
+                logger.info(
+                    "Nuvio skip delete; mark-unplayed sync off content_id=%s "
+                    "season=%s episode=%s",
+                    row.get("content_id"),
+                    row.get("season"),
+                    row.get("episode"),
+                )
                 self._remember(nuvio_id)
                 return True
             if self.gate_upserts and self._is_echo(row):
@@ -908,6 +915,13 @@ class NuvioImporter:
         if record["operation"] != "upsert":
             return True
         if self.gate_upserts and not self.user.nuvio_sync_mark_played_enabled:
+            logger.info(
+                "Nuvio skip upsert; mark-played sync off content_id=%s "
+                "season=%s episode=%s",
+                row.get("content_id"),
+                row.get("season"),
+                row.get("episode"),
+            )
             self._remember(nuvio_id)
             return True
         if self.gate_upserts and self._is_echo(row):
@@ -944,13 +958,17 @@ class NuvioImporter:
                 self._watched_key_from_record(record),
                 present=True,
             )
-        if action in {"create", "update"}:
+        if action in {"create", "update", "skip"}:
             logger.info(
-                "Nuvio import %s %s: %s",
+                "Nuvio import %s %s: %s (media_id=%s season=%s episode=%s)",
                 action,
                 record["kind"],
                 record["title"],
+                record.get("media_id"),
+                record.get("season"),
+                record.get("episode"),
             )
+        if action in {"create", "update"}:
             self.created[record["kind"]] += 1
         return True
 
