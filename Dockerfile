@@ -39,7 +39,7 @@ COPY ./uv.lock ./uv.lock
 # Force Pillow from sdist so it links system Brotli instead of wheel.libs 1.2.0.
 RUN uv sync --locked --no-binary-package pillow \
     && uv pip install --python /mediatrail/.venv/bin/python \
-        "djangorestframework~=3.16.1" \
+        "djangorestframework~=3.18.2" \
         "drf-spectacular~=0.28.0"
 
 # --- Final stage: minimal runtime image ---
@@ -86,6 +86,7 @@ RUN apk add --no-cache \
     tiff \
     zlib \
     brotli-libs=1.2.1-r0 \
+    krb5-libs=1.22.3-r0 \
     && chmod +x /entrypoint.sh \
     # create user abc for later PUID/PGID mapping
     && useradd -U -M -s /bin/sh abc \
