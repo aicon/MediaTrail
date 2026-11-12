@@ -734,35 +734,51 @@ class NuvioImporter:
         return "missing"
 
     def _delta(self):
-        blocked = False
+        """Apply every delta event; advance the cursor only if all succeed.
+
+        Partial progress must not move ``account.cursor``, otherwise the next
+        run would skip the failed event (and any after it that were already
+        consumed in this pass).
+        """
         since = self.account.cursor
+        start_cursor = since
+        last_applied = None
         logger.info("Nuvio delta starting from cursor=%s", since)
-        for row in self.client.iter_delta(since):
-            event_id = row.get("event_id") if isinstance(row, dict) else None
-            if event_id is None:
-                blocked = True
-                continue
-            operation = str(row.get("operation") or "upsert")
-            logger.info(
-                "Nuvio delta event_id=%s operation=%s content_id=%s "
-                "season=%s episode=%s",
-                event_id,
-                operation,
-                row.get("content_id"),
-                row.get("season"),
-                row.get("episode"),
-            )
-            if not self._apply(row, operation=operation, event_id=int(event_id)):
-                blocked = True
-                continue
-            # Only advance after a successful apply, in ascending event_id order.
-            if not blocked and self.account.bootstrapped:
-                self.account.cursor = int(event_id)
+        try:
+            for row in self.client.iter_delta(since):
+                event_id = row.get("event_id") if isinstance(row, dict) else None
+                if event_id is None:
+                    msg = (
+                        "Nuvio import stopped on a failed record. "
+                        "It will continue on the next run."
+                    )
+                    raise MediaImportError(msg)
+                operation = str(row.get("operation") or "upsert")
+                logger.info(
+                    "Nuvio delta event_id=%s operation=%s content_id=%s "
+                    "season=%s episode=%s",
+                    event_id,
+                    operation,
+                    row.get("content_id"),
+                    row.get("season"),
+                    row.get("episode"),
+                )
+                if not self._apply(row, operation=operation, event_id=int(event_id)):
+                    msg = (
+                        "Nuvio import stopped on a failed record. "
+                        "It will continue on the next run."
+                    )
+                    raise MediaImportError(msg)
+                last_applied = int(event_id)
+            self._flush_progress()
+            if last_applied is not None and self.account.bootstrapped:
+                self.account.cursor = last_applied
                 self._save_account(["cursor"])
-        self._flush_progress()
-        if blocked:
-            msg = "Nuvio import stopped on a failed record. It will continue on the next run."
-            raise MediaImportError(msg)
+        except Exception:
+            if self.account.cursor != start_cursor:
+                self.account.cursor = start_cursor
+                self._save_account(["cursor"])
+            raise
 
     def _apply(self, row, *, operation, event_id):
         if not isinstance(row, dict):

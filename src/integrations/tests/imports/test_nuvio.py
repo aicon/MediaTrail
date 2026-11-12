@@ -557,7 +557,99 @@ class NuvioImportTests(TestCase):
             self._run(DeltaFailNuvio(history=[], cursor=99))
         self.account.refresh_from_db()
         self.assertEqual(self.account.watched_keys, prior)
+        self.assertEqual(self.account.cursor, 5)
         self.assertEqual(Movie.objects.filter(user=self.user).count(), 1)
+
+    def test_delta_cursor_advances_only_after_all_events_succeed(self):
+        """A mid-delta apply failure must leave the cursor at the run start."""
+        self.user.nuvio_sync_mark_unplayed_enabled = True
+        self.user.save(update_fields=["nuvio_sync_mark_unplayed_enabled"])
+        self._run(
+            FakeNuvio(
+                [_history("tmdb:550", "movie", "Fight Club", nuvio_id="m1")],
+                cursor=5,
+            ),
+        )
+        self.account.refresh_from_db()
+        self.assertEqual(self.account.cursor, 5)
+        original_apply = nuvio.NuvioImporter._apply
+
+        def fail_on_second(importer, row, *, operation, event_id):
+            if event_id == 12:
+                return False
+            return original_apply(
+                importer, row, operation=operation, event_id=event_id,
+            )
+
+        with patch.object(nuvio.NuvioImporter, "_apply", fail_on_second):
+            with self.assertRaises(nuvio.MediaImportError):
+                self._run(
+                    FakeNuvio(
+                        history=[
+                            _history("tmdb:550", "movie", "Fight Club", nuvio_id="m1"),
+                        ],
+                        delta=[
+                            {
+                                "event_id": 11,
+                                "operation": "upsert",
+                                "id": "m2",
+                                "content_id": "tmdb:551",
+                                "content_type": "movie",
+                                "title": "Other",
+                                "watched_at": WATCHED_AT,
+                            },
+                            {
+                                "event_id": 12,
+                                "operation": "upsert",
+                                "id": "m3",
+                                "content_id": "tmdb:552",
+                                "content_type": "movie",
+                                "title": "Later",
+                                "watched_at": WATCHED_AT,
+                            },
+                        ],
+                        cursor=99,
+                    ),
+                )
+        self.account.refresh_from_db()
+        self.assertEqual(self.account.cursor, 5)
+
+    def test_delta_cursor_advances_when_all_events_succeed(self):
+        self._run(
+            FakeNuvio(
+                [_history("tmdb:550", "movie", "Fight Club", nuvio_id="m1")],
+                cursor=5,
+            ),
+        )
+        self._run(
+            FakeNuvio(
+                history=[_history("tmdb:550", "movie", "Fight Club", nuvio_id="m1")],
+                delta=[
+                    {
+                        "event_id": 11,
+                        "operation": "upsert",
+                        "id": "m2",
+                        "content_id": "tmdb:551",
+                        "content_type": "movie",
+                        "title": "Other",
+                        "watched_at": WATCHED_AT,
+                    },
+                    {
+                        "event_id": 12,
+                        "operation": "upsert",
+                        "id": "m3",
+                        "content_id": "tmdb:552",
+                        "content_type": "movie",
+                        "title": "Later",
+                        "watched_at": WATCHED_AT,
+                    },
+                ],
+                cursor=99,
+            ),
+        )
+        self.account.refresh_from_db()
+        self.assertEqual(self.account.cursor, 12)
+        self.assertEqual(Movie.objects.filter(user=self.user).count(), 3)
 
     def test_history_apply_failure_keeps_prior_watched_keys(self):
         self.user.nuvio_sync_mark_unplayed_enabled = True
