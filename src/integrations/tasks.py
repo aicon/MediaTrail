@@ -139,14 +139,23 @@ def import_nuvio(user_id, mode, username=None):
     retry_backoff=True,
     retry_kwargs={"max_retries": 5},
 )
-def push_nuvio_watched_item(user_id, item):
-    """Upsert one watched item to Nuvio. Idempotent on retry."""
+def push_nuvio_watched_item(user_id, items):
+    """Upsert watched item variants to Nuvio. Idempotent on retry."""
     user = get_user_model().objects.get(id=user_id)
     if not user.nuvio_sync_mark_played_enabled:
         return
-    if not isinstance(item, dict) or not item.get("content_id"):
+    if isinstance(items, dict):
+        items = [items]
+    if not isinstance(items, list):
         return
-    nuvio.NuvioClient(user.nuvio_account).push_watched_items([item])
+    payload = [
+        item
+        for item in items
+        if isinstance(item, dict) and item.get("content_id")
+    ]
+    if not payload:
+        return
+    nuvio.NuvioClient(user.nuvio_account).push_watched_items(payload)
 
 
 @shared_task(
@@ -155,16 +164,27 @@ def push_nuvio_watched_item(user_id, item):
     retry_backoff=True,
     retry_kwargs={"max_retries": 5},
 )
-def delete_nuvio_watched_item(user_id, key):
-    """Delete one watched item from Nuvio by content key. Idempotent on retry."""
+def delete_nuvio_watched_item(user_id, keys, progress_keys=None):
+    """Delete watched + progress key variants from Nuvio. Idempotent on retry."""
     user = get_user_model().objects.get(id=user_id)
     if not user.nuvio_sync_mark_unplayed_enabled:
         return
-    if not isinstance(key, dict) or not key.get("content_id"):
+    if isinstance(keys, dict):
+        keys = [keys]
+    if not isinstance(keys, list):
         return
-    nuvio.NuvioClient(user.nuvio_account).delete_watched_items([key])
-
-
+    payload = [
+        key for key in keys if isinstance(key, dict) and key.get("content_id")
+    ]
+    client = nuvio.NuvioClient(user.nuvio_account)
+    if payload:
+        client.delete_watched_items(payload)
+    if isinstance(progress_keys, str):
+        progress_keys = [progress_keys]
+    if isinstance(progress_keys, list) and progress_keys:
+        client.delete_watch_progress(
+            [key for key in progress_keys if isinstance(key, str) and key],
+        )
 @shared_task(name="Import from Trakt")
 def import_trakt(
     user_id,

@@ -400,6 +400,18 @@ class NuvioClient:
             },
         )
 
+    def delete_watch_progress(self, progress_keys):
+        """Delete continue-watching progress rows by progress_key. Safe to retry."""
+        if not progress_keys:
+            return
+        self._rpc(
+            "sync_delete_watch_progress",
+            {
+                "p_profile_id": self._profile_id,
+                "p_keys": list(progress_keys),
+            },
+        )
+
     def _rpc(self, name, body):
         try:
             return self._request(f"/rest/v1/rpc/{name}", body)
