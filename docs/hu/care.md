@@ -4,14 +4,14 @@
 
 ## Frissítés
 
-Töltse le a legújabb konténerképet, majd hozza létre újra a futó konténert:
+Töltsd le a legújabb konténerképet, majd hozd létre újra a futó konténert:
 
 ```bash
 docker compose pull
 docker compose up -d
 ```
 
-Az indítás során a rendszer önműködően elvégzi a szükséges adatbázis-migrációkat. Mivel a `db` mappa a kiszolgálógépen helyezkedik el, egy új konténerkép alkalmazása nem érinti a gyűjtemény már meglévő adatait.
+Az indítás során a rendszer önműködően elvégzi a szükséges adatbázis-migrációkat. Mivel a `db` mappa a kiszolgálógépeden helyezkedik el, egy új konténerkép alkalmazása nem érinti a gyűjteményed már meglévő adatait.
 
 A hivatalos, folyamatosan frissülő konténerkép a `ghcr.io/aicon/mediatrail:latest`. A számozott verziócímkék mindvégig az adott kiadás változatlan állapotát rögzítik.
 
@@ -23,10 +23,10 @@ Amennyiben ugyanez a hibaüzenet körülbelül 45 másodpercenként folyamatosan
 
 ## Biztonsági mentés és visszaállítás
 
-Állítsa le a futó konténert, majd készítsen másolatot a `db` mappáról. Ez a biztonsági mentés tartalmazza a SQLite adatbázisállományt és a Redis állapotmentését is. A helyreállítás fordított sorrendben történik: helyezze vissza a mentett mappát az eredeti helyére, majd indítsa el a konténert. A SQLite adatbázisfájl futás közbeni másolása csonka vagy sérült fájlt eredményezhet, a konténer előzetes leállítása ezt a kockázatot küszöböli ki.
+Állítsd le a futó konténert, majd készíts másolatot a `db` mappáról. Ez a biztonsági mentés tartalmazza a SQLite adatbázisállományt és a Redis állapotmentését is. A helyreállítás fordított sorrendben történik: helyezd vissza a mentett mappát az eredeti helyére, majd indítsd el a konténert. A SQLite adatbázisfájl futás közbeni másolása csonka vagy sérült fájlt eredményezhet, a konténer előzetes leállítása ezt a kockázatot küszöböli ki.
 
-A `SECRET` környezeti változó értéke nem ebben a mappában tárolódik. A visszaállított gyűjtemény zökkenőmentes használatához – a meglévő bejelentkezési munkamenetek és a titkosított Nuvio-jelszavak megőrzése érdekében – pontosan ugyanazt a `SECRET` értéket kell biztosítani. Ha a titkosítási kulcs megváltozik, a felhasználóknak újra be kell jelentkezniük, és az elmentett Nuvio-jelszót ismételten meg kell adni.
+A `SECRET` környezeti változó értéke nem ebben a mappában tárolódik. A visszaállított gyűjtemény zökkenőmentes használatához – a meglévő bejelentkezési munkamenetek és a titkosított Nuvio-jelszavak megőrzése érdekében – pontosan ugyanazt a `SECRET` értéket kell biztosítanod. Ha a titkosítási kulcs megváltozik, a felhasználóknak újra be kell lépniük, és a mentett Nuvio-jelszót ismét be kell írniuk.
 
 ## A forráskód közzététele
 
-Nyilvánosan elérhető rendszer üzemeltetése esetén a `MEDIATRAIL_SOURCE_URL` változónak a futó verziót felépítő pontos forráskód `http` vagy `https` címére kell mutatnia. Az oldal lábléce és a `/source/` hivatkozás erre a forrásra mutat. A változó értékét kizárólag szigorúan magáncélú, zárt környezetben futtatott példányok esetén szabad üresen hagyni.
+Nyilvánosan elérhető rendszer üzemeltetése esetén a `MEDIATRAIL_SOURCE_URL` változónak a futó verziót felépítő pontos forráskód `http` vagy `https` címére kell mutatnia. Az oldal lábléce és a `/source/` hivatkozás erre a forrásra mutat. A változó értékét kizárólag szigorúan magáncélú, zárt környezetben futtatott példányok esetén szabad üresen hagynod.
