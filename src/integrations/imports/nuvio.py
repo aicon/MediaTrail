@@ -842,12 +842,23 @@ class NuvioImporter:
 
         nuvio_id = record["nuvio_id"]
         if nuvio_id and nuvio_id in self._permanent:
+            logger.info(
+                "Nuvio skip permanent id=%s content_id=%s operation=%s",
+                nuvio_id,
+                row.get("content_id"),
+                record["operation"],
+            )
             return True
         if record["source"] == "imdb":
             mapped = self._map_imdb(record)
             if mapped is False:
                 return False
             if mapped is None:
+                logger.info(
+                    "Nuvio skip unmapped IMDb content_id=%s operation=%s",
+                    row.get("content_id"),
+                    record["operation"],
+                )
                 return True
             record = mapped
         if record["operation"] == "delete":
@@ -855,6 +866,13 @@ class NuvioImporter:
                 self._remember(nuvio_id)
                 return True
             if self.gate_upserts and self._is_echo(row):
+                logger.info(
+                    "Nuvio skip outbound-echo delete content_id=%s "
+                    "season=%s episode=%s",
+                    row.get("content_id"),
+                    row.get("season"),
+                    row.get("episode"),
+                )
                 self._remember(nuvio_id)
                 return True
             try:
@@ -893,6 +911,13 @@ class NuvioImporter:
             self._remember(nuvio_id)
             return True
         if self.gate_upserts and self._is_echo(row):
+            logger.info(
+                "Nuvio skip outbound-echo upsert content_id=%s "
+                "season=%s episode=%s",
+                row.get("content_id"),
+                row.get("season"),
+                row.get("episode"),
+            )
             self._remember(nuvio_id)
             return True
 

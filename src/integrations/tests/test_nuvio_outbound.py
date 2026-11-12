@@ -111,6 +111,55 @@ class NuvioOutboundTests(TestCase):
                 ],
             )
 
+    def test_pending_upsert_does_not_block_inbound_delete(self):
+        """A recent watched push must not suppress a Nuvio unwatch for the same title."""
+        self.user.nuvio_sync_mark_played_enabled = True
+        self.user.nuvio_sync_mark_unplayed_enabled = True
+        self.user.save(
+            update_fields=[
+                "nuvio_sync_mark_played_enabled",
+                "nuvio_sync_mark_unplayed_enabled",
+            ],
+        )
+        with patch("integrations.tasks.push_nuvio_watched_item.delay"):
+            nuvio_outbound.enqueue_watched_upsert(self.user, self.movie)
+        delete_row = {
+            "operation": "delete",
+            "content_id": "tmdb:550",
+            "content_type": "movie",
+            "title": "Fight Club",
+        }
+        self.assertFalse(nuvio_outbound.is_pending_outbound(self.user.id, delete_row))
+        upsert_row = {
+            "operation": "upsert",
+            "content_id": "tmdb:550",
+            "content_type": "movie",
+            "title": "Fight Club",
+            "watched_at": 1_711_600_000_000,
+        }
+        self.assertTrue(nuvio_outbound.is_pending_outbound(self.user.id, upsert_row))
+
+    def test_pending_delete_does_not_block_inbound_upsert(self):
+        self.user.nuvio_sync_mark_unplayed_enabled = True
+        self.user.save(update_fields=["nuvio_sync_mark_unplayed_enabled"])
+        with patch("integrations.tasks.delete_nuvio_watched_item.delay"):
+            nuvio_outbound.enqueue_watched_delete(self.user, self.movie)
+        upsert_row = {
+            "operation": "upsert",
+            "content_id": "tmdb:550",
+            "content_type": "movie",
+            "title": "Fight Club",
+            "watched_at": 1_711_600_000_000,
+        }
+        self.assertFalse(nuvio_outbound.is_pending_outbound(self.user.id, upsert_row))
+        delete_row = {
+            "operation": "delete",
+            "content_id": "tmdb:550",
+            "content_type": "movie",
+            "title": "Fight Club",
+        }
+        self.assertTrue(nuvio_outbound.is_pending_outbound(self.user.id, delete_row))
+
     def test_client_push_handles_204(self):
         from integrations.imports import nuvio
 

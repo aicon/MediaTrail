@@ -28,7 +28,10 @@ def enqueue_watched_upsert(user, media):
     if not items:
         return
     for item in items:
-        _mark_pending(user.id, item)
+        # Upsert and delete echoes must not share a key: a recent push must not
+        # suppress an inbound unwatch for the same title.
+        _clear_pending(user.id, item, operation="delete")
+        _mark_pending(user.id, item, operation="upsert")
     logger.info(
         "Queue Nuvio watched push for %s (%s)",
         items[0].get("title"),
@@ -50,7 +53,8 @@ def enqueue_watched_delete(user, media):
         return
     progress_keys = _progress_keys_from_delete_keys(keys)
     for key in keys:
-        _mark_pending(user.id, key)
+        _clear_pending(user.id, key, operation="upsert")
+        _mark_pending(user.id, key, operation="delete")
     logger.info(
         "Queue Nuvio watched delete keys %s progress %s",
         ", ".join(_identity_from_payload(key) or "?" for key in keys),
@@ -62,8 +66,11 @@ def enqueue_watched_delete(user, media):
 
 
 def is_pending_outbound(user_id, row):
-    """True when this delta row matches a recent outbound push/delete."""
-    key = _cache_key(user_id, _identity_from_row(row))
+    """True when this delta row matches a recent outbound of the same operation."""
+    operation = str(row.get("operation") or "upsert").lower()
+    if operation not in {"upsert", "delete"}:
+        operation = "upsert"
+    key = _cache_key(user_id, _identity_from_row(row), operation=operation)
     return bool(key and cache.get(key))
 
 
@@ -207,11 +214,18 @@ def _watched_at_ms(end_date):
     return int(end_date.timestamp() * 1000)
 
 
-def _mark_pending(user_id, payload):
+def _mark_pending(user_id, payload, *, operation):
     identity = _identity_from_payload(payload)
-    key = _cache_key(user_id, identity)
+    key = _cache_key(user_id, identity, operation=operation)
     if key:
         cache.set(key, True, OUTBOUND_TTL_SECONDS)
+
+
+def _clear_pending(user_id, payload, *, operation):
+    identity = _identity_from_payload(payload)
+    key = _cache_key(user_id, identity, operation=operation)
+    if key:
+        cache.delete(key)
 
 
 def _identity_from_payload(payload):
@@ -241,7 +255,8 @@ def _identity_from_row(row):
         return content_id
 
 
-def _cache_key(user_id, identity):
+def _cache_key(user_id, identity, *, operation):
     if not identity:
         return None
-    return f"nuvio_outbound:{user_id}:{identity}"
+    op = "delete" if operation == "delete" else "upsert"
+    return f"nuvio_outbound:{user_id}:{op}:{identity}"
