@@ -614,6 +614,81 @@ class NuvioImportTests(TestCase):
         self.account.refresh_from_db()
         self.assertEqual(self.account.cursor, 5)
 
+    def test_delta_batch_replay_is_idempotent_after_partial_failure(self):
+        """At-least-once: replay a batch where event 1 already applied before failure.
+
+        First event upserts a new title, second delete fails; on retry the upsert
+        must not duplicate and the delete must still apply once.
+        """
+        self.user.nuvio_sync_mark_unplayed_enabled = True
+        self.user.save(update_fields=["nuvio_sync_mark_unplayed_enabled"])
+        self._run(
+            FakeNuvio(
+                [_history("tmdb:550", "movie", "Fight Club", nuvio_id="m1")],
+                cursor=5,
+            ),
+        )
+        batch = FakeNuvio(
+            history=[_history("tmdb:550", "movie", "Fight Club", nuvio_id="m1")],
+            delta=[
+                {
+                    "event_id": 11,
+                    "operation": "upsert",
+                    "id": "m2",
+                    "content_id": "tmdb:551",
+                    "content_type": "movie",
+                    "title": "Other",
+                    "watched_at": WATCHED_AT,
+                },
+                {
+                    "event_id": 12,
+                    "operation": "delete",
+                    "id": "m1-delete",
+                    "content_id": "tmdb:550",
+                    "content_type": "movie",
+                    "title": "Fight Club",
+                },
+            ],
+            cursor=99,
+        )
+        original_apply = nuvio.NuvioImporter._apply
+
+        def fail_delete_once(importer, row, *, operation, event_id):
+            if event_id == 12:
+                return False
+            return original_apply(
+                importer, row, operation=operation, event_id=event_id,
+            )
+
+        with patch.object(nuvio.NuvioImporter, "_apply", fail_delete_once):
+            with self.assertRaises(nuvio.MediaImportError):
+                self._run(batch)
+
+        self.account.refresh_from_db()
+        self.assertEqual(self.account.cursor, 5)
+        self.assertEqual(
+            Movie.objects.filter(user=self.user, item__media_id="551").count(),
+            1,
+        )
+        self.assertTrue(
+            Movie.objects.filter(user=self.user, item__media_id="550").exists(),
+        )
+
+        counts, _warnings, removed = self._run(batch)
+        self.account.refresh_from_db()
+        self.assertEqual(self.account.cursor, 12)
+        # Upsert replayed without creating a second row.
+        self.assertEqual(
+            Movie.objects.filter(user=self.user, item__media_id="551").count(),
+            1,
+        )
+        self.assertFalse(
+            Movie.objects.filter(user=self.user, item__media_id="550").exists(),
+        )
+        self.assertEqual(Movie.objects.filter(user=self.user).count(), 1)
+        self.assertNotIn(MediaTypes.MOVIE.value, counts)
+        self.assertEqual(removed.get(MediaTypes.MOVIE.value), 1)
+
     def test_delta_cursor_advances_when_all_events_succeed(self):
         self._run(
             FakeNuvio(
