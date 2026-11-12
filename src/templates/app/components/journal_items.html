@@ -5,7 +5,7 @@
     <div data-journal-day="{{ day.day_iso }}"
          class="col-span-full flex items-center gap-3 pt-3 first:pt-0">
       <h2 class="shrink-0 text-sm font-semibold text-gray-300">{{ day.label }}</h2>
-      <div class="journal-day-rule"></div>
+      <div class="h-px flex-1 bg-white/10"></div>
     </div>
   {% endif %}
   {% for entry in day.entries %}
@@ -13,7 +13,8 @@
              data-journal-entry-day="{{ day.day_iso }}"
              x-data="{ confirmOpen: false }"
              class="group relative flex gap-4 bg-[#2a2f35] rounded-xl p-3 ring-1 ring-white/5 hover:ring-indigo-500/40 hover:bg-[#30363d] transition-all duration-200">
-      <a href="{{ entry.item|media_url }}" class="relative shrink-0">
+      {# self-start: keep the absolute badge anchored to the poster, not the stretched card height #}
+      <a href="{{ entry.item|media_url }}" class="relative block shrink-0 self-start">
         {% if entry.item.image and entry.item.image != IMG_NONE %}
           <img alt="{{ entry.item.title }}"
                class="w-30 aspect-2/3 rounded-lg object-cover bg-[#3e454d] shadow-md group-hover:opacity-90 transition-opacity"

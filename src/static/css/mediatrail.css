@@ -5,6 +5,7 @@
   --color-sky-500: oklch(68.5% 0.169 237.323);
   --color-yellow-500: oklch(79.5% 0.184 86.047);
   --color-slate-500: oklch(55.4% 0.046 257.417);
+  --color-white: #fff;
 }
 
 .col-span-full {
@@ -15,8 +16,42 @@
   width: calc(var(--spacing) * 30);
 }
 
+.w-3\.5 {
+  width: calc(var(--spacing) * 3.5);
+}
+
+.h-3\.5 {
+  height: calc(var(--spacing) * 3.5);
+}
+
+.-bottom-1\.5 {
+  bottom: calc(var(--spacing) * -1.5);
+}
+
+.-right-1\.5 {
+  right: calc(var(--spacing) * -1.5);
+}
+
+.self-start {
+  align-self: flex-start;
+}
+
+.self-end {
+  align-self: flex-end;
+}
+
 .rounded-xl {
   border-radius: var(--radius-xl);
+}
+
+.bg-white\/10 {
+  background-color: color-mix(in srgb, #fff 10%, transparent);
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+  .bg-white\/10 {
+    background-color: color-mix(in oklab, var(--color-white) 10%, transparent);
+  }
 }
 
 .bg-emerald-500 {
@@ -45,40 +80,6 @@
 
 .bg-slate-500 {
   background-color: var(--color-slate-500);
-}
-
-/* Journal day header rule (Yamtrack: h-px flex-1 bg-white/10). */
-.journal-day-rule {
-  height: 1px;
-  flex: 1 1 0%;
-  background-color: rgb(255 255 255 / 0.1);
-}
-
-/*
- * Journal activity badge on the poster corner.
- * Sized/placed to match the Yamtrack reference screenshot (smaller + higher
- * than Tailwind's w-6 / -bottom-1.5 defaults when posters use w-30).
- */
-.journal-badge {
-  position: absolute;
-  bottom: -0.15rem;
-  right: -0.15rem;
-  width: 1.15rem;
-  height: 1.15rem;
-  border-radius: 9999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow:
-    0 0 0 2px #2a2f35,
-    0 2px 4px rgb(0 0 0 / 0.35);
-  z-index: 1;
-}
-
-.journal-badge-icon {
-  width: 0.7rem;
-  height: 0.7rem;
-  flex-shrink: 0;
 }
 
 @media (width >= 64rem) {
