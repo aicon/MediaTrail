@@ -4,7 +4,7 @@
 
 A self-hosted personal media tracker and digital logbook for everything you watch, read, and play.
 
-[![Release](https://img.shields.io/badge/version-0.25.27-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Release](https://img.shields.io/badge/version-0.25.28-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Documentation](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/)
@@ -22,13 +22,15 @@ MediaTrail originates as an independent fork of [Yamtrack](https://github.com/Fu
 
 - **A record for every title:** Movies, TV shows, anime, manga, video games, books, comics, and board games. Save a score, status, and progress, count repeats, set start and end dates, and write notes.
 - **Seasons and complete rewatch history:** Follow each season independently. An episode can keep several watch records, each with its own timestamp and note. Movies and TV series stay cleanly separated.
+- **Journal activity feed:** Browse day-by-day what you watched, read, or played, with posters, status badges, and relative timestamps.
+- **Richer statistics:** Desktop summary cards in one row, chart labels in your language, plus In Progress, % Rated, and consumption breakdowns.
 - **Detailed change logs:** Keep track of the steps themselves: when an item was added, when you started watching/reading it, and when you completed or rewatched it.
 - **Manual custom entries:** Add custom entries when none of the supported online databases lists a title.
 - **Collaborative lists:** Build personal lists for any purpose and invite other accounts to collaborate.
 - **Upcoming releases & calendar:** Keep an eye on upcoming releases with an exportable iCalendar (`.ics`) link and automated Apprise notifications (Discord, Telegram, ntfy, Slack, email, etc.).
 - **Multi-user with separate libraries:** Each user manages an isolated library. Authenticate locally or via social/OIDC providers (Google, GitHub, Discord) through django-allauth.
 - **English and Hungarian localization:** Switch interface languages per user account. Metadata from TMDB follows `TMDB_LANG`.
-- **Imports, including Nuvio:** Import profiles directly from Nuvio (add missing items or update existing ones) with encrypted credentials and scheduling. Automated sync is also available for Trakt, SIMKL, MyAnimeList, AniList, and Kitsu. Export/import your full library via CSV, or bring in data from IMDb, Goodreads, Steam, and HowLongToBeat.
+- **Imports, including Nuvio:** Import profiles directly from Nuvio (add missing items or update existing ones) with encrypted credentials and scheduling. Automated sync is also available for Trakt, SIMKL, MyAnimeList, AniList, and Kitsu. Import a Trakt website export ZIP with validation and preview. Export/import your full library via CSV, or bring in data from IMDb, Goodreads, Steam, and HowLongToBeat.
 - **Built-in Playback Scrobbler (Nuvio & Media Servers):** MediaTrail includes a native Stremio-protocol addon endpoint that captures playback events from companion apps without requiring a separate scrobbler container. Displays live "Now Watching" strips on your dashboard and automatically records completions. Jellyfin, Plex, and Emby can also scrobble via webhooks.
 - **Preview REST API:** Full REST API at `/api/v1/`, OpenAPI schema at `/api/schema/`, and interactive Swagger documentation at `/api/docs/`. Written reference: [API.md](API.md) ([magyar](API_HU.md)).
 - **Self-contained single container:** Ready-to-run Docker Compose image with embedded Redis. All data stays inside a single mounted directory.
@@ -129,7 +131,7 @@ MediaTrail is an independent, unofficial fork and is **not affiliated with, main
 ### Background
 MediaTrail diverged from Yamtrack `dev` post-`v0.25.3` (specifically the July 12, 2026 tabbed detail view), incorporating PR `#1378` (REST API preview) and PR `#1608` (Episode history).
 
-When upstream Yamtrack adopted the `0.26` architecture, MediaTrail intentionally remained on the `0.25.x` foundation to prioritize stability, self-contained deployment, and specific integrations. Upstream changes such as the rewritten log page, statistical reworks, and Trakt zip imports were deliberately omitted.
+MediaTrail continues on the `0.25.x` line to prioritize stability, self-contained deployment, and its own integrations (Nuvio, journal, statistics, and import tools).
 
 | Feature | Upstream Yamtrack (Stable) | MediaTrail |
 | :--- | :---: | :---: |

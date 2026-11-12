@@ -4,7 +4,7 @@
 
 Önállóan üzemeltethető személyes médiakatalógus és digitális krónika mindarról, amit megnézel, elolvasol vagy végigjátszol.
 
-[![Verzió](https://img.shields.io/badge/verzió-0.25.27-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Verzió](https://img.shields.io/badge/verzió-0.25.28-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![Licenc: AGPL v3](https://img.shields.io/badge/Licenc-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Dokumentáció](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/hu/)
@@ -22,13 +22,15 @@ A projekt a [Yamtrack](https://github.com/FuzzyGrim/Yamtrack) független leágaz
 
 - **Minden műnek saját lapja van:** Filmek, sorozatok, animék, mangák, videojátékok, könyvek, képregények és társasjátékok. Rögzíthetsz személyes értékelést, megtekintési állapotot, előrehaladást, számlálhatod az ismétléseket, megadhatsz kezdő- és záródátumot, valamint egyéni jegyzeteket fűzhetsz hozzájuk.
 - **Évadok és teljes újranézési előzmények:** Az évadokat egymástól függetlenül követheted nyomon. Egyetlen epizódhoz több önálló megtekintési bejegyzést is fűzhetsz, mindegyikhez saját időbélyeggel és jegyzettel. A filmek és sorozatok áttekinthetően elkülönülnek egymástól.
+- **Napló (Journal):** Napról napra átnézheted, mit néztél, olvastál vagy játszottál — poszterekkel, állapotjelzőkkel és relatív időbélyegekkel.
+- **Részletesebb statisztikák:** Asztali nézetben egy sorban az összefoglaló kártyák, a diagramfeliratok a választott nyelven, plusz Folyamatban, Értékelt arány és fogyasztási bontás.
 - **Részletes műveletnapló:** Lépésről lépésre visszakövetheted az eseményeket: mikor adtál hozzá egy tételt a gyűjteményedhez, mikor kezdted el nézni vagy olvasni, és mikor értél a végére vagy kezdted elölről.
 - **Egyéni tételek kézi rögzítése:** Tetszés szerint felvehetsz egyedi bejegyzéseket akkor is, ha az online katalógusok egyike sem ismeri az adott művet.
 - **Együttműködés és megosztott listák:** Bármilyen célra létrehozhatsz tematikus listákat, és a szerkesztésbe bevonhatod a szerver többi felhasználóját is.
 - **Közelgő megjelenések és naptár:** Mindig szem előtt tarthatod a várható bemutatókat a külső alkalmazásokba exportálható iCalendar (`.ics`) hivatkozás és az automatikus Apprise-értesítések (Discord, Telegram, ntfy, Slack, e-mail stb.) segítségével.
 - **Több felhasználó, teljesen elkülönülő gyűjtemények:** Minden felhasználó saját, elszeparált médiatárat kezel. A belépés történhet helyi jelszóval vagy közösségi / OIDC azonosítóval (Google, GitHub, Discord) a django-allauth modulon keresztül.
 - **Magyar és angol kezelőfelület:** A kívánt nyelvet fiókonként külön-külön megválaszthatod a Beállításokban. A TMDB-ből érkező leírások nyelve a `TMDB_LANG` környezeti változóval határozható meg.
-- **Előzmények importálása, Nuvio-integrációval:** Beemelheted a profilodat közvetlenül a Nuvióból (akár csak az új tételek hozzáadásával, akár a meglévők frissítésével), titkosított hitelesítő adatokkal és automatikus ütemezéssel. A szinkronizáció elérhető a Trakt, SIMKL, MyAnimeList, AniList és Kitsu rendszerekkel is. A teljes gyűjteményedet bármikor exportálhatod vagy importálhatod CSV formátumban, emellett feldolgozhatók az IMDb, Goodreads, Steam és HowLongToBeat listái is.
+- **Előzmények importálása, Nuvio-integrációval:** Beemelheted a profilodat közvetlenül a Nuvióból (akár csak az új tételek hozzáadásával, akár a meglévők frissítésével), titkosított hitelesítő adatokkal és automatikus ütemezéssel. A szinkronizáció elérhető a Trakt, SIMKL, MyAnimeList, AniList és Kitsu rendszerekkel is. A Trakt webexport ZIP is importálható ellenőrzéssel és előnézettel. A teljes gyűjteményedet bármikor exportálhatod vagy importálhatod CSV formátumban, emellett feldolgozhatók az IMDb, Goodreads, Steam és HowLongToBeat listái is.
 - **Beépített lejátszáskövető (Scrobbler Nuvio és médiaszerverek számára):** A MediaTrail közvetlenül magában foglalja a Stremio protokollját támogató kiegészítő-végpontot, amely külső segédkonténer nélkül fogadja a lejátszási eseményeket a támogatott társalkalmazásokból. Élő „Most nézem” sávokat jelenít meg a kezdőlapon, és a megtekintés végén automatikusan rögzíti a befejezést. A Jellyfin, Plex és Emby szerverek webhookokon keresztül csatlakoztathatók.
 - **Korszerű REST API (előzetes változat):** Teljes értékű REST API a `/api/v1/`, OpenAPI séma a `/api/schema/`, és interaktív Swagger dokumentáció a `/api/docs/` címen. Részletes útmutató: [API_HU.md](API_HU.md) ([English](API.md)).
 - **Egyetlen, önálló konténer:** Azonnal futtatható Docker Compose konfiguráció beépített Redis-kiszolgálóval. Minden adat egyetlen csatolt mappában (`db`) marad a szervereden.
@@ -129,7 +131,7 @@ A MediaTrail egy független, nem hivatalos leágazás; **nem áll kapcsolatban a
 ### Háttér és célkitűzések
 A MediaTrail fejlesztése a Yamtrack `dev` ágából indult a `v0.25.3` kiadást követően (konkrétan a 2026. július 12-i, fülekkel ellátott részletes adatlap állapotából), beépítve a `#1378`-as számú REST API előzetest és a `#1608`-as epizód-előzménykezelést.
 
-Amikor az eredeti projekt áttért a `0.26`-os architektúrára, a MediaTrail szándékosan a bevált `0.25.x` alapokon maradt, a stabilitást, az önálló üzemeltethetőséget és a saját fejlesztésű integrációkat (például a Nuvio-támogatást) helyezve előtérbe. Az upstream projekt későbbi változtatásai – így az átírt naplózási felület, a statisztikák átdolgozása és a Trakt zip-fájlos import – szándékosan kimaradtak.
+A MediaTrail a `0.25.x` vonalon folytatódik, a stabilitást, az önálló üzemeltethetőséget és a saját integrációkat (Nuvio, napló, statisztikák, importeszközök) helyezve előtérbe.
 
 | Funkció | Eredeti Yamtrack (Stabil) | MediaTrail |
 | :--- | :---: | :---: |
