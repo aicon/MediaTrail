@@ -2,36 +2,36 @@
 
 [English](../library.md)
 
-A kezdőlap és az oldalsáv a könyvtár. A filmeknek, a sorozatoknak, az évadoknak és a többi típusnak külön listája van. A lista keresője annak a személynek a bejegyzéseiben keres.
+A gyűjtemény a kezdőlapon és az oldalsávon keresztül érhető el. A filmek, sorozatok, évadok és egyéb médiatípusok mind saját listával rendelkeznek. A listák keresőmezője a bejelentkezett felhasználó saját tételei között böngészik.
 
-Lejátszás vagy szünet közben a kezdőlap tetején **„Most nézem”** sávok lehetnek — eszközönként egy (telefon, minden tévé külön). A sávon a cím, az epizód, a már megnézett rész, a hátralévő idő és egy átnevezhető eszköznév látszik. Egy eszköz stopja vagy elvetése a többit nem törli. Ha a társalkalmazás `stop` eseményt küld, és a haladás legalább **90%**, a MediaTrail addon egy befejezett megtekintést ment. A kép a magyar felület.
+Lejátszás vagy szüneteltetés közben a kezdőlap tetején megjelennek a dinamikus **„Most nézem”** sávok – minden kapcsolódó eszközhöz (telefonhoz vagy különálló televízióhoz) egy-egy önálló sáv. A panelen látható a mű címe, az epizód száma, a megtekintett hányad, a hátralévő idő, valamint a tetszés szerint átnevezhető eszköznév. Ha egy adott eszközön leállítjuk a lejátszást vagy elrejtjük a sávot, az a többi készülék kijelzését nem érinti. Amikor a társalkalmazás leállítási (`stop`) eseményt küld, és az előrehaladás elérte a legalább **90%**-ot, a MediaTrail kiegészítője automatikusan egy befejezett megtekintést rögzít a naplóba. Az alábbi illusztráción a magyar nyelvű kezelőfelület látható.
 
 ![A Most nézem sáv a kezdőlapon](../screenshots/now-watching-desktop2.png)
 
-A MediaTrail addon címét a Beállítások → Integrációk → Nuvio alól add hozzá minden [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) vagy [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) klienshez. Részletek: [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md). A kétirányú megtekintési-előzmény szinkron (megnézett / nem megtekintett) ugyanezen az Integrációk oldalon kapcsolható; lásd: [Import → Nuvio](imports.md#nuvio).
+A MediaTrail kiegészítő hivatkozása a Beállítások → Integrációk → Nuvio menüpontból másolható ki, amelyet valamennyi [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) és [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) kliensben hozzá kell adni a bővítményekhez. Részletes tájékoztató: [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md). A kétirányú megtekintési-előzmény szinkron (megnézett / nem megtekintett) ugyanezen az Integrációk oldalon kapcsolható; lásd: [Import → Nuvio](imports.md#nuvio).
 
-Egy cím megnyitása a katalógus adatait és a követő űrlapot mutatja. Az állapot, a pontszám, a haladás, a kezdő és záró dátum, valamint a jegyzet ehhez a bejegyzéshez tartozik. Egy befejezett cím újrakezdése új kört ír a történetbe. A sorozat szülő: az évadok és az epizódok külön sorok, ezért egy epizód bejelölése nem írja felül az egész műsort.
+Egy mű adatlapját megnyitva a külső katalógus adatai és a naplózási űrlap jelenik meg. A bejegyzéshez rögzíthető az aktuális állapot, a személyes értékelés, a megtekintés előrehaladása, a kezdeti és befejezési dátum, valamint egyéni megjegyzés. Amennyiben egy korábban befejezett művet újra megtekintünk vagy újraolvasunk, a rendszer újabb bejegyzést fűz a megtekintési előzményekhez. A sorozatok hierarchikus felépítésűek: az évadok és az epizódok különálló tételként szerepelnek a rendszerben, így egyetlen rész megtekintésének rögzítése nem írja felül a teljes műsort.
 
-## Nyelv
+## Kezelőfelület és metaadatok nyelve
 
-A Beállításokban van a felület nyelve, angol vagy magyar. A fiókhoz van mentve. A külső katalógusok szövege attól a nyelvtől függ, amelyen a program a katalógust kérdezi. A `TMDB_LANG` a filmek és a sorozatok metaadatának nyelve. Lásd a [Környezet](runtime.md) oldalt.
+A Beállításokban adható meg a felület kívánt nyelve (magyar vagy angol), amely a felhasználói fiókhoz kötődve tárolódik. A külső katalógusokból beemelt leírások nyelve attól függ, hogy a kiszolgálót milyen nyelvi paraméterrel kérdezi le a rendszer. A filmek és sorozatok leírásának nyelvét a `TMDB_LANG` környezeti változó határozza meg (lásd a [Környezet](runtime.md) fejezetet).
 
-## Egyéni bejegyzés
+## Egyéni bejegyzések
 
-Van olyan cím, amely egyik katalógusban sincs. Az oldalsáv **Egyéni bejegyzés** pontja kézzel hoz létre egyet: típus, cím, és ha van, kép címe. Utána ugyanúgy követhető, mint a többi tétel.
+Előfordulhat, hogy egy keresett mű nem szerepel az elérhető online katalógusokban. Az oldalsávban található **Egyéni bejegyzés** menüpont révén bármilyen tétel kézzel is rögzíthető: megadható a típus, a cím és igény szerint egy borítókép hivatkozása is. Ezt követően a bejegyzés éppúgy kezelhető és naplózható, mint bármely más katalógustétel.
 
-## Listák
+## Egyéni listák
 
-A listákat te nevezed el. Egy listán keveredhetnek a típusok, és ugyanazon a MediaTrailen egy másik fiók is dolgozhat rajta. A kereső és a rendezés a lista oldalán van.
+A listák tetszőlegesen elnevezhető, tematikus gyűjtemények. Egyetlen listán belül különböző típusú művek is vegyíthetők, sőt, a szerkesztésbe ugyanazon a szerveren lévő más felhasználói fiókok is bevonhatók. A listán belüli keresés és a rendezési szempontok az adott lista oldalán érhetők el.
 
 ## Naptár
 
-A naptár a könyvtár közelgő megjelenéseit gyűjti. Az oldalon lévő exportlink egy másik naptárprogram privát címe. Benne van a személyes token. Ha a Beállításokban új tokent kérsz, a régi link megszűnik, és vele a lejátszók azok a webhookjai is, amelyek ugyanezt a tokent használják.
+A naptár a gyűjteményben szereplő tételek közelgő megjelenési dátumait foglalja össze. Az oldalon található exportálási hivatkozás révén a naptár privát forrásként beilleszthető bármilyen külső naptárprogramba. Ez a hivatkozás a személyes hitelesítési tokent tartalmazza; amennyiben a Beállításokban új tokent generál, a régi hivatkozás érvényét veszti, és a korábbi tokennel működő médialejátszó webhookok beállítását is frissíteni kell.
 
 ## Statisztika
 
-A statisztika az állapotokat, a tevékenységet és a kiválasztott időszakot foglalja össze, a mától a teljes előzményig. A feliratok a felület nyelvét követik.
+A statisztikai áttekintés összegzi az állapotok megoszlását, a naplózási aktivitást és a választott időszak eredményeit, a mai naptól kezdve egészen a kezdetekig visszamenően. A diagramok feliratai a felület választott nyelvét követik.
 
 ## Értesítések
 
-A Beállítások, majd az Értesítések oldal soronként egy Apprise-címet vár. A megjelenési emlékeztetők és a napi összesítő ezekre a címekre megy. Az oldalon lévő súgó megmondja, milyen címformát fogad el az Apprise.
+A Beállítások menüpont Értesítések oldalán soronként egy-egy Apprise-cím adható meg. A megjelenési emlékeztetők és a napi összesítők ezekre az értesítési végpontokra érkeznek. Az oldalon található segédlet részletesen felsorolja az Apprise által elfogadott formátumokat.

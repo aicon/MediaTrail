@@ -1,76 +1,78 @@
-# Import
+# Importálás
 
 [English](../imports.md)
 
-A Beállítások, majd az Adatimport oldal viszi be a külső előzményt a könyvtár soraiba. A lap tetején két választás minden forrásra vonatkozik:
+A külső szolgáltatásokból származó megtekintési előzmények a Beállítások felületén, az Adatimport menüpont alatt emelhetők be a gyűjteménybe. Az oldal tetején található két működési mód valamennyi adatforrásra érvényes:
 
-- A **csak az új elemek** azt veszi fel, ami helyben hiányzik, és a meglévő sorokat békén hagyja.
-- Az **új elemek és a meglévők felülírása** a már meglévő sor megtekintési dátumát is frissíti. A pontszám és a jegyzet megmarad. Törlés nincs.
+- **Csak az új elemek:** kizárólag azokat a tételeket rögzíti, amelyek még hiányoznak a helyi adatbázisból; a meglévő bejegyzéseket változatlanul hagyja.
+- **Új elemek és a meglévők felülírása:** a hiányzó elemek felvétele mellett a már meglévő tételek megtekintési dátumát is frissíti a forrás adatai alapján. A személyes pontszámok és feljegyzések mindvégig megmaradnak, és a folyamat egyetlen sort sem töröl.
 
-A gyakoriság lehet egyszeri, vagy ismétlődés a kiválasztott órától. Az ismétlés addig fut, amíg az aktív ütemezett importok közül ki nem veszed. A fájlfeltöltés nem ismételhető. A felhasználónév és a mentett belépés igen.
+Az importálás indítható egyszeri alkalommal, vagy ütemezhető a megadott időponttól kezdődő rendszeres ismétlődéssel. Az ütemezett feladat mindaddig periodikusan lefut, amíg el nem távolítja az aktív időzített importok közül. A fájlfeltöltéssel járó import kizárólag egyszer futtatható le, míg a felhasználónévhez vagy elmentett bejelentkezéshez kötött források ütemezhetők.
 
-A források alatti történet az elmúlt hét napot mutatja. A „most fut” állapotú feladat még dolgozik. A lezárt feladat felsorolhatja azokat a sorokat is, amelyeket kihagyott.
+A források alatt elhelyezkedő előzménytár az elmúlt hét nap feladatait sorolja fel. A folyamatban lévő feladatoknál külön állapotjelzés látható; a sikeresen lezárult feladatok részletes összegzésében pedig megtekinthetők azok a tételek is, amelyeket a rendszer figyelmen kívül hagyott.
 
 ## Nuvio
 
-A Nuvio az első forrás. Egy Nuvio-profil filmjeit és epizódjait olvassa. Az opcionális **kétirányú, interaktív megtekintési-előzmény szinkron** a Beállítások → Integrációk → Nuvio alatt kapcsolható (lásd lent). Az élő **„Most nézem”** sáv más út: a beépített MediaTrail addon a társalkalmazások `player` eseményeit kapja, eszközönkénti azonosítóval. Az előzményimport és a megtekintési-előzmény szinkron ezeket a sávokat nem írja felül. Lásd a [Könyvtár](library.md) oldalt és a [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md) leírást.
+Az elsődleges adatforrás a Nuvio, amely közvetlenül egy kiválasztott Nuvio-profilhoz tartozó filmeket és epizódokat olvassa be. A kétirányú előzményszinkronizáció a Beállítások → Integrációk → Nuvio menüpontban tetszés szerint engedélyezhető: a megtekintett, illetve a még nem látott jelölések átvétele helyben érvényesíti a Nuvio változásait, míg a MediaTrailben végzett bejegyzések vagy törlések automatikusan a megfelelő szinkronizációs hívásokat (`sync_push_watched_items` / `sync_delete_watched_items`) indítják el.
 
-A bejelentkezési adatok, a kurzor és az importált sorok a bejelentkezett MediaTrail-felhasználóhoz tartoznak (`NuvioAccount` fiókonként egy). Ugyanazon a MediaTrailen egy másik felhasználónak külön Nuvio-belépése és könyvtára van.
+A társalkalmazásokból érkező valós idejű **„Most nézem”** sáv működése ettől elkülönül: a MediaTrail beépített kiegészítője közvetlenül az eszközökhöz kötött lejátszási eseményeket fogadja. Az előzmények importálása ezeket az élő sávokat nem érinti. Erről bővebben a [Könyvtár](library.md) fejezetben és a [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md) leírásban olvashat.
 
-Az űrlap a Nuvio e-mailt, a jelszót és a profil számát kéri. Az első sikeres küldés titkosítva menti őket a MediaTrail-fiókodhoz. Legközelebb az e-mail és a profil ki van töltve. A jelszómezőt üresen hagyva a mentett jelszó marad. Új jelszót csak akkor írj be, ha cserélni akarod. Más e-mail vagy más profil elölről kezdi ennek a fióknak az importkurzort.
+A bejelentkezési adatok, az importálási mutatók (kurzor) és a beemelt sorok szigorúan az adott MediaTrail-felhasználóhoz tartoznak (minden fiókhoz egyetlen `NuvioAccount` rendelhető). Ha ugyanazon a szerveren több felhasználó is tevékenykedik, mindegyikük önálló Nuvio-fiókkal és független gyűjteménnyel rendelkezik.
 
-Egy futás ezt csinálja:
+Az űrlap a Nuvio-fiókhoz tartozó e-mail-címet, a jelszót és a kívánt profilszámot kéri. Az első sikeres hitelesítést követően a rendszer ezeket titkosítva tárolja a MediaTrail-fiókhoz. A következő látogatáskor az e-mail-cím és a profilszám már előre kitöltve jelenik meg; a jelszómezőt üresen hagyva a rendszer a már elmentett jelszót használja. Új jelszót csak akkor szükséges megadni, ha meg kívánja változtatni azt. Egy másik e-mail-cím vagy eltérő profilszám megadása az importálási kurzor elölről kezdését eredményezi.
 
-- A könyvtárban nem lévő film befejezettként kerül be, a Nuvio megtekintési idejével.
-- A könyvtárban nem lévő epizód ugyanígy. Az évad és a sorozat létrejön, ha még nincs meg.
-- „Csak az új elemek” mellett a már meglévő film vagy epizód változatlan marad, az általad javított dátummal együtt.
-- Felülírásnál a meglévő film, vagy az epizód legutóbbi sora megkapja a Nuvio idejét. A sor többi mezője marad.
-- Ha egy epizódot a MediaTrailben kiveszel, a Nuvio pedig még őrzi a megtekintést, a következő import visszateszi. A „csak az új elemek” a helyben hiányzót jelenti, akkor is, ha az az esemény egyszer már bejött.
-- Az a sorozatsor, amelyen nincs évadszám vagy nincs epizódszám, kimarad, és megjegyződik, hogy a későbbi futások ne jelentsék újra.
-- A Nuvio törlési eseményét a program figyelmen kívül hagyja, kivéve ha a **Nem megtekintett jelölés szinkronizálása** be van kapcsolva (lásd a kétirányú szinkront lent).
+Az importálás során a rendszer az alábbi szabályok szerint jár el:
 
-A profilszám a Nuvio profilja, nem egy MediaTrail-felhasználó. A legtöbb fióknak egy profilja van, az 1-es.
+- A gyűjteményben még nem szereplő filmeket befejezettként veszi fel, a Nuvióban rögzített megtekintési időponttal.
+- A hiányzó epizódok ugyanígy kerülnek be; amennyiben a hozzájuk tartozó évad vagy sorozat még nem létezik, a rendszer automatikusan létrehozza azokat.
+- A „Csak az új elemek” beállítás mellett a már meglévő filmek és epizódok változatlanok maradnak, megőrizve az Ön által korábban megadott egyedi dátumokat is.
+- A felülírási mód alkalmazásakor a már nyilvántartott filmek, illetve az epizódok legutóbbi megtekintési bejegyzései átveszik a Nuvio szerinti időpontot, a tétel többi adata azonban érintetlen marad.
+- Ha egy epizódot töröl a MediaTrail felületén, ám az a Nuvio előzményeiben továbbra is megtekintettként szerepel, a következő importálás ismét beemeli azt. A „Csak az új elemek” elve ugyanis a helyi hiányt pótolja, függetlenül attól, hogy a tétel korábban már szerepelt-e az adatbázisban.
+- Azok a sorozatelemek, amelyek nem tartalmaznak évad- vagy epizódszámot, kimaradnak; a rendszer feljegyzi ezeket, hogy a későbbi futások során ne jelezze őket ismételten hibaként.
+- A Nuvióban végzett törléseket a rendszer figyelmen kívül hagyja, kivéve, ha az Integrációk menüpontban bekapcsolta a **Nem megtekintett jelölés szinkronizálása** lehetőséget. Ekkor a művelet a helyi film- és epizód-előzményekből is eltávolítja a megfelelő tételt.
+
+A megadandó profilszám a Nuvio rendszerében érvényes profilra utal, nem a MediaTrail-fiókra. A fiókok többsége egyetlen, 1-es azonosítójú profillal rendelkezik.
 
 ### Kétirányú interaktív szinkron
 
-Ez a Jellyfin-szerű „megnézett / nem megtekintett” jelölést köti össze a Nuvio Cloud megtekintési előzménye és a MediaTrail film-/epizódsorai között. Nem távoli szüneteltetés, és nem a „Most nézem” scrobble.
+Ez a Jellyfin-szerű „megnézett / nem megtekintett” jelölést köti össze a Nuvio Cloud megtekintési előzménye és a MediaTrail film-, illetve epizódbejegyzései között. Nem távoli szüneteltetés, és nem azonos a „Most nézem” scrobble-lel.
 
-Kapcsolók: **Beállítások → Integrációk → Nuvio**:
+A kapcsolók a **Beállítások → Integrációk → Nuvio** oldalon találhatók:
 
 | Kapcsoló | Nuvio → MediaTrail | MediaTrail → Nuvio |
 | --- | --- | --- |
-| **Megnézett jelölés szinkronizálása** | Upsert az előzményimportból és a megtekintési-előzmény deltából | `sync_push_watched_items` sorba állítása, ha helyben megtekintettnek jelölsz |
-| **Nem megtekintett jelölés szinkronizálása** | Delta-törlések alkalmazása; teljes, sikeres history snapshot után a Nuvióban már nem lévő, korábban szinkronizált helyi megtekintések is törlődhetnek | `sync_delete_watched_items` (és a hozzá tartozó watch-progress kulcsok) sorba állítása nem megtekintett jelölésnél vagy előzménytörlésnél |
+| **Megnézett jelölés szinkronizálása** | Upsert az előzményimportból és a megtekintési-előzmény deltából | `sync_push_watched_items` sorba állítása, ha helyben megtekintettnek jelöl |
+| **Nem megtekintett jelölés szinkronizálása** | Delta-törlések alkalmazása; teljes, sikeres history-snapshot után a Nuvióban már nem lévő, korábban szinkronizált helyi megtekintések is törlődhetnek | `sync_delete_watched_items` (és a kapcsolódó watch-progress kulcsok) sorba állítása nem megtekintett jelölésnél vagy előzménytörlésnél |
 
-Ha bármelyik kapcsoló be van kapcsolva, a MediaTrail rövid időközönként lekéri a Nuvio deltát is, így az interaktív változások kézi import nélkül is megjelennek. A kézi Adatimport → Nuvio továbbra is teljes előzmény-ellenőrzést futtat, majd a deltát.
+Ha bármelyik kapcsoló aktív, a MediaTrail rövid időközönként lekéri a Nuvio deltát is, így az interaktív változások kézi import nélkül is megjelenhetnek. A kézi Adatimport → Nuvio továbbra is teljes előzmény-ellenőrzést futtat, majd a deltát.
 
-A nem megtekintett / snapshot-összevetés szabályai:
+A nem megtekintett jelölés / snapshot-összevetés szabályai:
 
 - Azonosítók összehasonlítás előtt TMDB megtekintési kulcsra egységesülnek (`tmdb:…` és IMDb `tt…` ugyanarra a címre egynek számít).
-- Snapshot-reconcile csak akkor fut, ha minden history-oldal megjött, és minden TMDB-re várható sor feloldódott. Köztes API- vagy alkalmazási hiba nem indít törlést.
+- Snapshot-reconcile csak akkor fut, ha minden history-oldal megérkezett, és minden TMDB-re várható sor feloldódott. Köztes API- vagy alkalmazási hiba nem indít törlést.
 - Snapshotból csak a korábban Nuvióból szinkronizált megtekintések törölhetők. A Trakt, kézi vagy más forrású helyi megtekintések megmaradnak.
 - A mentett delta-kurzor csak akkor lép előre, ha az adott futás minden eseménye sikeresen alkalmazódott. Hibánál a kurzor a futás elején marad, a következő futás újra megpróbálja a batch-et (at-least-once; az upsert és a törlés idempotens).
 - A tárolt Nuvio megtekintési-kulcs készlet csak a teljes, sikeres importút után frissül.
 
-## További források
+## További adatforrások
 
-Ezek ugyanazt a módot és gyakoriságot használják.
+Az egyéb források ugyanazokat a működési módokat és ütemezési lehetőségeket használják.
 
-| Forrás | Amit megadsz | Megjegyzés |
+| Forrás | Szükséges adatok | Megjegyzések |
 | --- | --- | --- |
-| Trakt | Nyilvános felhasználónév, vagy gomb a zárt profilhoz | A zárt profilhoz saját Trakt-alkalmazás azonosítója és titka kell. Lásd a [Környezet](runtime.md) oldalt. |
-| Simkl | Kapcsolódás gombbal | A zárt importhoz saját Simkl-azonosító és titok kell, ha a beépített klienst cseréled. |
+| Trakt | Nyilvános felhasználónév, vagy közvetlen összekapcsolás | Zárt profil esetén saját Trakt-alkalmazás kliensazonosítója és titkos kulcsa szükséges (lásd a [Környezet](runtime.md) fejezetet). |
+| Simkl | Közvetlen összekapcsolás gombbal | Saját alkalmazás használata esetén külön Simkl-azonosító és titkos kulcs szükséges a beépített kliens felülbírálásához. |
 | MyAnimeList | Nyilvános felhasználónév | |
-| AniList | Nyilvános felhasználónév, vagy kapcsolódás gombbal | A zárt profilhoz saját AniList-alkalmazás kell. |
-| Kitsu | A profilcímben lévő szám | |
-| Steam | A 64 bites Steam-azonosító | A profilnak nyilvánosnak kell lennie, kivéve ha a Steam-kulcs ehhez a fiókhoz tartozik. |
-| MediaTrail-mentés | CSV a Beállítások, majd az Adatexport oldalról | Csak egyszeri. |
-| HowLongToBeat | CSV-export | Csak egyszeri. Játékok. |
-| IMDb | Értékelés-CSV | Csak egyszeri. |
-| Goodreads | Könyvtárexport | Csak egyszeri. Könyvek. |
+| AniList | Nyilvános felhasználónév, vagy közvetlen összekapcsolás | Zárt profil eléréséhez saját AniList-alkalmazás regisztrációja szükséges. |
+| Kitsu | A profil hivatkozásában szereplő numerikus azonosító | |
+| Steam | A 64 bites Steam-azonosító | A profilnak nyilvánosnak kell lennie, kivéve, ha az API-kulcs közvetlenül az adott fiókhoz tartozik. |
+| MediaTrail biztonsági mentés | A Beállítások → Adatexport menüből származó CSV-fájl | Kizárólag egyszeri importként használható. |
+| HowLongToBeat | CSV-exportfájl | Kizárólag egyszeri importként, videojátékokhoz használható. |
+| IMDb | Értékeléseket tartalmazó CSV-fájl | Kizárólag egyszeri importként használható. |
+| Goodreads | Gyűjteményexport CSV-formátumban | Kizárólag egyszeri importként, könyvekhez használható. |
 
-A párosítás azokkal a katalógusazonosítókkal megy, amelyeket a MediaTrail eleve tárol. A katalógusban ismeretlen cím a lezárt feladatban jelenik meg, és nem jön létre helyette kitalált sor.
+A tételek párosítása azoknak a katalógusazonosítóknak az alapján történik, amelyeket a MediaTrail alapértelmezés szerint nyilvántart. Ha egy cím a katalógusokban nem azonosítható, az a feladat összegzésében jelenik meg, és a rendszer nem hoz létre hozzá pontatlan, fiktív bejegyzést.
 
-## Lejátszók
+## Médialejátszók
 
-A Jellyfin, a Plex és az Emby webhookkal szólhat a MediaTrailnek a lejátszásról. A Beállítások, majd az Integrációk oldal mutatja mindegyik címét. A címben benne van a token. A kattintások listája magán az oldalon van. Új token kérése után a cím megváltozik.
+A Jellyfin, a Plex és az Emby szerverek webhookokon keresztül képesek értesíteni a MediaTrailt a lejátszási eseményekről. A Beállítások → Integrációk oldalon valamennyi támogatott lejátszóhoz megtalálható a hozzárendelt webhook-cím, amely magában foglalja a személyes hitelesítési tokent is. Az oldalon lépésről lépésre követhető útmutató található a lejátszók beállításához. Amennyiben a Beállításokban új személyes tokent igényel, ezek a webhook-címek is megváltoznak, így azokat a külső programokban is frissíteni szükséges.

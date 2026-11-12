@@ -1,70 +1,70 @@
-# Környezet
+# Környezet és konfiguráció
 
 [English](../runtime.md)
 
-Ezek a konténer környezeti változói. Nem a Beállítások oldal. A Compose-fájlban kell őket módosítani, utána a konténert újra kell létrehozni. Egy titok fájlútvonal is lehet: a `VALAMI_FILE` változó arra a fájlra mutat, amelynek a tartalma az érték. A Docker-titkok így olvashatók.
+Az alábbi paraméterek a konténer környezeti változói, amelyeket nem a webes Beállítások felületén, hanem a Docker Compose konfigurációban kell megadni, majd a konténert újra létrehozni. A bizalmas kulcsok és jelszavak fájlútvonalként is átadhatók: a `_FILE` végződésű változók (például `SECRET_FILE`) egy olyan fájlra mutatnak, amelynek tartalma adja meg a tényleges értéket – a Docker secrets mechanizmusa is ezen az elven működik.
 
-Ezek az értékek ne kerüljenek a kép építésébe. A kép a program. A kulcsok azon a gépen maradnak, amely futtatja.
+Ezeket az értékeket soha ne ágyazza be a lemezkép fordítási folyamatába. A konténerkép magát a programot testesíti meg, míg a hitelesítési kulcsok és titkok biztonságosan azon a kiszolgálón maradnak, amely a rendszert futtatja.
 
-## Amit általában be kell állítani
+## Gyakran használt alapbeállítások
 
-| Változó | Szerepe |
+| Változó | Szerepe és rendeltetése |
 | --- | --- |
-| `SECRET` | Munkamenet- és titkosítókulcs. Hosszú, véletlen érték, mielőtt az oldalt más is eléri. |
-| `TZ` | Időzóna neve, például `Europe/Budapest`. A megjelenített dátumok ezt használják. |
-| `URLS` | Nyilvános címek, vesszővel elválasztva, `http://` vagy `https://` előtaggal, záró perjel nélkül. Közvetítő mögött kötelező. |
-| `ALLOWED_HOSTS` | Azok a gépnevek, amelyekre az oldal válaszol. Az alapértelmezés `*`. Ha listát adsz meg, a `localhost` és a `127.0.0.1` akkor is hozzáadódik. |
-| `PUID` és `PGID` | A `db` könyvtár tulajdonosának felhasználója és csoportja. Az alapértelmezés `1000`. |
-| `MEDIATRAIL_SOURCE_URL` | A futó verzió pontos forrásának nyilvános `http` vagy `https` címe. Kötelező, ha mások is használják az oldalt. |
-| `REGISTRATION` | `True` esetén új fiók létrehozható. `False` lezárja a regisztrációs oldalt. |
-| `ADMIN_ENABLED` | `True` bekapcsolja a `/admin/` címet. Amíg nem állítod be, ki van kapcsolva. |
+| `SECRET` | A munkamenetek hitelesítésére és az adatok titkosítására szolgáló kulcs. Célszerű egy hosszú, véletlenszerű karaktersorozatot megadni, mielőtt az oldalt mások számára elérhetővé tenné. |
+| `TZ` | Az időzóna neve (például `Europe/Budapest`). A rendszer ebben az időzónában jeleníti meg a rögzített időpontokat. |
+| `URLS` | A rendszer nyilvános webcímei vesszővel elválasztva, a `http://` vagy `https://` előtaggal, záró perjel nélkül. Fordított proxy mögött kötelezően megadandó. |
+| `ALLOWED_HOSTS` | Azok a hosztnevek és domainek, amelyekre a szerver válaszol. Alapértelmezett értéke `*`. Egyedi lista megadásakor a `localhost` és a `127.0.0.1` automatikusan a listához adódik. |
+| `PUID` és `PGID` | A tárolt adatokat őrző `db` mappa tulajdonosi felhasználói és csoportazonosítója. Alapértelmezett értéke `1000`. |
+| `MEDIATRAIL_SOURCE_URL` | A futó változat pontos forráskódjának nyilvános `http` vagy `https` elérhetősége. Kötelező megadni, amennyiben az oldalt más felhasználók is elérik. |
+| `REGISTRATION` | `True` esetén a nyilvános regisztráció engedélyezett; a `False` érték lezárja a regisztrációs felületet. |
+| `ADMIN_ENABLED` | `True` esetén elérhetővé teszi a `/admin/` felületet; alapértelmezés szerint biztonsági okokból ki van kapcsolva. |
 
-A `DEBUG` maradjon `False`, ha a gépet más is eléri.
+A `DEBUG` változó értéke nyilvánosan vagy több felhasználó által elérhető szerveren mindig maradjon `False`.
 
-## Adatbázis
+## Adatbázis-beállítások
 
-Adatbázis-gép nélkül a MediaTrail SQLite-ot használ, a csatolt adatkönyvtár `db/db.sqlite3` fájljában. A képben lévő Redis a fájlját a `db/redis` alatt tartja.
+Külön adatbázis-kiszolgáló hiányában a MediaTrail a beépített SQLite adatbázist használja, amely a csatolt adatkönyvtárban, a `db/db.sqlite3` fájlban tárolódik. A konténerben futó Redis a saját perzisztens fájljait a `db/redis` mappa alatt őrzi.
 
-A `DB_HOST` beállítása PostgreSQL-re vált. Mellé kell a `DB_PORT`, a `DB_NAME`, a `DB_USER` és a `DB_PASSWORD`. A `DB_SSL_MODE` és a `DB_SSL_CERT_MODE` nem kötelező, és a PostgreSQL saját elnevezését használja erre a két kapcsolati beállításra.
+A `DB_HOST` változó beállításával a rendszer PostgreSQL adatbázisra vált. Ebben az esetben a `DB_PORT`, `DB_NAME`, `DB_USER` és `DB_PASSWORD` értékeket is meg kell adni. A `DB_SSL_MODE` és `DB_SSL_CERT_MODE` beállítások nem kötelezők, és a PostgreSQL hivatalos kapcsolati elnevezéseit követik.
 
-A `REDIS_URL` alapból a képben lévő Redis, `redis://127.0.0.1:6379`. Csak akkor állítsd, ha szándékosan másik Redisre mutatsz. A `CELERY_REDIS_URL` külön felülírja a háttérfeladat közvetítőjét. A `REDIS_PREFIX` a gyorsítótár kulcsait előtagozza, ha két alkalmazás egy Redist használ.
+A `REDIS_URL` alapértelmezés szerint a konténerbe épített Redisre mutat (`redis://127.0.0.1:6379`). Ezt kizárólag akkor szükséges felülbírálni, ha szándékosan egy külső Redis-kiszolgálót szeretne használni. A `CELERY_REDIS_URL` önállóan képes felülírni a háttérfeladatokat kezelő üzenetsor közvetítőjét. A `REDIS_PREFIX` segítségével előtag adható a gyorsítótár-kulcsoknak, amennyiben több alkalmazás osztozik egyazon Redis-példányon.
 
-## Katalóguskulcsok
+## Katalógusok API-kulcsai
 
-A film, a sorozat, az anime, a játék, a könyv, a képregény és a társasjáték keresése a programban lévő klienskulcsokkal működik. Kulcsot akkor cserélj, ha saját keretet akarsz, vagy ha a szolgáltató ezt kéri. Ha egy kulcsot nem adsz meg, a beépített kliens marad. Kulcsot ne másolj a képbe, és ebbe a könyvbe se.
+A filmek, sorozatok, animék, videojátékok, könyvek, képregények és társasjátékok keresése alapértelmezés szerint a programba épített klienskulcsokkal történik. Kulcscserére akkor lehet szükség, ha saját lekérdezési kvótát szeretne fenntartani, vagy ha a szolgáltató ezt előírja. Ha egy változót üresen hagy, a beépített kliens marad érvényben. Saját kulcsait soha ne illessze be se a konténerképbe, se ebbe a kézikönyvbe.
 
 | Változó | Szolgáltató |
 | --- | --- |
-| `TMDB_API` | Filmek és sorozatok. A `TMDB_LANG` a metaadat nyelve, alapból `en`. A `TMDB_NSFW` `True` értéknél a felnőtt találatokat is kéri. |
-| `TVDB_API` | További sorozatadatok. |
-| `MAL_API` | MyAnimeList. A `MAL_NSFW` `True` értéknél a felnőtt találatokat is kéri. |
-| `IGDB_ID` és `IGDB_SECRET` | Játékok. Az `IGDB_NSFW` `True` értéknél. |
-| `STEAM_API_KEY` | Steam-áruházi adatok. Beépített kulcs nincs. |
-| `HARDCOVER_API` | Könyvek. Az értéknek a `Bearer` szóval és egy szóközzel kell kezdődnie. |
-| `COMICVINE_API` | Képregények. |
-| `BGG_API_TOKEN` | Társasjátékok. |
-| `TRAKT_API` és `TRAKT_API_SECRET` | Saját Trakt-alkalmazás a jelenlegi zárt importhoz, vagy saját kerethez. |
-| `TRAKT_API_PKCE` | Új Trakt-alkalmazás Client ID-ja. Ezek az alkalmazások nem adnak titkot. Az importoldal ezt kínálja eszközkódos belépésként. Az ingyenes Trakt-fiók csak két alkalmazást enged bekötni. |
-| `ANILIST_ID` és `ANILIST_SECRET` | Saját AniList-alkalmazás, zárt importhoz. |
-| `SIMKL_ID` és `SIMKL_SECRET` | Saját Simkl-alkalmazás. |
+| `TMDB_API` | Filmek és sorozatok metaadatai. A `TMDB_LANG` a leírások nyelvét határozza meg (alapértelmezése `en`). A `TMDB_NSFW` értéke `True` esetén a felnőtt besorolású találatokat is megjeleníti. |
+| `TVDB_API` | Kiegészítő metaadatok televíziós sorozatokhoz. |
+| `MAL_API` | MyAnimeList adatok. A `MAL_NSFW` értéke `True` esetén a felnőtt tartalmakat is lekéri. |
+| `IGDB_ID` és `IGDB_SECRET` | Videojátékok metaadatai. Az `IGDB_NSFW` a felnőtt tartalmak engedélyezésére szolgál. |
+| `STEAM_API_KEY` | A Steam áruházból származó adatok (beépített kulcs nem áll rendelkezésre). |
+| `HARDCOVER_API` | Könyvek metaadatai. Az értéknek a `Bearer ` előtaggal és egy szóközzel kell kezdődnie. |
+| `COMICVINE_API` | Képregények adatai. |
+| `BGG_API_TOKEN` | BoardGameGeek társasjáték-adatok. |
+| `TRAKT_API` és `TRAKT_API_SECRET` | Saját Trakt-alkalmazás zárt profilok importálásához vagy saját lekérdezési kerethez. |
+| `TRAKT_API_PKCE` | Új típusú Trakt-alkalmazás ügyfélazonosítója (Client ID). Az ilyen alkalmazások nem igényelnek titkos kulcsot; az importáló oldal ezt eszközkódos belépésként kínálja fel. Az ingyenes Trakt-fiókok legfeljebb két csatlakoztatott alkalmazást engedélyeznek. |
+| `ANILIST_ID` és `ANILIST_SECRET` | Saját AniList-alkalmazás zárt profilok eléréséhez. |
+| `SIMKL_ID` és `SIMKL_SECRET` | Saját Simkl-alkalmazás beállításai. |
 
-A `MU_NSFW` a MangaUpdates felnőtt tartalmának kapcsolója.
+A `MU_NSFW` a MangaUpdates felnőtt tartalmú szűrőjének kapcsolója.
 
-## Belépés másik oldalon keresztül
+## Külső fiókkal történő hitelesítés (SSO / OAuth)
 
-A `SOCIAL_PROVIDERS` a django-allauth szolgáltatómoduljainak vesszővel elválasztott listája, például `allauth.socialaccount.providers.github`. A `SOCIALACCOUNT_PROVIDERS` JSON-objektum: a szolgáltató kliensazonosítója, titka, és amit a szolgáltató dokumentációja még kér.
+A `SOCIAL_PROVIDERS` a django-allauth szolgáltatói moduljainak vesszővel elválasztott listája (például `allauth.socialaccount.providers.github`). A `SOCIALACCOUNT_PROVIDERS` egy JSON-objektum, amely az adott szolgáltatóhoz tartozó ügyfélazonosítót, titkos kulcsot és az egyéb szükséges paramétereket foglalja magában.
 
-A `SOCIALACCOUNT_ONLY` `True` értéke elrejti a jelszavas belépést. A `REDIRECT_LOGIN_TO_SSO` `True` értéke a belépőoldalt egyből a külső szolgáltatóhoz küldi.
+A `SOCIALACCOUNT_ONLY` változó `True` értékre állításával elrejthető a hagyományos jelszavas belépés. A `REDIRECT_LOGIN_TO_SSO=True` beállítás a bejelentkezési oldalt közvetlenül a külső hitelesítő szolgáltatóhoz irányítja át.
 
-A szolgáltatónál regisztrált visszairányítási cím a MediaTrail nyilvános címe, plusz az az útvonal, amelyet a szolgáltató vár. A `URLS` ugyanaz a cím legyen, különben a visszaút elutasításra kerül.
+A külső szolgáltatónál rögzített visszairányítási címnek a MediaTrail nyilvános domainjéből és a szolgáltató által elvárt végpontból kell állnia. A `URLS` változónak pontosan ezzel a nyilvános címmel kell megegyeznie, különben a hitelesítés után visszatérő kérést a rendszer érvénytelennek minősíti és elutasítja.
 
-## „Most nézem” idle időzítők
+## A „Most nézem” sáv inaktivitási időkorlátjai
 
-A társalkalmazások a beépített MediaTrail addonon keresztül hajtják az élő sávokat. Az elmaradt `stop` eseményeket ezek az opcionális felülírások takarítják (a legtöbb telepítésen a gyári érték elég):
+A társalkalmazások a beépített MediaTrail kiegészítőn keresztül frissítik az élő lejátszási sávokat. Az elmaradt leállítási (`stop`) események kezelésére az alábbi opcionális időkorlátok szolgálnak (a legtöbb környezetben a gyári értékek maradéktalanul megfelelnek):
 
-| Változó | Alapérték | Szerep |
+| Változó | Alapérték | Szerepe és feladata |
 | --- | --- | --- |
-| `LIVE_PLAYBACK_WATCHING_STALE_SECONDS` | `180` | A progress nélküli `watching` sáv ennyi idő után törlődik |
-| `LIVE_PLAYBACK_PAUSED_STALE_SECONDS` | `600` | A magára hagyott `paused` sáv ennyi idő után törlődik |
+| `LIVE_PLAYBACK_WATCHING_STALE_SECONDS` | `180` | Az előrehaladás nélküli, aktív lejátszású (`watching`) sáv ennyi másodperc inaktivitás után automatikusan törlődik. |
+| `LIVE_PLAYBACK_PAUSED_STALE_SECONDS` | `600` | A szüneteltetett állapotban hagyott (`paused`) sáv ennyi másodperc elteltével automatikusan törlődik. |
 
-Lásd: [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md).
+Részletes információk: [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md).

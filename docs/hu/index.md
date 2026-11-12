@@ -2,26 +2,26 @@
 
 [English](../index.md)
 
-A MediaTrail a saját naplód arról, amit megnézel, elolvasol vagy végigjátszol. Te futtatod. Mindenkinek külön könyvtára van: filmek, sorozatok, évadok, epizódok, anime, manga, játékok, könyvek, képregények és társasjátékok.
+A MediaTrail egy önállóan üzemeltethető, személyes napló mindarról, amit megnézünk, elolvasunk vagy végigjátszunk. A rendszerben minden felhasználó saját gyűjteménnyel rendelkezik: ide tartoznak a filmek, sorozatok, évadok és epizódok, valamint az animék, mangák, videojátékok, könyvek, képregények és társasjátékok is.
 
-Egy címen állapot, pontszám, haladás, dátumok és jegyzet lehet. A sorozat évadonként követhető, az epizódok külön megtekintést őriznek. A könyvtár mellett listák, naptár és statisztika van. A felület angol vagy magyar. A választás a Beállításokban van, és a bejelentkezett fiókra vonatkozik. Aki nincs bejelentkezve, angol felületet lát.
+Minden egyes műhöz rögzíthető az aktuális állapot, a személyes értékelés, a megtekintés vagy olvasás előrehaladása, a fontosabb dátumok és tetszőleges feljegyzések. A sorozatok évadonként követhetők nyomon, míg az epizódok önálló megtekintési előzményeket őriznek. A gyűjteményt egyéni listák, áttekinthető naptár és részletes statisztikai oldal teszi teljessé. A felület nyelve – angol vagy magyar – a Beállítások menüpontban tetszés szerint megválasztható, és a bejelentkezett fiókra érvényes. A be nem lépett látogatókat az alapértelmezett angol nyelvű felület fogadja.
 
-Ez a könyv a MediaTrail kézikönyve.
+Ez a kötet a MediaTrail átfogó kézikönyve.
 
-## Merre tovább
+## Fejezetek áttekintése
 
-- A [Telepítés](install.md) a konténerről, az adatkönyvtárról és az első indulásról szól.
-- A [Könyvtár](library.md) a követésről, a listákról, a naptárról, az egyéni bejegyzésről és a több eszközös „Most nézem” sávokról szól.
-- A [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md) az eszközönkénti sávokról, az addon eseményekről, az átnevezésről és az idle TTL-ekről szól.
-- Az [Import](imports.md) a már meglévő előzmény behozataláról szól, benne a Nuvióval és az opcionális kétirányú, interaktív megtekintési-előzmény szinkronnal.
-- A [Környezet](runtime.md) azokat a beállításokat írja le, amelyek a futtató gépen vannak, nem egy fiókban.
-- A [Fiókok](accounts.md) a belépésről, a regisztrációról és az adminfelületről szól.
-- A [Karbantartás](care.md) a frissítésről, a mentésről és az állapotvizsgálatról szól.
+- A [Telepítés](install.md) a konténer üzembe helyezését, az adattároló mappát és az első indítás lépéseit mutatja be.
+- A [Könyvtár](library.md) fejezet az élmények követéséről, a listák és a naptár kezeléséről, az egyéni tételek rögzítéséről, valamint a többeszközös „Most nézem” sávról nyújt tájékoztatást.
+- A [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md) az eszközönkénti lejátszási sávok működését, a kiegészítő eseményeit, az eszközök átnevezését és az inaktivitási időkorlátokat részletezi.
+- Az [Import](imports.md) fejezet a korábbi előzmények behozatalát ismerteti, kitérve a Nuvióra és az opcionális kétirányú, interaktív megtekintési-előzmény szinkronra is.
+- A [Környezet](runtime.md) leírása azokat a rendszerszintű beállításokat foglalja össze, amelyek nem az egyes fiókokhoz, hanem magához az üzemeltetőhöz tartoznak.
+- A [Fiókok](accounts.md) a bejelentkezés, az új felhasználók regisztrációja és az adminisztrációs felület működését mutatja be.
+- A [Karbantartás](care.md) a rendszer frissítésével, a biztonsági mentések készítésével és az állapotvizsgálattal kapcsolatos tudnivalókat tartalmazza.
 
-## Licenc
+## Licencfeltételek
 
-A MediaTrail szabad szoftver, a GNU Affero General Public License 3. változata alatt. A licenc szövege a tároló `LICENSE` fájlja.
+A MediaTrail szabad szoftver, amely a GNU Affero General Public License 3. változata alatt áll. A licenc teljes szövege a forráskódtár `LICENSE` fájljában található.
 
-Ha rajtad kívül más is használja a példányt a hálózaton, annak a pontos forráskódot is fel kell kínálni, amelyik verzió fut. Ennek a címét a `MEDIATRAIL_SOURCE_URL` változóba kell tenni. A saját gépen, zárt körben a változó üresen maradhat. A lábléc és a `/source/` oldal jelzi, ha az ajánlat hiányzik.
+Amennyiben a rendszert hálózaton keresztül más felhasználók számára is elérhetővé teszi, a licenc értelmében kötelező felajánlani számukra a futó verzió pontos forráskódját. Ezt a forráshivatkozást a `MEDIATRAIL_SOURCE_URL` környezeti változóban szükséges megadni. Ha a szolgáltatás kizárólag saját gépen, szigorúan zárt körben fut, a változó üresen hagyható. A lábléc és a `/source/` oldal világosan jelzi, amennyiben ez a közzétételi hivatkozás hiányzik.
 
-A MediaTrail önálló projekt. Nem áll kapcsolatban a Yamtrackkal, azt nem támogatja, és nem is annak a karbantartói gondozzák. A `NOTICE` rögzíti, hogy a program annak a szoftvernek a módosított változata, és hogy a szerzői jogi jelzések a forrásfában megmaradnak. Ez licenctény, nem második név erre a termékre.
+A MediaTrail önálló kezdeményezés: nem áll kapcsolatban a Yamtrack projekttel, nem élvezi annak hivatalos támogatását, és nem annak fejlesztői gondozzák. A `NOTICE` dokumentum rögzíti, hogy a szoftver az említett projekt módosított változataként jött létre, és az eredeti szerzői jogi megjegyzések a forrásfában mindvégig megmaradnak. Ez jogi és licencelési tény, nem pedig a termék alternatív elnevezése.

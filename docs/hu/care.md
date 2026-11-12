@@ -1,32 +1,32 @@
-# Karbantartás
+# Karbantartás és üzemeltetés
 
 [English](../care.md)
 
 ## Frissítés
 
-Húzd le a futtatott címkét, majd hozd létre újra a konténert:
+Töltse le a legújabb konténerképet, majd hozza létre újra a futó konténert:
 
 ```bash
 docker compose pull
 docker compose up -d
 ```
 
-Az indulás magától lefuttatja az adatbázis-migrációt. A `db` könyvtár a gépen marad, ezért az új kép nem üríti ki a könyvtárat.
+Az indítás során a rendszer önműködően elvégzi a szükséges adatbázis-migrációkat. Mivel a `db` mappa a kiszolgálógépen helyezkedik el, egy új konténerkép alkalmazása nem érinti a gyűjtemény már meglévő adatait.
 
-A `ghcr.io/aicon/mediatrail:latest` a lehívandó kép. A számozott címke annál a kiadásnál marad.
+A hivatalos, folyamatosan frissülő konténerkép a `ghcr.io/aicon/mediatrail:latest`. A számozott verziócímkék mindvégig az adott kiadás változatlan állapotát rögzítik.
 
-## Állapotvizsgálat
+## Állapotvizsgálat (Health check)
 
-A konténer saját magától kéri a `GET /health/` címet a 8000-es porton. Az első másodpercekben az alkalmazás még indulhat, és a naplóban megjelenhet a `connect() failed (111: Connection refused)` sor a `127.0.0.1:8001` címre. Ez az az egy sor, amikor a vizsgálat hamarabb érkezik, mint hogy az alkalmazás figyelne. A következő vizsgálatnak sikerülnie kell.
+A konténer belső rutinja rendszeresen lekérdezi a `GET /health/` végpontot a 8000-es porton. Az indulás legelső másodperceiben az alkalmazás inicializálása még tarthat, így a rendszernaplóban megjelenhet a `connect() failed (111: Connection refused)` bejegyzés a `127.0.0.1:8001` belső címre hivatkozva. Ez csupán azt jelzi, hogy az állapotellenőrzés egy pillanattal megelőzte a kiszolgáló felállását; a soron következő vizsgálatnak már zökkenőmentesen sikerülnie kell.
 
-Ha ugyanez a sor körülbelül 45 másodpercenként ismétlődik, az alkalmazás nem maradt fent. Az oka az utána következő, az alkalmazás folyamatából származó sorokban van.
+Amennyiben ugyanez a hibaüzenet körülbelül 45 másodpercenként folyamatosan ismétlődik, az alkalmazás nem tudott elindulni vagy váratlanul leállt. A hiba pontos okáról az azt követő, közvetlenül a főfolyamatból származó naplósorok nyújtanak részletes tájékoztatást.
 
-## Mentés
+## Biztonsági mentés és visszaállítás
 
-Állítsd le a konténert, és másold le a `db` könyvtárat. A másolatban benne van a SQLite-fájl és a Redis pillanatképe. A visszaállítás fordítva megy: tedd vissza a könyvtárat, majd indítsd a konténert. A SQLite-fájl másolása írás közben csonka fájlt adhat. A leállítás ezt elkerüli.
+Állítsa le a futó konténert, majd készítsen másolatot a `db` mappáról. Ez a biztonsági mentés tartalmazza a SQLite adatbázisállományt és a Redis állapotmentését is. A helyreállítás fordított sorrendben történik: helyezze vissza a mentett mappát az eredeti helyére, majd indítsa el a konténert. A SQLite adatbázisfájl futás közbeni másolása csonka vagy sérült fájlt eredményezhet, a konténer előzetes leállítása ezt a kockázatot küszöböli ki.
 
-A `SECRET` nincs ebben a könyvtárban. A visszaállított könyvtárhoz ugyanaz a `SECRET` kell, ha a meglévő munkameneteknek és a titkosított Nuvio-jelszónak működnie kell. Ha a titok megváltozik, mindenki újra belép, és a mentett Nuvio-jelszót egyszer újra be kell írni.
+A `SECRET` környezeti változó értéke nem ebben a mappában tárolódik. A visszaállított gyűjtemény zökkenőmentes használatához – a meglévő bejelentkezési munkamenetek és a titkosított Nuvio-jelszavak megőrzése érdekében – pontosan ugyanazt a `SECRET` értéket kell biztosítani. Ha a titkosítási kulcs megváltozik, a felhasználóknak újra be kell jelentkezniük, és az elmentett Nuvio-jelszót ismételten meg kell adni.
 
-## Forráskód felajánlása
+## A forráskód közzététele
 
-Nyilvános telepítésnél a `MEDIATRAIL_SOURCE_URL` a futó képet felépítő pontos forrás `http` vagy `https` címe. A lábléc ide mutat. A `/source/` ugyanez az ajánlat. Üresen hagyni csak zárt, saját példánynál szabad.
+Nyilvánosan elérhető rendszer üzemeltetése esetén a `MEDIATRAIL_SOURCE_URL` változónak a futó verziót felépítő pontos forráskód `http` vagy `https` címére kell mutatnia. Az oldal lábléce és a `/source/` hivatkozás erre a forrásra mutat. A változó értékét kizárólag szigorúan magáncélú, zárt környezetben futtatott példányok esetén szabad üresen hagyni.

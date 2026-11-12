@@ -2,13 +2,13 @@
 
 [English](../install.md)
 
-A MediaTrail egy konténerben fut. A webszerver, az alkalmazás, a háttérfeladat és a Redis mind ebben a képben van. Külön Redis-szolgáltatás nem kell.
+A MediaTrail egyetlen önálló konténerként fut. A webszerver, a főalkalmazás, a háttérfolyamatokat végző kiszolgáló és a beépített Redis egyaránt ebben a lemezképben kapott helyet, így nincs szükség különálló Redis-szolgáltatás beállítására.
 
-A használandó kép a `ghcr.io/aicon/mediatrail:latest`. A csomag zárt, ezért a gépnek olyan belépés kell, amely olvashatja a `ghcr.io/aicon/mediatrail` csomagot.
+A futtatandó konténerkép: `ghcr.io/aicon/mediatrail:latest`.
 
-## Compose
+## Docker Compose konfiguráció
 
-Mentsd el `docker-compose.yml` néven egy üres `db` könyvtár mellé:
+Hozza létre az alábbi `docker-compose.yml` állományt egy üresen létrehozott `db` mappa mellett:
 
 ```yaml
 services:
@@ -25,36 +25,36 @@ services:
       - ./db:/mediatrail/db
 ```
 
-A `SECRET` a munkameneteket és a titkosított értékeket írja alá. Cseréld le, mielőtt más is eléri az oldalt, és később csak akkor változtasd meg, ha mindenkit ki akarsz léptetni. A `TZ` az az időzóna, amelyben a tárolt időpont megjelenik.
+A `SECRET` kulcs a munkamenetek hitelesítésére és a bizalmas adatok titkosítására szolgál. Mindenképpen helyettesítse egy hosszú, véletlenszerű karaktersorozattal még azelőtt, hogy a felületet mások számára elérhetővé tenné. Ezt a kulcsot a későbbiekben csak akkor érdemes megváltoztatni, ha szándékosan minden aktív felhasználót ki kíván léptetni. A `TZ` változó határozza meg azt az időzónát, amely szerint a naplózott időpontok megjelennek.
 
-A gépen a `db` könyvtárban van a SQLite-adatbázis és a Redis tartós fájlja. A konténeren belül ez a `/mediatrail/db`. A csatolást így hagyd.
+A kiszolgálógép `db` mappája őrzi a SQLite-adatbázist és a Redis perzisztens állapotfájlját; ez a konténeren belül a `/mediatrail/db` útvonalnak felel meg. Ezt a kötetcsatolást változatlan formában érdemes hagyni.
 
-Indítás:
+Az indítás menete:
 
 ```bash
 docker compose up -d
 ```
 
-Nyisd meg a `http://localhost:8000` címet, és hozz létre fiókot. A regisztráció nyitva van, amíg le nem zárod. Erről a [Fiókok](accounts.md) oldal szól.
+Ezt követően nyissa meg a böngészőben a `http://localhost:8000` címet, és hozza létre az első felhasználói fiókot. A regisztráció alapértelmezés szerint nyitott, mindaddig, amíg le nem tiltja. Erről részletesebben a [Fiókok](accounts.md) fejezetben olvashat.
 
-Az élő „Most nézem” sávhoz a MediaTrailben nyisd meg a **Beállítások → Integrációk → Nuvio** oldalt, másold ki a bővítmény címét (benne van a fiók tokenje), add hozzá minden társalkalmazásban a **Beállítások → Bővítmények** alatt, és vedd ki a régi scrobbler vagy token nélküli MediaTrail URL-t. Részletek: [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md).
+A valós idejű „Most nézem” funkció használatához nyissa meg a MediaTrail felületén a **Beállítások → Integrációk → Nuvio** menüpontot, másolja ki a bővítmény egyedi hivatkozását (amely tartalmazza a fiók személyes hitelesítési tokenjét), majd adja hozzá a kapcsolódó alkalmazásokhoz a **Beállítások → Bővítmények** alatt. További részletek: [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md).
 
-Az indulás első másodperceiben az állapotvizsgálat egyszer elbukhat, mert az alkalmazás még nem figyel. Ha a következő vizsgálat sikerül, az indulás rendben lezajlott. Részletek a [Karbantartás](care.md) oldalon.
+Az elindulást követő első másodpercekben az automatikus állapotvizsgálat egyszer még hibát jelezhet, mivel az alkalmazás inicializálása éppen folyamatban van. Amennyiben a rá következő ellenőrzés sikeres, a rendszer indítása zökkenőmentesen befejeződött. További tudnivalók a [Karbantartás](care.md) oldalon találhatók.
 
-## Nyilvános cím
+## Nyilvános elérés és egyedi domainnév
 
-Ha egy közvetítő a MediaTrailt valódi névre teszi, a `URLS` értéke ez a cím, `http://` vagy `https://` előtaggal, perjel nélkül a végén:
+Amennyiben a MediaTrail fordított proxy (reverse proxy) mögött, saját domainnév alatt üzemel, a `URLS` változóban kell megadni ezt a nyilvános címet a `http://` vagy `https://` protokollal együtt, lezáró perjel nélkül:
 
 ```yaml
 URLS: https://mediatrail.example
 ```
 
-Több cím vesszővel választható el. A bejelentkezés és az import visszairányítása ezt fogadja el. Enélkül a közvetítő mögötti oldal elutasítja a saját űrlapjait.
+Több domain esetén a címeket vesszővel választhatja el. A bejelentkezés és az importálás átirányításai ezeket a címeket fogadják el hiteles forrásként. E konfiguráció hiányában a proxy mögé helyezett oldal elutasítja a beérkező űrlapokat.
 
-Ha ezen a nyilvános oldalon mások is használják a programot, a `MEDIATRAIL_SOURCE_URL` a futó verzió pontos forrásának nyilvános címe legyen. Lásd a [Kezdés](index.md) oldalt.
+Ha ezen a nyilvános címen más felhasználók is igénybe veszik a rendszert, a `MEDIATRAIL_SOURCE_URL` változónak a futó verziót felépítő pontos forráskód nyilvános elérésére kell mutatnia (lásd a [Kezdés](index.md) fejezetet).
 
-## Ebből a könyvtárból építve
+## Helyi forrásból történő fordítás
 
-A `docker-compose.local.yml` a helyi másolatot `mediatrail:local` néven építi. Ezt akkor használd, ha a programon dolgozol. Különben a fenti, közzétett kép a futtatandó.
+A tárolóban található `docker-compose.local.yml` állomány segítségével a helyi forráskódból építhető fel a `mediatrail:local` nevű konténerkép. Ezt kizárólag a forráskód módosítása és fejlesztése során célszerű használni, általános használatra a hivatalosan közzétett, kész konténerkép javasolt.
 
-A szolgáltatói kulcsok és a többi titok a Compose környezetében vagy egy helyi `.env` fájlban maradnak, és nem kerülnek a képbe. Ne add át őket a build argumentumaként.
+A külső szolgáltatókhoz tartozó API-kulcsokat és egyéb bizalmas adatokat a Compose futási környezetében vagy egy helyi `.env` fájlban tárolja, soha ne építse be őket a konténerképbe (ne adja át őket build argumentumként).
