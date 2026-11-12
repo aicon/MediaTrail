@@ -559,6 +559,7 @@ ANILIST_SECRET = config(
     ),
 )
 
+# AUTH V1 (deprecated; planned retirement ~April 2027). Kept for existing tokens.
 SIMKL_ID = config(
     "SIMKL_ID",
     default=secret(
@@ -571,6 +572,21 @@ SIMKL_SECRET = config(
     default=secret(
         "SIMKL_SECRET_FILE",
         "1b548a88ac7884a757cc58a552842913a9337f3cab3a4905836c6dc305dda316",
+    ),
+)
+# AUTH V2 (preferred for new connections). Separate app registration; never commit secrets.
+SIMKL_V2_ID = config(
+    "SIMKL_V2_ID",
+    default=secret(
+        "SIMKL_V2_ID_FILE",
+        "",
+    ),
+)
+SIMKL_V2_SECRET = config(
+    "SIMKL_V2_SECRET",
+    default=secret(
+        "SIMKL_V2_SECRET_FILE",
+        "",
     ),
 )
 

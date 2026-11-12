@@ -351,9 +351,13 @@ def import_trakt(
 
 
 @shared_task(name="Import from SIMKL")
-def import_simkl(token, user_id, mode, username=None):  # noqa: ARG001
-    """Celery task for importing media data from SIMKL."""
-    return import_media(simkl.importer, token, user_id, mode)
+def import_simkl(token, user_id, mode, username=None, auth="v1"):  # noqa: ARG001
+    """Celery task for importing media data from SIMKL.
+
+    ``auth=v2`` treats ``token`` as an encrypted refresh token.
+    ``auth=v1`` (default) keeps legacy encrypted access tokens working.
+    """
+    return import_media(simkl.importer, token, user_id, mode, auth=auth)
 
 
 @shared_task(name="Import from MyAnimeList")

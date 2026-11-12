@@ -61,7 +61,7 @@ These sources use the same mode and frequency controls.
 | Source | What you provide | Notes |
 | --- | --- | --- |
 | Trakt | A public username, private API login (browser PKCE on `auth.trakt.tv`, or device code), or a website export ZIP | Private login needs `TRAKT_API_PKCE` (modern Trakt app, no secret). Device code stays available for TVs and limited-input devices. The ZIP comes from Trakt → Settings → Export (max 50 MB). Corrupt or empty archives are rejected before the import starts. “Only new items” skips titles you already have. |
-| Simkl | A connect button | A private import needs your own Simkl id and secret if you replace the built-in client. |
+| Simkl | A connect button | New links use AUTH V2 when `SIMKL_V2_ID` is set (PKCE). Existing AUTH V1 tokens keep importing until Simkl retires V1 (~April 2027); set V2 and reconnect before then. |
 | MyAnimeList | A public username | |
 | AniList | A public username, or a connect button | A private profile needs your own AniList application. |
 | Kitsu | The numeric user id from the profile address | |

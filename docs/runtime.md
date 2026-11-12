@@ -47,7 +47,9 @@ Movie, series, anime, game, book, comic, and board-game lookups work with the cl
 | `TRAKT_API_SECRET` | Only needed to refresh older private-import schedules that still use the legacy client. New logins do not use it. |
 | `TRAKT_API_PKCE` | Client ID of a modern Trakt app (no secret). Used for browser PKCE login on `auth.trakt.tv` and for device-code login. Register the MediaTrail callback URL (`…/import/trakt/private`) on that app. A free Trakt account can connect only two applications. |
 | `ANILIST_ID` and `ANILIST_SECRET` | Your own AniList application, for a private import. |
-| `SIMKL_ID` and `SIMKL_SECRET` | Your own Simkl application. |
+| `SIMKL_ID` and `SIMKL_SECRET` | Simkl AUTH V1 app (deprecated; planned retirement ~April 2027). Still used for existing V1 tokens and as fallback when V2 is unset. |
+| `SIMKL_V2_ID` | Simkl AUTH V2 client id for new connections (PKCE). Register callback `…/import/simkl_private`. |
+| `SIMKL_V2_SECRET` | Optional V2 client secret for server-type apps. Never commit; prefer `*_FILE` mounts. |
 
 `MU_NSFW` is the adult-content switch for MangaUpdates.
 

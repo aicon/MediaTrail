@@ -92,7 +92,7 @@ class ImportSimkl(TestCase):
         self.assertEqual(imported_counts[MediaTypes.TV.value], 1)
         self.assertEqual(imported_counts[MediaTypes.MOVIE.value], 1)
         self.assertEqual(imported_counts[MediaTypes.ANIME.value], 1)
-        self.assertEqual(warnings, "")
+        self.assertEqual(warnings, simkl.SIMKL_V1_RETIRE_NOTE)
 
         tv_item = Item.objects.get(media_type=MediaTypes.TV.value)
         self.assertEqual(tv_item.title, "Breaking Bad")

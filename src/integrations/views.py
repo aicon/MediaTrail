@@ -360,23 +360,46 @@ def import_trakt_export(request):
 
 @require_POST
 def simkl_oauth(request):
-    """View for initiating the SIMKL OAuth2 authorization flow."""
+    """Start Simkl OAuth: AUTH V2 + PKCE when configured, else legacy V1."""
     redirect_uri = app_helpers.build_absolute_app_url(
         request,
         reverse("import_simkl_private"),
     )
-    url = "https://simkl.com/oauth/authorize"
-
     state = {
         "mode": request.POST["mode"],
         "frequency": request.POST["frequency"],
         "time": request.POST["time"],
+        "redirect_uri": redirect_uri,
     }
+
+    if simkl.v2_enabled():
+        code_verifier, code_challenge = simkl.make_pkce_pair()
+        state["code_verifier"] = code_verifier
+        state["auth"] = "v2"
+        state_token = secrets.token_urlsafe(32)
+        request.session[state_token] = state
+        return redirect(
+            f"{simkl.SIMKL_AUTHORIZE_URL}?{
+                urlencode(
+                    {
+                        'client_id': simkl.v2_client_id(),
+                        'redirect_uri': redirect_uri,
+                        'response_type': 'code',
+                        'scope': 'media:read media:write',
+                        'state': state_token,
+                        'code_challenge': code_challenge,
+                        'code_challenge_method': 'S256',
+                    }
+                )
+            }",
+        )
+
+    # Legacy AUTH V1 (deprecated; planned retirement ~April 2027).
+    state["auth"] = "v1"
     state_token = secrets.token_urlsafe(32)
     request.session[state_token] = state
-
     return redirect(
-        f"{url}?{
+        f"{simkl.SIMKL_V1_AUTHORIZE_URL}?{
             urlencode(
                 {
                     'client_id': settings.SIMKL_ID,
@@ -391,19 +414,55 @@ def simkl_oauth(request):
 
 @require_GET
 def import_simkl_private(request):
-    """View for getting the SIMKL OAuth2 token."""
-    oauth_callback = simkl.get_token(request)
-    enc_token = helpers.encrypt(oauth_callback["access_token"])
-    state_token = request.GET["state"]
+    """Handle Simkl OAuth callback and queue/schedule the import."""
+    state_token = request.GET.get("state")
+    state = request.session.pop(state_token, None) if state_token else None
+    if not state:
+        messages.error(request, "Invalid or expired Simkl authorization request.")
+        return redirect("import_data")
 
-    frequency = request.session[state_token]["frequency"]
-    mode = request.session[state_token]["mode"]
-    import_time = request.session[state_token]["time"]
+    code_verifier = state.pop("code_verifier", None)
+    if request.GET.get("error"):
+        messages.error(request, "Simkl authorization was cancelled or failed.")
+        return redirect("import_data")
+
+    if state.get("auth") == "v2":
+        iss = request.GET.get("iss")
+        if iss != simkl.SIMKL_ISSUER:
+            messages.error(request, "Simkl authorization response was rejected.")
+            return redirect("import_data")
+
+    redirect_uri = state.get("redirect_uri")
+    try:
+        oauth_callback = simkl.get_token(
+            request,
+            code_verifier=code_verifier,
+            redirect_uri=redirect_uri,
+        )
+    except helpers.MediaImportError as error:
+        messages.error(request, str(error))
+        return redirect("import_data")
+
+    auth = oauth_callback.get("auth") or state.get("auth") or "v1"
+    if auth == "v2":
+        enc_token = helpers.encrypt(oauth_callback["refresh_token"])
+    else:
+        enc_token = helpers.encrypt(oauth_callback["access_token"])
+
+    frequency = state["frequency"]
+    mode = state["mode"]
+    import_time = state["time"]
 
     if frequency == "once":
-        tasks.import_simkl.delay(token=enc_token, user_id=request.user.id, mode=mode)
+        tasks.import_simkl.delay(
+            token=enc_token,
+            user_id=request.user.id,
+            mode=mode,
+            auth=auth,
+        )
         messages.info(request, "The task to import media from Simkl has been queued.")
     else:
+        task_kwargs = {"auth": auth} if auth != "v1" else None
         helpers.create_import_schedule(
             oauth_callback["username"],
             request,
@@ -412,7 +471,16 @@ def import_simkl_private(request):
             import_time,
             "SIMKL",
             token=enc_token,
+            task_kwargs=task_kwargs,
         )
+        if auth == "v1":
+            messages.warning(
+                request,
+                _(
+                    "Simkl AUTH V1 is deprecated and planned for retirement around "
+                    "April 2027. Configure SIMKL_V2_ID and reconnect when ready."
+                ),
+            )
 
     return redirect("import_data")
 

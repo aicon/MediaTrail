@@ -47,7 +47,9 @@ A filmek, sorozatok, animék, videojátékok, könyvek, képregények és társa
 | `TRAKT_API_SECRET` | Csak a régi, secret-es ügyféllel létrehozott ütemezett importok tokenfrissítéséhez kell. Az új belépések nem használják. |
 | `TRAKT_API_PKCE` | Modern Trakt-alkalmazás ügyfélazonosítója (nincs secret). Böngészős PKCE-belépéshez (`auth.trakt.tv`) és eszközkódos belépéshez. Az alkalmazásnál állítsd be a MediaTrail callback URL-t (`…/import/trakt/private`). Az ingyenes Trakt-fiókok legfeljebb két csatlakoztatott alkalmazást engedélyeznek. |
 | `ANILIST_ID` és `ANILIST_SECRET` | Saját AniList-alkalmazás zárt profilok eléréséhez. |
-| `SIMKL_ID` és `SIMKL_SECRET` | Saját Simkl-alkalmazás beállításai. |
+| `SIMKL_ID` és `SIMKL_SECRET` | Simkl AUTH V1 alkalmazás (elavult; tervezett kivezetés ~2027. április). Meglévő V1 tokenekhez és V2 nélküli tartalékként. |
+| `SIMKL_V2_ID` | Simkl AUTH V2 ügyfélazonosító az új kapcsolásokhoz (PKCE). Callback: `…/import/simkl_private`. |
+| `SIMKL_V2_SECRET` | Opcionális V2 titok szerver-típusú alkalmazásokhoz. Ne kerüljön a repóba; inkább `*_FILE`. |
 
 A `MU_NSFW` a MangaUpdates felnőtt tartalmú szűrőjének kapcsolója.
 

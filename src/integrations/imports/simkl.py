@@ -1,4 +1,8 @@
+import base64
+import hashlib
+import json
 import logging
+import secrets
 from collections import defaultdict
 
 import requests
@@ -6,6 +10,7 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
+from django_celery_beat.models import PeriodicTask
 
 import app
 from app import helpers as app_helpers
@@ -16,15 +21,164 @@ from integrations.imports.helpers import MediaImportError, MediaImportUnexpected
 
 logger = logging.getLogger(__name__)
 
+SIMKL_API_BASE_URL = "https://api.simkl.com"
+SIMKL_AUTHORIZE_URL = "https://simkl.com/oauth2/authorize"
+SIMKL_V1_AUTHORIZE_URL = "https://simkl.com/oauth/authorize"
+SIMKL_TOKEN_URL = f"{SIMKL_API_BASE_URL}/oauth2/token"
+SIMKL_ISSUER = "https://simkl.com"
+SIMKL_V1_RETIRE_NOTE = (
+    "Simkl AUTH V1 is deprecated and planned for retirement around April 2027."
+)
 
-def get_token(request):
-    """View for getting the SIMKL OAuth2 token."""
-    code = request.GET["code"]
-    url = "https://api.simkl.com/oauth/token"
 
-    headers = {
-        "Content-Type": "application/json",
+def v2_client_id():
+    """Return the configured AUTH V2 client id, or empty if unset."""
+    return str(getattr(settings, "SIMKL_V2_ID", "") or "").strip()
+
+
+def v2_client_secret():
+    """Return the optional AUTH V2 client secret (server apps)."""
+    return str(getattr(settings, "SIMKL_V2_SECRET", "") or "").strip()
+
+
+def v2_enabled():
+    """True when new Simkl connections should use AUTH V2."""
+    return bool(v2_client_id())
+
+
+def make_pkce_pair():
+    """Return ``(code_verifier, code_challenge)`` for S256 PKCE."""
+    verifier = (
+        base64.urlsafe_b64encode(secrets.token_bytes(32)).rstrip(b"=").decode("ascii")
+    )
+    challenge = (
+        base64.urlsafe_b64encode(hashlib.sha256(verifier.encode("ascii")).digest())
+        .rstrip(b"=")
+        .decode("ascii")
+    )
+    return verifier, challenge
+
+
+def _form_headers():
+    """Headers for Simkl OAuth2 form posts."""
+    return {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": "MediaTrail",
     }
+
+
+def exchange_v2_code(code, redirect_uri, code_verifier):
+    """Exchange a V2 authorization code for access + refresh tokens."""
+    client_id = v2_client_id()
+    if not client_id:
+        msg = "Simkl AUTH V2 is not configured on this server."
+        raise MediaImportError(msg)
+    if not code or not code_verifier:
+        msg = "Invalid or expired Simkl authorization request."
+        raise MediaImportError(msg)
+
+    body = {
+        "grant_type": "authorization_code",
+        "client_id": client_id,
+        "code": code,
+        "redirect_uri": redirect_uri,
+        "code_verifier": code_verifier,
+    }
+    secret = v2_client_secret()
+    if secret:
+        body["client_secret"] = secret
+
+    try:
+        # AUTH V2 requires application/x-www-form-urlencoded (data=), not JSON.
+        token_response = app.providers.services.api_request(
+            "SIMKL",
+            "POST",
+            SIMKL_TOKEN_URL,
+            headers=_form_headers(),
+            data=body,
+        )
+    except services.ProviderAPIError as error:
+        if error.status_code == requests.codes.unauthorized:
+            msg = "Invalid Simkl V2 client configuration."
+            raise MediaImportError(msg) from error
+        raise
+
+    access = token_response.get("access_token")
+    refresh = token_response.get("refresh_token")
+    if not access or not refresh:
+        msg = "Simkl did not return V2 tokens."
+        raise MediaImportError(msg)
+    return {
+        "access_token": access,
+        "refresh_token": refresh,
+        "scope": token_response.get("scope") or "",
+    }
+
+
+def update_stored_simkl_token(old_encrypted, new_encrypted):
+    """Update encrypted Simkl tokens stored on periodic import tasks."""
+    periodic_task = PeriodicTask.objects.filter(
+        task="Import from SIMKL",
+        kwargs__contains=f'"token": "{old_encrypted}"',
+    ).first()
+    if periodic_task:
+        task_kwargs = json.loads(periodic_task.kwargs)
+        task_kwargs["token"] = new_encrypted
+        periodic_task.kwargs = json.dumps(task_kwargs)
+        periodic_task.save()
+
+
+def refresh_v2_token(encrypted_refresh_token):
+    """Refresh a V2 access token; persist a rotated refresh token when present."""
+    client_id = v2_client_id()
+    if not client_id:
+        msg = "Simkl AUTH V2 is not configured on this server."
+        raise MediaImportError(msg)
+
+    decrypted = helpers.decrypt(encrypted_refresh_token)
+    body = {
+        "grant_type": "refresh_token",
+        "client_id": client_id,
+        "refresh_token": decrypted,
+    }
+    secret = v2_client_secret()
+    if secret:
+        body["client_secret"] = secret
+
+    try:
+        token_response = app.providers.services.api_request(
+            "SIMKL",
+            "POST",
+            SIMKL_TOKEN_URL,
+            headers=_form_headers(),
+            data=body,
+        )
+    except services.ProviderAPIError as error:
+        if error.status_code in {
+            requests.codes.unauthorized,
+            requests.codes.bad_request,
+        }:
+            msg = (
+                "Simkl V2 refresh failed. Reconnect Simkl from the import page."
+            )
+            raise MediaImportError(msg) from error
+        raise
+
+    access = token_response.get("access_token")
+    if not access:
+        msg = "Simkl did not return a V2 access token."
+        raise MediaImportError(msg)
+
+    new_refresh = token_response.get("refresh_token") or decrypted
+    if new_refresh != decrypted:
+        update_stored_simkl_token(encrypted_refresh_token, helpers.encrypt(new_refresh))
+    return access
+
+
+def get_token_v1(request):
+    """Exchange an AUTH V1 authorization code for an access token."""
+    code = request.GET["code"]
+    url = f"{SIMKL_API_BASE_URL}/oauth/token"
 
     params = {
         "client_id": settings.SIMKL_ID,
@@ -42,7 +196,7 @@ def get_token(request):
             "SIMKL",
             "POST",
             url,
-            headers=headers,
+            headers={"Content-Type": "application/json"},
             params=params,
         )
     except services.ProviderAPIError as error:
@@ -54,16 +208,39 @@ def get_token(request):
     return {
         "access_token": token_response["access_token"],
         "username": get_username(token_response["access_token"]),
+        "auth": "v1",
     }
 
 
+def get_token(request, code_verifier=None, redirect_uri=None):
+    """Handle Simkl OAuth callback for V2 (preferred) or legacy V1."""
+    if v2_enabled() and code_verifier is not None:
+        redirect_uri = redirect_uri or app_helpers.build_absolute_app_url(
+            request,
+            reverse("import_simkl_private"),
+        )
+        tokens = exchange_v2_code(
+            request.GET.get("code"),
+            redirect_uri,
+            code_verifier,
+        )
+        return {
+            "access_token": tokens["access_token"],
+            "refresh_token": tokens["refresh_token"],
+            "username": get_username_v2(tokens["access_token"]),
+            "auth": "v2",
+            "scope": tokens.get("scope") or "",
+        }
+    return get_token_v1(request)
+
+
 def get_username(token):
-    """Get the username from SIMKL using the provided token."""
+    """Get the username from SIMKL using a V1 access token."""
     try:
         user_info = app.providers.services.api_request(
             "SIMKL",
             "POST",
-            "https://api.simkl.com/users/settings",
+            f"{SIMKL_API_BASE_URL}/users/settings",
             headers={
                 "Authorization": f"Bearer {token}",
                 "simkl-api-key": settings.SIMKL_ID,
@@ -79,29 +256,67 @@ def get_username(token):
     return user_info["user"]["name"]
 
 
-def importer(token, user, mode):
+def get_username_v2(token):
+    """Get the username using a V2 access token."""
+    client_id = v2_client_id()
+    try:
+        user_info = app.providers.services.api_request(
+            "SIMKL",
+            "GET",
+            f"{SIMKL_API_BASE_URL}/users/settings",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "User-Agent": "MediaTrail",
+                "simkl-api-key": client_id,
+            },
+            params={
+                "client_id": client_id,
+                "app-name": "MediaTrail",
+                "app-version": str(getattr(settings, "VERSION", "dev")),
+            },
+        )
+    except services.ProviderAPIError as error:
+        if error.status_code == requests.codes.unauthorized:
+            msg = "Invalid Simkl V2 token."
+            raise MediaImportError(msg) from error
+        raise
+
+    return user_info["user"]["name"]
+
+
+def importer(token, user, mode, auth="v1"):
     """Import tv shows, movies and anime from SIMKL."""
-    simkl_importer = SimklImporter(token, user, mode)
+    simkl_importer = SimklImporter(token, user, mode, auth=auth)
     return simkl_importer.import_data()
 
 
 class SimklImporter:
     """Class to handle importing user data from Simkl."""
 
-    SIMKL_API_BASE_URL = "https://api.simkl.com"
+    SIMKL_API_BASE_URL = SIMKL_API_BASE_URL
 
-    def __init__(self, token, user, mode):
-        """Initialize the importer with token, user, and mode.
+    def __init__(self, token, user, mode, auth="v1"):
+        """Initialize the importer with token, user, mode, and auth version.
 
         Args:
-            token (str): Simkl OAuth token
+            token (str): Encrypted Simkl token (V1 access, or V2 refresh)
             user: Django user object to import data for
             mode (str): Import mode ("new" or "overwrite")
+            auth (str): ``v1`` (legacy access token) or ``v2`` (refresh token)
         """
-        self.token = helpers.decrypt(token)
+        self.auth = auth or "v1"
+        self.encrypted_token = token
+        if self.auth == "v2":
+            self.token = refresh_v2_token(token)
+            self.api_key = v2_client_id()
+        else:
+            self.token = helpers.decrypt(token)
+            self.api_key = settings.SIMKL_ID
         self.user = user
         self.mode = mode
         self.warnings = []
+        if self.auth == "v1":
+            self.warnings.append(SIMKL_V1_RETIRE_NOTE)
 
         # Track existing media for "new" mode
         self.existing_media = helpers.get_existing_media(user)
@@ -113,9 +328,10 @@ class SimklImporter:
         self.bulk_media = defaultdict(list)
 
         logger.info(
-            "Initialized Simkl importer for user %s with mode %s",
+            "Initialized Simkl importer for user %s with mode %s auth %s",
             user.username,
             mode,
+            self.auth,
         )
 
     def import_data(self):
@@ -141,15 +357,23 @@ class SimklImporter:
     def _get_user_list(self):
         """Get the user's list from Simkl."""
         url = f"{self.SIMKL_API_BASE_URL}/sync/all-items/"
+        # V1 historically used "Bearer: "; V2 expects standard "Bearer ".
+        bearer = (
+            f"Bearer {self.token}" if self.auth == "v2" else f"Bearer: {self.token}"
+        )
         headers = {
-            "Authorization": f"Bearer: {self.token}",
-            "simkl-api-key": settings.SIMKL_ID,
+            "Authorization": bearer,
+            "simkl-api-key": self.api_key,
         }
         params = {
             "extended": "full",
             "episode_watched_at": "yes",
             "memos": "yes",
         }
+        if self.auth == "v2":
+            params["client_id"] = self.api_key
+            params["app-name"] = "MediaTrail"
+            params["app-version"] = str(getattr(settings, "VERSION", "dev"))
 
         return app.providers.services.api_request(
             "SIMKL",

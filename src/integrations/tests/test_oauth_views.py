@@ -308,3 +308,146 @@ class TraktOAuthViewTests(TestCase):
             mock_schedule.call_args.kwargs["task_kwargs"]["auth"],
             "device",
         )
+
+
+class SimklOAuthViewTests(TestCase):
+    """Test Simkl OAuth V1 fallback and AUTH V2 + PKCE."""
+
+    def setUp(self):
+        """Create user for the tests."""
+        credentials = {"username": "testuser", "password": "testpass123"}
+        self.user = get_user_model().objects.create_user(**credentials)
+        self.client.login(**credentials)
+
+    @override_settings(
+        URLS=["https://mediatrail.example.com:8924"],
+        SIMKL_V2_ID="",
+        SIMKL_ID="v1-client-id",
+    )
+    def test_simkl_oauth_falls_back_to_v1_without_v2_id(self):
+        """Without SIMKL_V2_ID, new links still use AUTH V1 authorize."""
+        response = self.client.post(
+            reverse("simkl_oauth"),
+            {"mode": "new", "frequency": "once", "time": "14:30"},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        redirect = urlparse(response["Location"])
+        query = parse_qs(redirect.query)
+        self.assertEqual(redirect.netloc, "simkl.com")
+        self.assertEqual(redirect.path, "/oauth/authorize")
+        self.assertEqual(query["client_id"], ["v1-client-id"])
+        self.assertNotIn("code_challenge", query)
+        state = self.client.session[query["state"][0]]
+        self.assertEqual(state["auth"], "v1")
+
+    @override_settings(
+        URLS=["https://mediatrail.example.com:8924"],
+        SIMKL_V2_ID="v2-client-id-abc",
+    )
+    def test_simkl_oauth_uses_v2_authorize_and_pkce(self):
+        """With SIMKL_V2_ID, new links use oauth2 authorize and S256 PKCE."""
+        response = self.client.post(
+            reverse("simkl_oauth"),
+            {"mode": "new", "frequency": "once", "time": "14:30"},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        redirect = urlparse(response["Location"])
+        query = parse_qs(redirect.query)
+        self.assertEqual(redirect.netloc, "simkl.com")
+        self.assertEqual(redirect.path, "/oauth2/authorize")
+        self.assertEqual(query["client_id"], ["v2-client-id-abc"])
+        self.assertEqual(query["code_challenge_method"], ["S256"])
+        self.assertTrue(query["code_challenge"][0])
+        self.assertEqual(query["scope"], ["media:read media:write"])
+        self.assertEqual(
+            query["redirect_uri"],
+            ["https://mediatrail.example.com:8924/import/simkl_private"],
+        )
+        state = self.client.session[query["state"][0]]
+        self.assertEqual(state["auth"], "v2")
+        self.assertTrue(state["code_verifier"])
+
+    @override_settings(SIMKL_V2_ID="v2-client-id-abc")
+    @patch("integrations.views.tasks.import_simkl.delay")
+    @patch("integrations.views.simkl.get_token")
+    def test_simkl_v2_callback_stores_refresh_token(
+        self,
+        mock_get_token,
+        mock_import_simkl,
+    ):
+        """V2 callback encrypts the refresh token and queues auth=v2."""
+        session = self.client.session
+        session["state-token"] = {
+            "mode": "new",
+            "frequency": "once",
+            "time": "14:30",
+            "redirect_uri": "https://mediatrail.example.com/import/simkl_private",
+            "code_verifier": "verifier-value",
+            "auth": "v2",
+        }
+        session.save()
+        mock_get_token.return_value = {
+            "access_token": "access",
+            "refresh_token": "refresh-token",
+            "username": "simkl-user",
+            "auth": "v2",
+        }
+
+        response = self.client.get(
+            reverse("import_simkl_private"),
+            {
+                "code": "auth-code",
+                "state": "state-token",
+                "iss": "https://simkl.com",
+            },
+        )
+
+        self.assertRedirects(response, reverse("import_data"))
+        mock_get_token.assert_called_once()
+        self.assertEqual(
+            mock_get_token.call_args.kwargs["code_verifier"],
+            "verifier-value",
+        )
+        mock_import_simkl.assert_called_once()
+        self.assertEqual(mock_import_simkl.call_args.kwargs["auth"], "v2")
+        self.assertNotIn("state-token", self.client.session)
+
+    @override_settings(SIMKL_V2_ID="v2-client-id-abc")
+    @patch("integrations.views.simkl.get_token")
+    def test_simkl_v2_callback_rejects_bad_issuer(self, mock_get_token):
+        """V2 callback rejects a mismatched iss before exchanging the code."""
+        session = self.client.session
+        session["state-token"] = {
+            "mode": "new",
+            "frequency": "once",
+            "time": "14:30",
+            "code_verifier": "verifier-value",
+            "auth": "v2",
+        }
+        session.save()
+
+        response = self.client.get(
+            reverse("import_simkl_private"),
+            {
+                "code": "auth-code",
+                "state": "state-token",
+                "iss": "https://evil.example",
+            },
+        )
+
+        self.assertRedirects(response, reverse("import_data"))
+        mock_get_token.assert_not_called()
+
+    @patch("integrations.views.simkl.get_token")
+    def test_simkl_callback_rejects_missing_state(self, mock_get_token):
+        """Missing OAuth state aborts without exchanging the code."""
+        response = self.client.get(
+            reverse("import_simkl_private"),
+            {"code": "auth-code"},
+        )
+
+        self.assertRedirects(response, reverse("import_data"))
+        mock_get_token.assert_not_called()
+

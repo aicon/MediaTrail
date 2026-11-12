@@ -1142,6 +1142,22 @@ msgstr ""
 msgid "Import TV shows, movies and anime"
 msgstr "Sorozatok, filmek és animék importálása"
 
+msgid ""
+"New connections use Simkl AUTH V2 when SIMKL_V2_ID is set. Existing AUTH V1 "
+"tokens keep working until Simkl retires V1 around April 2027; reconnect "
+"after configuring V2."
+msgstr ""
+"Az új kapcsolások Simkl AUTH V2-t használnak, ha a SIMKL_V2_ID be van "
+"állítva. A meglévő AUTH V1 tokenek a V1 kivezetéséig (~2027. április) "
+"működnek; a V2 beállítása után kapcsolódj újra."
+
+msgid ""
+"Simkl AUTH V1 is deprecated and planned for retirement around April 2027. "
+"Configure SIMKL_V2_ID and reconnect when ready."
+msgstr ""
+"A Simkl AUTH V1 elavult, tervezett kivezetése körülbelül 2027. április. "
+"Állítsd be a SIMKL_V2_ID-t, és kapcsolódj újra, ha készen állsz."
+
 msgid "Connect with Simkl & Import"
 msgstr "Csatlakozás a Simklhez és importálás"
 

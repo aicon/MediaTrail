@@ -236,6 +236,9 @@
         <div class="bg-[#39404b] p-4 rounded-lg">
           <div class="flex items-center mb-3">{% source_display "simkl" %}</div>
           <p class="text-sm text-gray-400 mb-3">{% translate "Import TV shows, movies and anime" %}</p>
+          <p class="text-xs text-gray-500 mb-3">
+            {% translate "New connections use Simkl AUTH V2 when SIMKL_V2_ID is set. Existing AUTH V1 tokens keep working until Simkl retires V1 around April 2027; reconnect after configuring V2." %}
+          </p>
           <form method="post" action="{% url 'simkl_oauth' %}">
             {% csrf_token %}
             <input type="hidden" name="frequency" x-model="importFrequency">
