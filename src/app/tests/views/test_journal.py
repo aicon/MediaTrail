@@ -254,6 +254,41 @@ class JournalViewTests(TestCase):
         labels = [day["label"] for day in response.context["journal_days"]]
         self.assertEqual(labels, ["Today"])
         self.assertContains(response, "Today")
+        # Day headers live outside the card grid so they never share columns.
+        self.assertContains(response, 'data-journal-day="')
+        self.assertContains(response, 'data-journal-day-grid="')
+        self.assertNotContains(response, "col-span-full")
+        self.assertContains(response, "xl:grid-cols-4")
+        self.assertContains(response, "<time")
+        self.assertRegex(response.content.decode(), r"<time[^>]+datetime=")
+
+    def test_journal_day_headers_are_outside_card_grid(self):
+        """Date headers are siblings of day grids, not grid children."""
+        older = timezone.now() - datetime.timedelta(days=2)
+        item = Item.objects.create(
+            media_id="older-1",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.MOVIE.value,
+            title="Older Movie",
+            image="http://example.com/older.jpg",
+        )
+        movie = Movie(item=item, user=self.user, status=Status.COMPLETED.value)
+        movie._history_user = self.user
+        Movie.save_base(movie)
+        historical_movie = apps.get_model("app", "historicalmovie")
+        historical_movie.objects.filter(id=movie.id).update(history_date=older)
+
+        response = self.client.get(reverse("journal") + "?start-date=all&end-date=all")
+        html = response.content.decode()
+
+        self.assertGreaterEqual(len(response.context["journal_days"]), 2)
+        # Header for a day must appear before that day's grid, not inside it.
+        for day in response.context["journal_days"]:
+            header = f'data-journal-day="{day["day_iso"]}"'
+            grid = f'data-journal-day-grid="{day["day_iso"]}"'
+            self.assertIn(header, html)
+            self.assertIn(grid, html)
+            self.assertLess(html.index(header), html.index(grid))
 
     def test_journal_day_header_not_repeated_across_pages(self):
         """A day continued on the next page suppresses its repeated header."""
