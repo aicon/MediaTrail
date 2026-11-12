@@ -298,6 +298,19 @@ class StatisticsViewTests(TestCase):
         self.assertContains(response, "In Progress")
         self.assertContains(response, "% Rated")
 
+    def test_statistics_rated_label_translates_in_hungarian(self):
+        """Django translate doubles %; the HU catalog must still resolve the label."""
+        self.user.language = "hu"
+        self.user.save(update_fields=["language"])
+
+        response = self.client.get(
+            reverse("statistics") + "?start-date=all&end-date=all",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Értékelt elemek aránya")
+        self.assertNotContains(response, ">% Rated<")
+
     def test_statistics_view_invalid_date_format(self):
         """Test the statistics view with invalid date format."""
         start_date = "01/01/2023"  # MM/DD/YYYY instead of YYYY-MM-DD

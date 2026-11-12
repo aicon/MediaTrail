@@ -41,12 +41,13 @@ class JournalViewTests(TestCase):
             progress=0,
         )
         # Mirror the middleware attributing history records to the request user.
+        # save_base avoids provider/cache lookups while still writing history.
         self.movie._history_user = self.user
-        self.movie.save()
+        Movie.save_base(self.movie)
         self.movie.status = Status.COMPLETED.value
         self.movie.progress = 1
         self.movie.score = 8
-        self.movie.save()
+        Movie.save_base(self.movie)
 
     def _add_episode(self):
         """Add a watched episode without triggering provider lookups."""
@@ -216,6 +217,16 @@ class JournalViewTests(TestCase):
         self.assertIn("stats", response.context["activity_data"])
         self.assertGreater(response.context["activity_total"], 0)
         self.assertIn("date_format_values", response.context)
+
+    def test_journal_activity_percent_translates_in_hungarian(self):
+        """Most-active-day percent uses blocktranslate; HU catalog must match %% key."""
+        self.user.language = "hu"
+        self.user.save(update_fields=["language"])
+
+        response = self.client.get(reverse("journal") + "?start-date=all&end-date=all")
+        percent = response.context["activity_data"]["stats"]["most_active_day_percentage"]
+        self.assertContains(response, f"a tevékenység {percent}%-a")
+        self.assertNotContains(response, f"{percent}% of activity")
 
     def test_journal_date_range_excludes_activity(self):
         """A past date range with no activity yields an empty feed."""
