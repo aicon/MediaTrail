@@ -117,6 +117,15 @@ class HistoryProcessorTests(TestCase):
             "Stopped watching",
         )
         self.assertEqual(
+            format_description(
+                "status",
+                Status.COMPLETED.value,
+                Status.IN_PROGRESS.value,
+                MediaTypes.TV.value,
+            ),
+            "Changed status from Completed to In Progress",
+        )
+        self.assertEqual(
             format_description("status", "Custom1", "Custom2", MediaTypes.TV.value),
             "Changed status from Custom1 to Custom2",
         )

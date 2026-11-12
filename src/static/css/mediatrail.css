@@ -1,10 +1,66 @@
-/* Journal utilities present in Yamtrack's compiled Tailwind but missing here. */
+/* Utilities present in Yamtrack's compiled Tailwind but missing from MediaTrail main.css. */
+
+:root {
+  --radius-xl: 0.75rem;
+  --color-sky-500: oklch(68.5% 0.169 237.323);
+  --color-yellow-500: oklch(79.5% 0.184 86.047);
+  --color-slate-500: oklch(55.4% 0.046 257.417);
+}
+
 .col-span-full {
   grid-column: 1 / -1;
 }
 
 .w-30 {
   width: calc(var(--spacing) * 30);
+}
+
+.w-3\.5 {
+  width: calc(var(--spacing) * 3.5);
+}
+
+.h-3\.5 {
+  height: calc(var(--spacing) * 3.5);
+}
+
+.-bottom-1\.5 {
+  bottom: calc(var(--spacing) * -1.5);
+}
+
+.-right-1\.5 {
+  right: calc(var(--spacing) * -1.5);
+}
+
+.rounded-xl {
+  border-radius: var(--radius-xl);
+}
+
+.bg-emerald-500 {
+  background-color: var(--color-emerald-500);
+}
+
+.bg-indigo-500 {
+  background-color: var(--color-indigo-500);
+}
+
+.bg-orange-500 {
+  background-color: var(--color-orange-500);
+}
+
+.bg-red-500 {
+  background-color: var(--color-red-500);
+}
+
+.bg-sky-500 {
+  background-color: var(--color-sky-500);
+}
+
+.bg-yellow-500 {
+  background-color: var(--color-yellow-500);
+}
+
+.bg-slate-500 {
+  background-color: var(--color-slate-500);
 }
 
 @media (width >= 64rem) {

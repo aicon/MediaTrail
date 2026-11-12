@@ -540,6 +540,14 @@ def _verbs(media_type):
     return config.get_property(media_type, "verb")
 
 
+def _status_label(status):
+    """Return the translated Status label, or the raw value if unknown."""
+    try:
+        return str(Status(status).label)
+    except ValueError:
+        return status
+
+
 def _initial_status(verb, status):
     """Describe the first status, as a whole sentence."""
     phrases = {
@@ -561,7 +569,10 @@ def _initial_status(verb, status):
     phrase = phrases.get((verb, status))
     if phrase:
         return phrase
-    return _("Changed status from %(old)s to %(new)s") % {"old": "", "new": status}
+    return _("Changed status from %(old)s to %(new)s") % {
+        "old": "",
+        "new": _status_label(status),
+    }
 
 
 def _status_transition(verb, old_value, new_value):
@@ -599,8 +610,8 @@ def _status_transition(verb, old_value, new_value):
     if phrase:
         return phrase
     return _("Changed status from %(old)s to %(new)s") % {
-        "old": old_value,
-        "new": new_value,
+        "old": _status_label(old_value),
+        "new": _status_label(new_value),
     }
 
 
