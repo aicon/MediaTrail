@@ -69,6 +69,41 @@ class DeltaFailNuvio(FakeNuvio):
         raise nuvio.NuvioError("Nuvio request failed", 503)
 
 
+class BootstrapOrderNuvio(FakeNuvio):
+    """Cursor tip advances during snapshot; delta must still see mid-bootstrap events."""
+
+    def __init__(self):
+        super().__init__(
+            history=[_history("tmdb:550", "movie", "Fight Club", nuvio_id="m1")],
+            cursor=10,
+        )
+        self.calls = []
+        self._tip = 10
+
+    def history_cursor(self):
+        self.calls.append("cursor")
+        return self._tip
+
+    def iter_history(self):
+        self.calls.append("history")
+        # A watch lands while pages are downloading; tip moves past the snapshot.
+        self._tip = 15
+        yield from self.history
+
+    def iter_delta(self, since):
+        self.calls.append(("delta", since))
+        if since is not None and since < 15:
+            yield {
+                "event_id": 11,
+                "operation": "upsert",
+                "id": "m2",
+                "content_id": "tmdb:551",
+                "content_type": "movie",
+                "title": "Other",
+                "watched_at": WATCHED_AT,
+            }
+
+
 def _metadata(media_type, media_id, source, season_numbers=None, episode_number=None):
     if media_type == "tv_with_seasons":
         seasons = season_numbers or [1]
@@ -191,6 +226,28 @@ class NuvioImportTests(TestCase):
         self.assertTrue(self.account.bootstrapped)
         self.assertEqual(self.account.cursor, 10)
         self.assertEqual(self.account.imported_ids, ["m1"])
+
+    def test_bootstrap_captures_cursor_before_snapshot(self):
+        """Mid-bootstrap Nuvio changes must land via delta after the pre-snapshot tip."""
+        client = BootstrapOrderNuvio()
+        counts, _warnings, _removed = self._run(client)
+        self.assertEqual(client.calls[0], "cursor")
+        self.assertEqual(client.calls[1], "history")
+        self.assertEqual(client.calls[2], ("delta", 10))
+        self.account.refresh_from_db()
+        self.assertTrue(self.account.bootstrapped)
+        # Pre-snapshot tip was 10; delta event 11 advanced the cursor.
+        self.assertEqual(self.account.cursor, 11)
+        self.assertEqual(counts.get(MediaTypes.MOVIE.value), 2)
+        self.assertEqual(
+            set(
+                Movie.objects.filter(user=self.user).values_list(
+                    "item__media_id",
+                    flat=True,
+                ),
+            ),
+            {"550", "551"},
+        )
 
     def test_existing_movie_is_not_changed(self):
         item = Item.objects.create(

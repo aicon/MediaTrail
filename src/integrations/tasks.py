@@ -131,22 +131,55 @@ def _nuvio_sync_accounts():
     )
 
 
+def _nuvio_sync_lock(user_id, *, timeout):
+    """Prevent overlapping polls/reconciles for the same MediaTrail user."""
+    from django.core.cache import cache
+
+    return cache.add(f"nuvio-watch-sync:{user_id}", "1", timeout=timeout)
+
+
+def _nuvio_sync_unlock(user_id):
+    from django.core.cache import cache
+
+    cache.delete(f"nuvio-watch-sync:{user_id}")
+
+
 @shared_task(name="Sync Nuvio watch history")
 def sync_nuvio_watch_history():
     """Apply only the Nuvio watched-history delta (fast interactive poll)."""
     for account in _nuvio_sync_accounts():
+        user_id = account.user_id
+        if not _nuvio_sync_lock(user_id, timeout=120):
+            logger.info(
+                "Nuvio watch-history delta poll skipped; already running user=%s",
+                user_id,
+            )
+            continue
         try:
+            logger.info(
+                "Nuvio watch-history delta poll start user=%s cursor=%s",
+                user_id,
+                account.cursor,
+            )
             with disable_fetch_releases():
                 nuvio.NuvioImporter(
                     account.user,
                     mode="new",
                     gate_upserts=True,
                 ).sync_delta()
+            account.refresh_from_db(fields=["cursor"])
+            logger.info(
+                "Nuvio watch-history delta poll done user=%s cursor=%s",
+                user_id,
+                account.cursor,
+            )
         except Exception:
             logger.exception(
                 "Nuvio watch-history delta sync failed for %s",
-                account.user_id,
+                user_id,
             )
+        finally:
+            _nuvio_sync_unlock(user_id)
 
 
 @shared_task(name="Sync Nuvio watch history for user")
@@ -168,7 +201,18 @@ def sync_nuvio_watch_history_for_user(user_id):
         return
     if not account.bootstrapped or account.cursor is None:
         return
+    if not _nuvio_sync_lock(user_id, timeout=120):
+        logger.info(
+            "Nuvio watch-history one-shot skipped; already running user=%s",
+            user_id,
+        )
+        return
     try:
+        logger.info(
+            "Nuvio watch-history one-shot start user=%s cursor=%s",
+            user_id,
+            account.cursor,
+        )
         with disable_fetch_releases():
             nuvio.NuvioImporter(
                 user,
@@ -177,13 +221,27 @@ def sync_nuvio_watch_history_for_user(user_id):
             ).sync_delta()
     except Exception:
         logger.exception("Nuvio watch-history delta sync failed for %s", user_id)
+    finally:
+        _nuvio_sync_unlock(user_id)
 
 
 @shared_task(name="Reconcile Nuvio watch history")
 def reconcile_nuvio_watch_history():
     """Full history snapshot + delta so missed unwatches are reconciled."""
     for account in _nuvio_sync_accounts():
+        user_id = account.user_id
+        if not _nuvio_sync_lock(user_id, timeout=600):
+            logger.info(
+                "Nuvio watch-history reconcile skipped; already running user=%s",
+                user_id,
+            )
+            continue
         try:
+            logger.info(
+                "Nuvio watch-history reconcile start user=%s cursor=%s",
+                user_id,
+                account.cursor,
+            )
             with disable_fetch_releases():
                 nuvio.NuvioImporter(
                     account.user,
@@ -193,8 +251,10 @@ def reconcile_nuvio_watch_history():
         except Exception:
             logger.exception(
                 "Nuvio watch-history reconcile failed for %s",
-                account.user_id,
+                user_id,
             )
+        finally:
+            _nuvio_sync_unlock(user_id)
 
 
 @shared_task(name="Import from Nuvio")

@@ -570,19 +570,35 @@ class NuvioImporter:
     def _replay_history(self):
         """Check the full watch history and add anything missing locally.
 
-        On first bootstrap, capture the tip cursor after the snapshot. On later
-        imports, keep the saved cursor so delete events are still visible to
-        ``_delta`` (advancing to tip here would skip them forever).
+        Bootstrap follows Nuvio's cursor-before-snapshot order so changes that
+        land while pages are downloading are not lost:
+
+        1. Capture ``sync_get_watched_items_delta_cursor`` first.
+        2. Pull every ``sync_pull_watched_items`` page.
+        3. Let ``_delta`` apply events after that captured cursor.
+
+        Capturing the tip *after* the snapshot would skip mid-bootstrap events
+        that never appeared in an already-fetched page. On later imports, keep
+        the saved cursor (do not jump to tip) so delete events remain visible.
 
         Returns ``(remote_tmdb_keys, snapshot_complete)``. ``snapshot_complete``
         is True only when every history page was fetched and every row that
         should map to TMDB did. ``watched_keys`` is not written here — the
         caller commits them only after delta/reconcile succeed.
         """
+        # Cursor BEFORE snapshot (Nuvio bootstrap order). Never move this below
+        # iter_history — a post-snapshot tip would open a gap for live changes.
         tip = self.client.history_cursor()
+        first_bootstrap = not self.account.bootstrapped
+        if first_bootstrap:
+            logger.info(
+                "Nuvio bootstrap cursor captured before snapshot tip=%s user=%s",
+                tip,
+                self.user.id,
+            )
         remote_keys = set()
         unmapped = 0
-        logger.info("Nuvio import started")
+        logger.info("Nuvio import started user=%s", self.user.id)
         # iter_history raises on mid-pagination API errors; that aborts before
         # snapshot_complete can become True.
         for index, row in enumerate(self.client.iter_history(), start=1):
@@ -608,19 +624,27 @@ class NuvioImporter:
                 "keeping prior watched_keys and skipping reconcile",
                 unmapped,
             )
-            if not self.account.bootstrapped:
+            if first_bootstrap:
                 self.account.cursor = tip
                 self.account.bootstrapped = True
                 self._save_account(["cursor", "bootstrapped"])
             return remote_keys, False
 
-        if not self.account.bootstrapped:
+        if first_bootstrap:
             self.account.cursor = tip
             self.account.bootstrapped = True
             self._save_account(["cursor", "bootstrapped"])
+            logger.info(
+                "Nuvio bootstrap snapshot done tip=%s remote_keys=%s user=%s; "
+                "delta will cover changes after tip",
+                tip,
+                len(remote_keys),
+                self.user.id,
+            )
         logger.info(
-            "Nuvio import history checked (%s remote TMDB keys)",
+            "Nuvio import history checked (%s remote TMDB keys) user=%s",
             len(remote_keys),
+            self.user.id,
         )
         return remote_keys, True
 
@@ -743,7 +767,13 @@ class NuvioImporter:
         since = self.account.cursor
         start_cursor = since
         last_applied = None
-        logger.info("Nuvio delta starting from cursor=%s", since)
+        applied = 0
+        deletes = 0
+        logger.info(
+            "Nuvio delta starting from cursor=%s user=%s",
+            since,
+            self.user.id,
+        )
         try:
             for row in self.client.iter_delta(since):
                 event_id = row.get("event_id") if isinstance(row, dict) else None
@@ -756,13 +786,15 @@ class NuvioImporter:
                 operation = str(row.get("operation") or "upsert")
                 logger.info(
                     "Nuvio delta event_id=%s operation=%s content_id=%s "
-                    "season=%s episode=%s",
+                    "season=%s episode=%s user=%s",
                     event_id,
                     operation,
                     row.get("content_id"),
                     row.get("season"),
                     row.get("episode"),
+                    self.user.id,
                 )
+                before_removed = dict(self.removed)
                 if not self._apply(row, operation=operation, event_id=int(event_id)):
                     msg = (
                         "Nuvio import stopped on a failed record. "
@@ -770,10 +802,25 @@ class NuvioImporter:
                     )
                     raise MediaImportError(msg)
                 last_applied = int(event_id)
+                applied += 1
+                if operation == "delete":
+                    deletes += sum(
+                        self.removed.get(kind, 0) - before_removed.get(kind, 0)
+                        for kind in self.removed
+                    )
             self._flush_progress()
             if last_applied is not None and self.account.bootstrapped:
                 self.account.cursor = last_applied
                 self._save_account(["cursor"])
+            logger.info(
+                "Nuvio delta finished user=%s start_cursor=%s end_cursor=%s "
+                "events=%s local_deletes=%s",
+                self.user.id,
+                start_cursor,
+                self.account.cursor,
+                applied,
+                deletes,
+            )
         except Exception:
             if self.account.cursor != start_cursor:
                 self.account.cursor = start_cursor
