@@ -13,7 +13,7 @@ The history list below the sources shows the last seven days. A task that says i
 
 ## Nuvio
 
-Nuvio is the first source. It reads movies and episodes from one Nuvio profile. It never writes back to Nuvio, and it does not delete local rows when something disappears upstream.
+Nuvio is the first source. It reads movies and episodes from one Nuvio profile. Outbound writes to Nuvio are not part of the import form; they belong to the optional sync toggles under Settings → Integrations → Nuvio.
 
 Live **Now Watching** from the companion apps is separate: the built-in MediaTrail addon receives `player` events with a per-device id. History import does not replace those device strips. See [Library](library.md) and [Live playback / Now Watching](LIVE_PLAYBACK_NOW_WATCHING.md).
 
@@ -29,7 +29,7 @@ What a run does:
 - In overwrite, the existing movie, or the latest row of that episode, gets the Nuvio watch time. The rest of the row stays.
 - If you remove an episode in MediaTrail and Nuvio still has that watch, the next import adds it again. "Only new items" means missing locally, even when that Nuvio event was imported before.
 - A series row that has no season number or no episode number is skipped and remembered, so later runs do not keep reporting it.
-- A delete event from Nuvio is ignored.
+- A delete event from Nuvio is ignored unless **Sync mark-unwatched** is enabled on Integrations. With that toggle on, matching local movie or episode history is removed.
 
 The profile number is the Nuvio profile, not a MediaTrail user. Most people have one profile, numbered 1.
 

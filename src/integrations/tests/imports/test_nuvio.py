@@ -356,6 +356,34 @@ class NuvioImportTests(TestCase):
         )
         self.assertEqual(Episode.objects.count(), 0)
 
+    def test_sync_delta_skips_upsert_when_played_toggle_off(self):
+        self._run(FakeNuvio([_history("tmdb:550", "movie", "Fight Club", nuvio_id="m1")]))
+        self.account.refresh_from_db()
+        self.assertTrue(self.account.bootstrapped)
+        client = FakeNuvio(
+            delta=[
+                {
+                    "event_id": 30,
+                    "operation": "upsert",
+                    "id": "m2",
+                    "content_id": "tmdb:551",
+                    "content_type": "movie",
+                    "title": "Other",
+                    "watched_at": WATCHED_AT,
+                },
+            ],
+        )
+        with (
+            patch("integrations.imports.nuvio.services.get_media_metadata", _metadata),
+            patch("app.models.providers.services.get_media_metadata", _metadata),
+        ):
+            nuvio.NuvioImporter(
+                self.user,
+                client,
+                gate_upserts=True,
+            ).sync_delta()
+        self.assertEqual(Movie.objects.filter(user=self.user).count(), 1)
+
     def test_tmdb_failure_keeps_the_cursor_unsaved(self):
         response = Mock(status_code=503, text="unavailable")
         error = requests.HTTPError("unavailable")

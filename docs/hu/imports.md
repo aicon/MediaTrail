@@ -13,7 +13,7 @@ A források alatti történet az elmúlt hét napot mutatja. A „most fut” á
 
 ## Nuvio
 
-A Nuvio az első forrás. Egy Nuvio-profil filmjeit és epizódjait olvassa. A Nuvio felé nem ír, és nem töröl helyi sort attól, hogy a forrásnál valami eltűnik.
+A Nuvio az első forrás. Egy Nuvio-profil filmjeit és epizódjait olvassa. A Nuvio felé írás nem az import űrlap része; az opcionális szinkron-kapcsolók a Beállítások → Integrációk → Nuvio alatt vannak.
 
 Az élő **„Most nézem”** sáv más út: a beépített MediaTrail addon a társalkalmazások `player` eseményeit kapja, eszközönkénti azonosítóval. Az előzményimport ezeket a sávokat nem írja felül. Lásd a [Könyvtár](library.md) oldalt és a [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md) leírást.
 
@@ -29,7 +29,7 @@ Egy futás ezt csinálja:
 - Felülírásnál a meglévő film, vagy az epizód legutóbbi sora megkapja a Nuvio idejét. A sor többi mezője marad.
 - Ha egy epizódot a MediaTrailben kiveszel, a Nuvio pedig még őrzi a megtekintést, a következő import visszateszi. A „csak az új elemek” a helyben hiányzót jelenti, akkor is, ha az az esemény egyszer már bejött.
 - Az a sorozatsor, amelyen nincs évadszám vagy nincs epizódszám, kimarad, és megjegyződik, hogy a későbbi futások ne jelentsék újra.
-- A Nuvio törlési eseményét a program figyelmen kívül hagyja.
+- A Nuvio törlési eseményét a program figyelmen kívül hagyja, kivéve ha az Integrációkon a **Nem megtekintett jelölés szinkronizálása** be van kapcsolva. Ilyenkor a megfelelő helyi film- vagy epizód-előzmény törlődik.
 
 A profilszám a Nuvio profilja, nem egy MediaTrail-felhasználó. A legtöbb fióknak egy profilja van, az 1-es.
 

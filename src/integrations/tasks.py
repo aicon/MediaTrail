@@ -98,6 +98,35 @@ def sync_nuvio_playback():
             logger.exception("Nuvio playback sync failed for %s", account.user_id)
 
 
+@shared_task(name="Sync Nuvio watch history")
+def sync_nuvio_watch_history():
+    """Apply Nuvio watched-history delta for accounts with sync toggles on."""
+    from django.db.models import Q
+
+    from integrations.models import NuvioAccount
+
+    accounts = NuvioAccount.objects.select_related("user").filter(
+        bootstrapped=True,
+        cursor__isnull=False,
+    ).filter(
+        Q(user__nuvio_sync_mark_played_enabled=True)
+        | Q(user__nuvio_sync_mark_unplayed_enabled=True),
+    )
+    for account in accounts:
+        try:
+            with disable_fetch_releases():
+                nuvio.NuvioImporter(
+                    account.user,
+                    mode="new",
+                    gate_upserts=True,
+                ).sync_delta()
+        except Exception:
+            logger.exception(
+                "Nuvio watch-history sync failed for %s",
+                account.user_id,
+            )
+
+
 @shared_task(name="Import from Nuvio")
 def import_nuvio(user_id, mode, username=None):
     """Celery task for importing missing movies and episodes from Nuvio."""

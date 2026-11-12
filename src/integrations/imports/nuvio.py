@@ -437,10 +437,12 @@ class NuvioClient:
 class NuvioImporter:
     """Copy Nuvio watches onto this user's movies and episodes."""
 
-    def __init__(self, user, client=None, mode="new"):
+    def __init__(self, user, client=None, mode="new", *, gate_upserts=False):
         """Load the saved account. Tests can pass a client that does not sign in."""
         self.user = user
         self.mode = "overwrite" if mode == "overwrite" else "new"
+        # Periodic sync honors the mark-watched toggle; manual import always upserts.
+        self.gate_upserts = gate_upserts
         try:
             self.account = user.nuvio_account
         except NuvioAccount.DoesNotExist as exc:
@@ -461,21 +463,39 @@ class NuvioImporter:
             self._replay_history()
             self._delta()
         except NuvioError as exc:
-            if exc.status in {401, 403}:
-                msg = "Nuvio sign-in failed."
-                raise MediaImportError(msg) from exc
-            if exc.status in _BLOCKING_STATUS:
-                msg = (
-                    "Nuvio could not be reached. "
-                    "The import will continue on the next run."
-                )
-                raise MediaImportError(msg) from exc
-            raise MediaImportError(str(exc)) from exc
+            self._raise_import_error(exc)
 
         counts = {
             media_type: count for media_type, count in self.created.items() if count
         }
         return counts, "\n".join(self.warnings)
+
+    def sync_delta(self):
+        """Apply only the watched-history delta for interactive sync."""
+        if not self.account.bootstrapped or self.account.cursor is None:
+            msg = "Nuvio history has not been imported yet."
+            raise MediaImportError(msg)
+        try:
+            self.client.assert_profile()
+            self._delta()
+        except NuvioError as exc:
+            self._raise_import_error(exc)
+        counts = {
+            media_type: count for media_type, count in self.created.items() if count
+        }
+        return counts, "\n".join(self.warnings)
+
+    def _raise_import_error(self, exc):
+        if exc.status in {401, 403}:
+            msg = "Nuvio sign-in failed."
+            raise MediaImportError(msg) from exc
+        if exc.status in _BLOCKING_STATUS:
+            msg = (
+                "Nuvio could not be reached. "
+                "The import will continue on the next run."
+            )
+            raise MediaImportError(msg) from exc
+        raise MediaImportError(str(exc)) from exc
 
     def _replay_history(self):
         """Check the full watch history and add anything missing locally."""
@@ -557,6 +577,9 @@ class NuvioImporter:
                 )
             return True
         if record["operation"] != "upsert":
+            return True
+        if self.gate_upserts and not self.user.nuvio_sync_mark_played_enabled:
+            self._remember(nuvio_id)
             return True
 
         try:
