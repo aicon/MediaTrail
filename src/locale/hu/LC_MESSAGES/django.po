@@ -22,6 +22,33 @@ msgstr "Egyéni bejegyzés, ha a média nincs az adatbázisban."
 msgid "Statistics"
 msgstr "Statisztika"
 
+msgid "Journal"
+msgstr "Napló"
+
+msgid "A feed of everything you've done in MediaTrail"
+msgstr "Minden MediaTrail-beli tevékenységed naplója"
+
+msgid "Tracked Activities"
+msgstr "Tevékenységek"
+
+msgid "Delete activity"
+msgstr "Tevékenység törlése"
+
+msgid "Delete activity?"
+msgstr "Törlöd a tevékenységet?"
+
+msgid "This removes the selected activity for %(title)s from your history. This can't be undone."
+msgstr "Ez eltávolítja a kiválasztott tevékenységet ennél: %(title)s. A művelet nem vonható vissza."
+
+msgid "No tracking activity in this date range."
+msgstr "Nincs követési tevékenység ebben az időszakban."
+
+msgid "Watched episode %(number)s"
+msgstr "%(number)s. epizód megnézve"
+
+msgid "Updated episode %(number)s"
+msgstr "%(number)s. epizód frissítve"
+
 msgid "Track your media consumption habits"
 msgstr "A médiafogyasztási szokásaid követése"
 
@@ -1176,6 +1203,12 @@ msgstr "Befejezett elemek"
 
 msgid "Average Rating"
 msgstr "Átlagos értékelés"
+
+msgid "% Rated"
+msgstr "Értékelt %"
+
+msgid "Consumption"
+msgstr "Fogyasztás"
 
 msgid "Most Active Day"
 msgstr "Legaktívabb nap"

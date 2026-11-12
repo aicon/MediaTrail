@@ -12,18 +12,18 @@
     <article id="journal-{{ entry.media_type }}-{{ entry.id }}"
              data-journal-entry-day="{{ day.day_iso }}"
              x-data="{ confirmOpen: false }"
-             class="group relative flex gap-4 bg-[#2a2f35] rounded-xl p-3 ring-1 ring-white/5 hover:ring-indigo-500/40 hover:bg-[#30363d] transition-all duration-200">
+             class="group relative flex items-center gap-3 bg-[#2a2f35] rounded-xl p-2.5 ring-1 ring-white/5 hover:ring-indigo-500/40 hover:bg-[#30363d] transition-all duration-200">
       <a href="{{ entry.item|media_url }}" class="relative shrink-0">
         <img alt="{{ entry.item.title }}"
-             class="lazyload w-30 aspect-2/3 rounded-lg object-cover bg-[#3e454d] shadow-md group-hover:opacity-90 transition-opacity"
+             class="lazyload w-16 h-24 rounded-md object-cover bg-[#3e454d] shadow-md group-hover:opacity-90 transition-opacity"
              data-src="{{ entry.item.image }}"
              src="{{ IMG_NONE }}">
         {% include "app/components/journal_badge.html" with accent=entry.accent %}
       </a>
-      <div class="min-w-0 flex-1 flex flex-col py-0.5">
-        <div class="flex items-start justify-between gap-3">
+      <div class="min-w-0 flex-1 flex flex-col self-stretch py-0.5">
+        <div class="flex items-start justify-between gap-2">
           <a href="{{ entry.item|media_url }}"
-             class="font-semibold text-white group-hover:text-indigo-400 transition-colors duration-200 line-clamp-1">{{ entry.item }}</a>
+             class="text-sm font-semibold text-white group-hover:text-indigo-400 transition-colors duration-200 line-clamp-1">{{ entry.item }}</a>
           <button type="button"
                   @click="confirmOpen = true"
                   aria-label="{% translate "Delete activity" %}"
@@ -31,12 +31,12 @@
             {% include "app/icons/trashcan.svg" with classes="w-4 h-4" %}
           </button>
         </div>
-        <span class="mt-1 inline-flex items-center gap-1.5 text-xs font-medium {{ entry.media_type|media_color }}">
+        <span class="mt-0.5 inline-flex items-center gap-1.5 text-xs font-medium {{ entry.media_type|media_color }}">
           <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
           {{ entry.media_type|media_type_readable }}
         </span>
-        {% for change in entry.changes %}<p class="mt-1 text-sm text-gray-200">{{ change.description }}</p>{% endfor %}
-        <time class="mt-auto self-end pt-2 text-xs text-gray-500"
+        {% for change in entry.changes %}<p class="mt-0.5 text-xs text-gray-300 line-clamp-2">{{ change.description }}</p>{% endfor %}
+        <time class="mt-auto self-end pt-1 text-[11px] text-gray-500"
               title="{{ entry.date|datetime_format:user }}">{{ entry.date|naturaltime }}</time>
       </div>
 
@@ -49,12 +49,9 @@
              @click.outside="confirmOpen = false">
           <h3 class="text-lg font-semibold text-white mb-2">{% translate "Delete activity?" %}</h3>
           <p class="text-sm text-gray-400 mb-6">
-            {% translate "This removes" %} “
-            {% for change in entry.changes %}
-              {{ change.description }}
-              {% if not forloop.last %},{% endif %}
-            {% endfor %}
-            ” {% blocktranslate with title=entry.item %}for {{ title }} from your history. This can't be undone.{% endblocktranslate %}
+            {% blocktranslate with title=entry.item trimmed %}
+              This removes the selected activity for {{ title }} from your history. This can't be undone.
+            {% endblocktranslate %}
           </p>
           <div class="flex justify-end gap-2">
             <button type="button"

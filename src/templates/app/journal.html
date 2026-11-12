@@ -113,8 +113,8 @@
       <div>
         <h3 class="text-sm font-medium text-gray-400">{% translate "Most Active Day" %}</h3>
         {% if activity_data.stats.most_active_day %}
-          <p class="text-2xl font-bold">{{ activity_data.stats.most_active_day }}</p>
-          <p class="text-sm text-gray-500">{{ activity_data.stats.most_active_day_percentage }}% {% translate "of activity" %}</p>
+          <p class="text-2xl font-bold">{% translate activity_data.stats.most_active_day %}</p>
+          <p class="text-sm text-gray-500">{% blocktranslate with percent=activity_data.stats.most_active_day_percentage %}{{ percent }}% of activity{% endblocktranslate %}</p>
         {% else %}
           <p class="text-2xl font-bold text-gray-500">--</p>
         {% endif %}
@@ -128,10 +128,10 @@
         <h3 class="text-sm font-medium text-gray-400">{% translate "Current Streak" %}</h3>
         {% if activity_data.stats.most_active_day %}
           <p class="text-2xl font-bold">
-            {{ activity_data.stats.current_streak }} {% blocktranslate count counter=activity_data.stats.current_streak %}day{% plural %}days{% endblocktranslate %}
+            {% blocktranslate count counter=activity_data.stats.current_streak %}{{ counter }} day{% plural %}{{ counter }} days{% endblocktranslate %}
           </p>
           <p class="text-sm text-gray-500">
-            {% translate "Longest:" %} {{ activity_data.stats.longest_streak }} {% blocktranslate count counter=activity_data.stats.longest_streak %}day{% plural %}days{% endblocktranslate %}
+            {% blocktranslate count counter=activity_data.stats.longest_streak %}Longest: {{ counter }} day{% plural %}Longest: {{ counter }} days{% endblocktranslate %}
           </p>
         {% else %}
           <p class="text-2xl font-bold text-gray-500">--</p>
@@ -153,7 +153,7 @@
         <div class="flex mb-2 pl-[36.68px]">
           {% for month, week_count in activity_data.months %}
             <div class="text-xs text-gray-400"
-                 style="width: calc({{ week_count }} * 1rem + ({{ week_count }} * 0.25rem))">{{ month }}</div>
+                 style="width: calc({{ week_count }} * 1rem + ({{ week_count }} * 0.25rem))">{% translate month %}</div>
           {% endfor %}
         </div>
 
@@ -165,7 +165,7 @@
               {% if forloop.counter|divisibleby:2 %}
                 <div class="h-4"></div>
               {% else %}
-                <div class="h-4 flex items-center">{{ label }}</div>
+                <div class="h-4 flex items-center">{% translate label %}</div>
               {% endif %}
             {% endfor %}
           </div>
@@ -176,7 +176,7 @@
               <div class="flex flex-col gap-1">
                 {% for day in week %}
                   <div class="w-4 h-4 rounded-sm transition-colors duration-200 hover:ring-2 hover:ring-white {% if day.level == 0 %}bg-[#3a414c]{% elif day.level == 1 %}bg-indigo-600{% elif day.level == 2 %}bg-indigo-500{% elif day.level == 3 %}bg-indigo-400{% elif day.level == 4 %}bg-indigo-300{% endif %}"
-                       title="{{ day.date }}: {{ day.count }} activit{{ day.count|pluralize:"y,ies" }}"></div>
+                       title="{% blocktranslate count counter=day.count with date=day.date %}{{ date }}: {{ counter }} activity{% plural %}{{ date }}: {{ counter }} activities{% endblocktranslate %}"></div>
                 {% endfor %}
               </div>
             {% endfor %}
