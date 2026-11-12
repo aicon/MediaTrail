@@ -64,7 +64,11 @@ def _metadata(media_type, media_id, source, season_numbers=None, episode_number=
             "episodes": [{"episode_number": 1, "still_path": None}],
         }
     if media_type == MediaTypes.MOVIE.value:
-        return {"title": "Movie", "image": "https://example.test/movie.jpg"}
+        return {
+            "title": "Movie",
+            "image": "https://example.test/movie.jpg",
+            "max_progress": 1,
+        }
     raise AssertionError(media_type)
 
 
@@ -103,9 +107,26 @@ class NuvioRecordTests(TestCase):
                 event_id=None,
             )
 
+    def test_delete_without_watched_at(self):
+        """Delete events identify by content keys; watched_at may be absent."""
+        record = nuvio.record_from_nuvio(
+            {
+                "event_id": 12,
+                "operation": "delete",
+                "content_id": "tmdb:550",
+                "content_type": "movie",
+                "title": "Fight Club",
+            },
+            operation="delete",
+            event_id=12,
+        )
+        self.assertEqual(record["operation"], "delete")
+        self.assertEqual(record["media_id"], "550")
+        self.assertIsNone(record["end_date"])
+
 
 class NuvioImportTests(TestCase):
-    """Missing movies and episodes are created. Existing rows and deletes are not."""
+    """Missing movies and episodes are created. Deletes need the unwatched toggle."""
 
     def setUp(self):
         self.user = get_user_model().objects.create_user("nuvio-user", password="secret")
@@ -117,7 +138,10 @@ class NuvioImportTests(TestCase):
         )
 
     def _run(self, client):
-        with patch("integrations.imports.nuvio.services.get_media_metadata", _metadata):
+        with (
+            patch("integrations.imports.nuvio.services.get_media_metadata", _metadata),
+            patch("app.models.providers.services.get_media_metadata", _metadata),
+        ):
             return nuvio.NuvioImporter(self.user, client).import_data()
 
     def test_creates_missing_movie_and_saves_cursor(self):
@@ -258,7 +282,7 @@ class NuvioImportTests(TestCase):
         self.assertEqual(counts[MediaTypes.EPISODE.value], 1)
         self.assertEqual(Episode.objects.count(), 1)
 
-    def test_delete_does_not_remove_media(self):
+    def test_delete_does_not_remove_media_when_toggle_off(self):
         self._run(FakeNuvio([_history("tmdb:550", "movie", "Fight Club", nuvio_id="m1")]))
         self._run(
             FakeNuvio(
@@ -276,6 +300,61 @@ class NuvioImportTests(TestCase):
             ),
         )
         self.assertEqual(Movie.objects.filter(user=self.user).count(), 1)
+
+    def test_delete_removes_media_when_toggle_on(self):
+        self.user.nuvio_sync_mark_unplayed_enabled = True
+        self.user.save(update_fields=["nuvio_sync_mark_unplayed_enabled"])
+        self._run(FakeNuvio([_history("tmdb:550", "movie", "Fight Club", nuvio_id="m1")]))
+        self.assertEqual(Movie.objects.filter(user=self.user).count(), 1)
+        self._run(
+            FakeNuvio(
+                delta=[
+                    {
+                        "event_id": 11,
+                        "operation": "delete",
+                        "id": "m1-delete",
+                        "content_id": "tmdb:550",
+                        "content_type": "movie",
+                        "title": "Fight Club",
+                        "watched_at": WATCHED_AT,
+                    },
+                ],
+            ),
+        )
+        self.assertEqual(Movie.objects.filter(user=self.user).count(), 0)
+
+    def test_delete_removes_episode_when_toggle_on(self):
+        self.user.nuvio_sync_mark_unplayed_enabled = True
+        self.user.save(update_fields=["nuvio_sync_mark_unplayed_enabled"])
+        history = [
+            _history(
+                "tmdb:1396",
+                "series",
+                "Breaking Bad",
+                season=1,
+                episode=1,
+                nuvio_id="e1",
+            ),
+        ]
+        self._run(FakeNuvio(history))
+        self.assertEqual(Episode.objects.count(), 1)
+        self._run(
+            FakeNuvio(
+                delta=[
+                    {
+                        "event_id": 21,
+                        "operation": "delete",
+                        "id": "e1-delete",
+                        "content_id": "tmdb:1396",
+                        "content_type": "series",
+                        "title": "Breaking Bad S01E01",
+                        "season": 1,
+                        "episode": 1,
+                    },
+                ],
+            ),
+        )
+        self.assertEqual(Episode.objects.count(), 0)
 
     def test_tmdb_failure_keeps_the_cursor_unsaved(self):
         response = Mock(status_code=503, text="unavailable")

@@ -1,8 +1,9 @@
 """Import Nuvio movies and episodes into MediaTrail.
 
-Writes the local models directly. Nothing is deleted. New mode adds only
-missing movies and episodes. Overwrite mode also replaces the watch date of
-items that are already tracked.
+Writes the local models directly. New mode adds only missing movies and
+episodes. Overwrite mode also replaces the watch date of items that are
+already tracked. Delete events from Nuvio remove matching local history only
+when the user enables mark-unwatched sync.
 """
 
 import logging
@@ -531,7 +532,7 @@ class NuvioImporter:
         nuvio_id = record["nuvio_id"]
         if nuvio_id and nuvio_id in self._permanent:
             return True
-        if record["source"] == "imdb" and record["operation"] == "upsert":
+        if record["source"] == "imdb":
             mapped = self._map_imdb(record)
             if mapped is False:
                 return False
@@ -539,7 +540,21 @@ class NuvioImporter:
                 return True
             record = mapped
         if record["operation"] == "delete":
+            if not self.user.nuvio_sync_mark_unplayed_enabled:
+                self._remember(nuvio_id)
+                return True
+            try:
+                action = self._delete(record)
+            except Exception:
+                logger.exception("Nuvio delete failed for %s", record["title"])
+                return False
             self._remember(nuvio_id)
+            if action == "delete":
+                logger.info(
+                    "Nuvio sync deleted %s: %s",
+                    record["kind"],
+                    record["title"],
+                )
             return True
         if record["operation"] != "upsert":
             return True
@@ -576,6 +591,49 @@ class NuvioImporter:
         if record["kind"] == MediaTypes.MOVIE.value:
             return self._write_movie(record)
         return self._write_episode(record)
+
+    def _delete(self, record):
+        if record["kind"] == MediaTypes.MOVIE.value:
+            return self._delete_movie(record)
+        return self._delete_episode(record)
+
+    def _delete_movie(self, record):
+        media_id = str(record["media_id"])
+        existing = (
+            app.models.Movie.objects.filter(
+                user=self.user,
+                item__media_id=media_id,
+                item__source=Sources.TMDB.value,
+                item__media_type=MediaTypes.MOVIE.value,
+            )
+            .order_by("-end_date", "-created_at")
+            .first()
+        )
+        if existing is None:
+            return "missing"
+        existing.delete()
+        return "delete"
+
+    def _delete_episode(self, record):
+        media_id = str(record["media_id"])
+        season_number = record["season"]
+        episode_number = record["episode"]
+        existing = (
+            app.models.Episode.objects.filter(
+                related_season__user=self.user,
+                item__media_id=media_id,
+                item__source=Sources.TMDB.value,
+                item__media_type=MediaTypes.EPISODE.value,
+                item__season_number=season_number,
+                item__episode_number=episode_number,
+            )
+            .order_by("-end_date", "-created_at")
+            .first()
+        )
+        if existing is None:
+            return "missing"
+        existing.delete()
+        return "delete"
 
     def _write_movie(self, record):
         media_id = str(record["media_id"])
@@ -853,9 +911,11 @@ def record_from_nuvio(row, *, operation, event_id):
         episode = _optional_int(extra[1])
 
     watched_at = row.get("watched_at")
-    if isinstance(watched_at, bool) or not isinstance(watched_at, (int, float)):
+    end_date = None
+    if isinstance(watched_at, (int, float)) and not isinstance(watched_at, bool):
+        end_date = datetime.fromtimestamp(int(watched_at) / 1000, tz=timezone.utc)
+    elif operation != "delete":
         raise RecordError(f"missing watched_at for {title}")
-    end_date = datetime.fromtimestamp(int(watched_at) / 1000, tz=timezone.utc)
     nuvio_id = _nuvio_id(row, event_id)
 
     if content_type == "movie":
