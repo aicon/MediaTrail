@@ -80,4 +80,7 @@ def watch_episode(
         season_metadata=season_metadata,
     )
     clear_live_playback_for_item(user=user, item=episode.item)
+    from integrations.nuvio_outbound import enqueue_watched_upsert
+
+    enqueue_watched_upsert(user, episode)
     return episode

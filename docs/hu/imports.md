@@ -13,7 +13,7 @@ A források alatti történet az elmúlt hét napot mutatja. A „most fut” á
 
 ## Nuvio
 
-A Nuvio az első forrás. Egy Nuvio-profil filmjeit és epizódjait olvassa. A Nuvio felé írás nem az import űrlap része; az opcionális szinkron-kapcsolók a Beállítások → Integrációk → Nuvio alatt vannak.
+A Nuvio az első forrás. Egy Nuvio-profil filmjeit és epizódjait olvassa. A kétirányú megtekintési-előzmény szinkron opcionális a Beállítások → Integrációk → Nuvio alatt: a megnézett / nem megtekintett kapcsolók a Nuvio deltát helyben alkalmazzák, és a MediaTrailben történő megjelölésnél vagy törlésnél a `sync_push_watched_items` / `sync_delete_watched_items` hívásokat indítják.
 
 Az élő **„Most nézem”** sáv más út: a beépített MediaTrail addon a társalkalmazások `player` eseményeit kapja, eszközönkénti azonosítóval. Az előzményimport ezeket a sávokat nem írja felül. Lásd a [Könyvtár](library.md) oldalt és a [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md) leírást.
 

@@ -133,6 +133,38 @@ def import_nuvio(user_id, mode, username=None):
     return import_media(nuvio.importer, username or "", user_id, mode)
 
 
+@shared_task(
+    name="Push Nuvio watched item",
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 5},
+)
+def push_nuvio_watched_item(user_id, item):
+    """Upsert one watched item to Nuvio. Idempotent on retry."""
+    user = get_user_model().objects.get(id=user_id)
+    if not user.nuvio_sync_mark_played_enabled:
+        return
+    if not isinstance(item, dict) or not item.get("content_id"):
+        return
+    nuvio.NuvioClient(user.nuvio_account).push_watched_items([item])
+
+
+@shared_task(
+    name="Delete Nuvio watched item",
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 5},
+)
+def delete_nuvio_watched_item(user_id, key):
+    """Delete one watched item from Nuvio by content key. Idempotent on retry."""
+    user = get_user_model().objects.get(id=user_id)
+    if not user.nuvio_sync_mark_unplayed_enabled:
+        return
+    if not isinstance(key, dict) or not key.get("content_id"):
+        return
+    nuvio.NuvioClient(user.nuvio_account).delete_watched_items([key])
+
+
 @shared_task(name="Import from Trakt")
 def import_trakt(
     user_id,

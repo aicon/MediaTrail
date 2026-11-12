@@ -268,7 +268,7 @@ def save_account(user, email, password, profile_id):
 
 
 class NuvioClient:
-    """Read one Nuvio profile's watch history. Never writes to Nuvio."""
+    """Talk to one Nuvio profile's watch history (read and optional write)."""
 
     def __init__(self, account):
         """Sign in with the encrypted password stored for this account."""
@@ -376,6 +376,30 @@ class NuvioClient:
             if len(rows) < PAGE_SIZE:
                 return
 
+    def push_watched_items(self, items):
+        """Upsert watched-history rows. Safe to retry the same items."""
+        if not items:
+            return
+        self._rpc(
+            "sync_push_watched_items",
+            {
+                "p_profile_id": self._profile_id,
+                "p_items": items,
+            },
+        )
+
+    def delete_watched_items(self, keys):
+        """Delete watched-history rows by content keys. Safe to retry."""
+        if not keys:
+            return
+        self._rpc(
+            "sync_delete_watched_items",
+            {
+                "p_profile_id": self._profile_id,
+                "p_keys": keys,
+            },
+        )
+
     def _rpc(self, name, body):
         try:
             return self._request(f"/rest/v1/rpc/{name}", body)
@@ -403,6 +427,8 @@ class NuvioClient:
             raise NuvioError("Nuvio request failed") from exc
         if response.status_code >= 400:
             raise NuvioError("Nuvio request failed", response.status_code)
+        if response.status_code == 204 or not response.content:
+            return None
         return response.json()
 
     def _ensure_token(self):
@@ -563,6 +589,9 @@ class NuvioImporter:
             if not self.user.nuvio_sync_mark_unplayed_enabled:
                 self._remember(nuvio_id)
                 return True
+            if self.gate_upserts and self._is_echo(row):
+                self._remember(nuvio_id)
+                return True
             try:
                 action = self._delete(record)
             except Exception:
@@ -579,6 +608,9 @@ class NuvioImporter:
         if record["operation"] != "upsert":
             return True
         if self.gate_upserts and not self.user.nuvio_sync_mark_played_enabled:
+            self._remember(nuvio_id)
+            return True
+        if self.gate_upserts and self._is_echo(row):
             self._remember(nuvio_id)
             return True
 
@@ -609,6 +641,12 @@ class NuvioImporter:
             )
             self.created[record["kind"]] += 1
         return True
+
+    def _is_echo(self, row):
+        """Skip delta rows that match a recent outbound push or delete."""
+        from integrations.nuvio_outbound import is_pending_outbound
+
+        return is_pending_outbound(self.user.id, row)
 
     def _write(self, record):
         if record["kind"] == MediaTypes.MOVIE.value:

@@ -705,8 +705,12 @@ def media_save(request):
     form_class = get_form_class(media_type)
     form = form_class(request.POST, instance=instance)
     if form.is_valid():
-        form.save()
-        logger.info("%s saved successfully.", form.instance)
+        saved = form.save()
+        logger.info("%s saved successfully.", saved)
+        if media_type == MediaTypes.MOVIE.value:
+            from integrations.nuvio_outbound import enqueue_watched_upsert
+
+            enqueue_watched_upsert(request.user, saved)
     else:
         logger.error(form.errors.as_json())
         for field, errors in form.errors.items():
@@ -725,6 +729,10 @@ def media_delete(request):
     instance_id = request.POST["instance_id"]
     media_type = request.POST["media_type"]
     media = helpers.get_owned_media_or_404(request, media_type, instance_id)
+    if media_type in {MediaTypes.MOVIE.value, MediaTypes.EPISODE.value}:
+        from integrations.nuvio_outbound import enqueue_watched_delete
+
+        enqueue_watched_delete(request.user, media)
     media.delete()
     logger.info("%s deleted successfully.", media)
 

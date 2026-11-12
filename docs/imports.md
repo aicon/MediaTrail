@@ -13,7 +13,7 @@ The history list below the sources shows the last seven days. A task that says i
 
 ## Nuvio
 
-Nuvio is the first source. It reads movies and episodes from one Nuvio profile. Outbound writes to Nuvio are not part of the import form; they belong to the optional sync toggles under Settings → Integrations → Nuvio.
+Nuvio is the first source. It reads movies and episodes from one Nuvio profile. Two-way watch-history sync is optional under Settings → Integrations → Nuvio: mark-watched / mark-unwatched toggles apply Nuvio delta changes locally and queue matching `sync_push_watched_items` / `sync_delete_watched_items` calls when you mark or delete history in MediaTrail.
 
 Live **Now Watching** from the companion apps is separate: the built-in MediaTrail addon receives `player` events with a per-device id. History import does not replace those device strips. See [Library](library.md) and [Live playback / Now Watching](LIVE_PLAYBACK_NOW_WATCHING.md).
 
