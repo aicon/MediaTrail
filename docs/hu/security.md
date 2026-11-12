@@ -4,18 +4,33 @@
 
 Az ellenőrzés a buildelt image-en történik, nem csupán a PyPI verziószámokon.
 
-## Állapot: biztonsági kör lezárva (`f75f118`)
+## Állapot (szétválasztva)
 
-Ellenőrzött runtime artifact:
+### Lezárva — image-függőségek / Trivy (`f75f118`)
 
 - Commit: `f75f118`
 - Workflow: https://github.com/aicon/MediaTrail/actions/runs/43251480942
 - Image digest: `ghcr.io/aicon/mediatrail@sha256:b2578814843384541a8cb219c5f8d04c1c9ca4007b183e2efaf9284716573545`
-- Build gate: `verify_pillow_native: OK`
-- Trivy (CRITICAL+HIGH+MEDIUM+LOW, vuln): **0 találat**; runtime: **nincs pip**; DRF 3.18.3 / Pillow 13.0.0 a lockból
+- `verify_pillow_native: OK`; Trivy vuln: **0**; nincs runtime `pip`; DRF/Pillow a lockból
 
-Célzott tesztek push előtt: Simkl 13/13, Trakt OAuth 11/11, lock tesztek 4/4.
-A teljes suite ebben a körben nem futott végig.
+### Lezárva — célzott OAuth / lock tesztek
+
+Simkl 13/13, Trakt 11/11, lock 4/4 (28/28). Ez **nem** igazolja a SoupSieve /
+BeautifulSoup importutakat.
+
+### Lezárva — SoupSieve 4.1 / BeautifulSoup importutak
+
+Külön futtatás `soupsieve==4.1` mellett (nem a 28 OAuth/lock teszt):
+comicvine/openlibrary metadata + search nodeid-ek **9/9**, plusz CSS/`get_text`
+smoke. Egy tágabb szűrésben a Hardcover genre-assert elbukott (`Fiction` vs
+`Literary Fiction`) — ez nem BeautifulSoup. A teljes suite továbbra is külön
+kérdés.
+
+### Nyitva — éles deployment-beállítások
+
+1. TLS / `X-Forwarded-Proto`
+2. `TRUSTED_PROXIES` (+ `URLS`)
+3. Production `SECRET` / `SECRET_FILE` ≠ repo default
 
 ## Támogatott telepítés (reprodukálható)
 

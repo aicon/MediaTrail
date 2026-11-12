@@ -4,9 +4,9 @@
 
 Verified against built images, not PyPI version numbers alone.
 
-## Status: security round closed (`f75f118`)
+## Status (split)
 
-Verified runtime artifact (not merely the moving `:dev` tag):
+### Closed — image dependencies / Trivy (`f75f118`)
 
 - Commit: `f75f118`
 - Workflow: https://github.com/aicon/MediaTrail/actions/runs/43251480942
@@ -14,11 +14,34 @@ Verified runtime artifact (not merely the moving `:dev` tag):
 - Image ID (config): `sha256:0b6f8ebe19f8ae664334cf463fa5139a5d55ba837d21c1b2e1e459a10bad2e6e`
 - Build gate: `verify_pillow_native: OK` (in image build log)
 - Trivy (`--severity CRITICAL,HIGH,MEDIUM,LOW`, `--scanners vuln`): **0 findings**
-- Runtime inventory on that digest: **no `pip`**; `djangorestframework==3.18.3`, `pillow==13.0.0`, `soupsieve==4.1` from the locked venv
+- Runtime inventory on that digest: **no `pip`**; `djangorestframework==3.18.3`,
+  `pillow==13.0.0`, `soupsieve==4.1` from the locked venv
 
-Targeted OAuth / lock tests before push: `SimklOAuthViewTests` 13/13,
-`TraktOAuthViewTests` 11/11, `LockedDependencyInstallTests` 4/4. Full suite was
-not re-run end-to-end in this round.
+### Closed — targeted OAuth / lock tests
+
+`SimklOAuthViewTests` 13/13, `TraktOAuthViewTests` 11/11,
+`LockedDependencyInstallTests` 4/4 (28/28). These do **not** cover SoupSieve /
+BeautifulSoup import paths.
+
+### Closed — SoupSieve 4.1 / BeautifulSoup import paths
+
+Dedicated pass under local `soupsieve==4.1` / `beautifulsoup4==4.14.3` (not
+covered by the 28 OAuth/lock tests):
+
+- `Metadata::test_book`, `test_comic`, `test_openlibrary_publish_date_with_abbreviated_month`
+- `Search::test_books`, `test_comics`
+- `ServicesTests` comicvine/openlibrary metadata + search (4)
+- CSS/`get_text` smoke against soupsieve 4.1
+
+**9/9** nodeids + smoke OK. A broader `-k book|comic` run also hit an unrelated
+Hardcover genre-label assertion failure (`Fiction` vs API `Literary Fiction`);
+that path does not use BeautifulSoup. Full suite remains a separate question.
+
+### Open — deployment settings (not closed by package scan)
+
+1. TLS / `X-Forwarded-Proto` (who terminates TLS?)
+2. `TRUSTED_PROXIES` (+ `URLS`) when a reverse proxy is in front
+3. Production `SECRET` / `SECRET_FILE` ≠ repository default
 
 ## Supported dependency install (reproducible)
 
