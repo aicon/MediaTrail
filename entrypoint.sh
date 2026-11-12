@@ -5,8 +5,9 @@ set -e
 configure_trusted_proxies() {
     proxies="$1"
 
+    # BusyBox ash: avoid bare quotes inside the character class (breaks parsing).
     case "$proxies" in
-        *[!0-9a-fA-F:./,\" "]*)
+        *[!0-9a-fA-F:./,\ ]*)
             echo "Invalid TRUSTED_PROXIES: '$proxies' (expected comma-separated IPv4/IPv6 addresses or CIDR subnets)" >&2
             exit 1
             ;;

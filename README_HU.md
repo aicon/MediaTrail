@@ -51,7 +51,7 @@ Minden egyes csatlakoztatott eszköz (telefonok és tetszőleges számú televí
 
 A sávok jól láthatóan a kezdőlapod legfelső részén helyezkednek el:
 
-![A Most nézem sáv a kezdőlapon](docs/screenshots/now-watching-desktop2.png)
+![A Most nézem sáv a kezdőlapon](docs/screenshots/now-watching-hu.png)
 
 ### Hogyan működik a lejátszáskövetés?
 
@@ -89,6 +89,12 @@ services:
       URLS:
       ADMIN_ENABLED: false
       REGISTRATION: false
+      # Simkl AUTH V2 (új kapcsolásokhoz, PKCE)
+      # SIMKL_V2_ID:
+      # SIMKL_V2_SECRET:
+      # Régi AUTH V1 (elavult ~2027. április), csak ha a V2 nincs beállítva:
+      # SIMKL_ID:
+      # SIMKL_SECRET:
     volumes:
       - ./db:/mediatrail/db
 ```
@@ -108,6 +114,17 @@ URLS=https://mediatrail.pelda.hu
 ```
 
 A megadott címnek minden esetben tartalmaznia kell a protokollt (`https://` vagy `http://`), záró perjel vagy almappa-útvonal nélkül. Több domain esetén az értékeket vesszővel választhatod el.
+
+#### Simkl AUTH V2
+
+Az új Simkl-kapcsolások **AUTH V2 + PKCE**-t használnak, ha a `SIMKL_V2_ID` be van állítva. Az alkalmazás callback címe legyen pontosan: `https://sajat-host/import/simkl_private`. A `SIMKL_V2_SECRET` csak szerver-típusú Simkl-alkalmazásokhoz kell. A titkot inkább `SIMKL_V2_ID_FILE` / `SIMKL_V2_SECRET_FILE` fájlból add át.
+
+```text
+SIMKL_V2_ID=sajat-v2-ugyfelazonosito
+# SIMKL_V2_SECRET=opcionalis-szerver-alkalmazashoz
+```
+
+A meglévő AUTH V1 tokenek a V1 kivezetéséig (~2027. április) működnek. A `SIMKL_ID` / `SIMKL_SECRET` a V2 nélküli tartalék. V2 beállítása után az Import oldalon kapcsolódj újra, hogy az ütemezés V2 refresh tokent tároljon.
 
 A támogatott beállítások részletes leírását a kézikönyv [Környezet](https://aicon.github.io/mediatrail-docs/hu/runtime/) fejezetében találod.
 

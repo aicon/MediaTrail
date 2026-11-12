@@ -4,9 +4,9 @@
 
 A gyűjteményed a kezdőlapon és az oldalsávon keresztül érhető el. A filmek, sorozatok, évadok és egyéb médiatípusok mind saját listával rendelkeznek. A listák keresőmezője a saját tételeid között böngészik.
 
-Lejátszás vagy szüneteltetés közben a kezdőlap tetején megjelennek a dinamikus **„Most nézem”** sávok – minden kapcsolódó eszközhöz (telefonhoz vagy különálló televízióhoz) egy-egy önálló sáv. A panelen látható a mű címe, az epizód száma, a megtekintett hányad, a hátralévő idő, valamint a tetszés szerint átnevezhető eszköznév. Ha egy adott eszközön leállítod a lejátszást vagy elrejted a sávot, az a többi készülék kijelzését nem érinti. Amikor a társalkalmazás leállítási (`stop`) eseményt küld, és az előrehaladás elérte a legalább **90%**-ot, a MediaTrail kiegészítője automatikusan egy befejezett megtekintést rögzít a naplódba. Az alábbi illusztráción a magyar nyelvű kezelőfelület látható.
+Lejátszás vagy szüneteltetés közben a kezdőlap tetején megjelennek a dinamikus **„Most nézem”** sávok – minden kapcsolódó eszközhöz (telefonhoz vagy különálló televízióhoz) egy-egy önálló sáv. A panelen látható a mű címe, az epizód száma, a megtekintett hányad, a hátralévő idő, valamint a tetszés szerint átnevezhető eszköznév. Ha egy adott eszközön leállítod a lejátszást vagy elrejted a sávot, az a többi készülék kijelzését nem érinti. Amikor a társalkalmazás leállítási (`stop`) eseményt küld, és az előrehaladás elérte a legalább **90%**-ot, a MediaTrail kiegészítője automatikusan egy befejezett megtekintést rögzít a naplódba.
 
-![A Most nézem sáv a kezdőlapon](../screenshots/now-watching-desktop2.png)
+![A Most nézem sáv a kezdőlapon](../screenshots/now-watching-hu.png)
 
 A MediaTrail kiegészítő hivatkozását a **Beállítások → Integrációk → Nuvio** menüpontból másolhatod ki, amelyet valamennyi [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) és [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) kliensedben hozzá kell adnod a bővítményekhez. Részletes tájékoztató: [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md).
 

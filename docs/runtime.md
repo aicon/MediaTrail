@@ -54,6 +54,22 @@ Movie, series, anime, game, book, comic, and board-game lookups work with the cl
 | `SIMKL_V2_ID` | Simkl AUTH V2 client id for new connections (PKCE). Register callback `…/import/simkl_private`. |
 | `SIMKL_V2_SECRET` | Optional V2 client secret for server-type apps. Never commit; prefer `*_FILE` mounts. |
 
+### Simkl AUTH V2 (Compose / `.env`)
+
+When `SIMKL_V2_ID` is set, Import → Connect with Simkl starts the V2 authorize URL (`simkl.com/oauth2/authorize`) with S256 PKCE, stores an encrypted **refresh** token, and schedules imports with `auth=v2`. Without `SIMKL_V2_ID`, MediaTrail falls back to AUTH V1 (`/oauth/authorize`) and encrypted access tokens.
+
+Example environment block:
+
+```text
+SIMKL_V2_ID=your-v2-client-id
+# SIMKL_V2_SECRET=only-if-your-simkl-app-is-server-type
+# Or file mounts:
+# SIMKL_V2_ID_FILE=/run/secrets/simkl_v2_id
+# SIMKL_V2_SECRET_FILE=/run/secrets/simkl_v2_secret
+```
+
+Register the redirect URI exactly as MediaTrail builds it from `URLS` + `/import/simkl_private`. After enabling V2, reconnect once so recurring tasks stop relying on V1-only access tokens. V1 remains until Simkl’s planned ~April 2027 retirement.
+
 `MU_NSFW` is the adult-content switch for MangaUpdates.
 
 ## Sign-in through another site

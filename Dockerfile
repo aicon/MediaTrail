@@ -26,7 +26,7 @@ RUN apk add --no-cache \
     libxcb-dev \
     openjpeg-dev \
     tiff-dev \
-    zlib-dev \
+    zlib-dev=1.4-r0 \
     brotli-dev=1.2.1-r0 \
     brotli-libs=1.2.1-r0
 
@@ -40,7 +40,12 @@ COPY ./uv.lock ./uv.lock
 RUN uv sync --locked --no-binary-package pillow \
     && uv pip install --python /mediatrail/.venv/bin/python \
         "djangorestframework~=3.18.2" \
-        "drf-spectacular~=0.28.0"
+        "drf-spectacular~=0.28.0" \
+    # Runtime image never needs pip; strip it from the shipped venv.
+    && (uv pip uninstall --python /mediatrail/.venv/bin/python -y pip || true) \
+    && rm -rf /mediatrail/.venv/lib/python*/site-packages/pip \
+              /mediatrail/.venv/lib/python*/site-packages/pip-*.dist-info \
+              /mediatrail/.venv/bin/pip /mediatrail/.venv/bin/pip3
 
 # --- Final stage: minimal runtime image ---
 FROM python:3.12-alpine3.23
@@ -84,7 +89,7 @@ RUN apk add --no-cache \
     libxcb \
     openjpeg \
     tiff \
-    zlib \
+    zlib=1.4-r0 \
     brotli-libs=1.2.1-r0 \
     krb5-libs=1.22.3-r0 \
     && chmod +x /entrypoint.sh \

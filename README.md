@@ -51,7 +51,7 @@ Each companion device gets its own dedicated strip on the home page, allowing ph
 
 The strips sit prominently at the top of your dashboard:
 
-![Now Watching on the home page](docs/screenshots/now-watching-desktop2.png)
+![Now Watching on the home page](docs/screenshots/now-watching-en.png)
 
 ### How Playback Tracking Works
 
@@ -89,6 +89,12 @@ services:
       URLS:
       ADMIN_ENABLED: false
       REGISTRATION: false
+      # Simkl AUTH V2 (preferred for new connections; PKCE)
+      # SIMKL_V2_ID:
+      # SIMKL_V2_SECRET:
+      # Legacy AUTH V1 (deprecated ~April 2027) only if V2 is unset:
+      # SIMKL_ID:
+      # SIMKL_SECRET:
     volumes:
       - ./db:/mediatrail/db
 ```
@@ -108,6 +114,17 @@ URLS=https://mediatrail.example.com
 ```
 
 The URL must include the protocol (`https` or `http`) and should not include a trailing slash or application path. Multiple origins can be separated with commas.
+
+#### Simkl AUTH V2
+
+New Simkl links use **AUTH V2 + PKCE** when `SIMKL_V2_ID` is set. Register your app callback as `https://your-host/import/simkl_private` (exact match). Optional `SIMKL_V2_SECRET` is only for server-type Simkl apps. Prefer `SIMKL_V2_ID_FILE` / `SIMKL_V2_SECRET_FILE` over putting secrets in Compose.
+
+```text
+SIMKL_V2_ID=your-v2-client-id
+# SIMKL_V2_SECRET=optional-for-server-apps
+```
+
+Existing AUTH V1 tokens keep working until Simkl retires V1 (~April 2027). `SIMKL_ID` / `SIMKL_SECRET` remain the V1 fallback when V2 is unset. After configuring V2, reconnect Simkl from Import so schedules store a V2 refresh token.
 
 For the full list of supported settings, see [Runtime Documentation](https://aicon.github.io/mediatrail-docs/runtime/).
 

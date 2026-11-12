@@ -54,6 +54,22 @@ A filmek, sorozatok, animék, videojátékok, könyvek, képregények és társa
 | `SIMKL_V2_ID` | Simkl AUTH V2 ügyfélazonosító az új kapcsolásokhoz (PKCE). Callback: `…/import/simkl_private`. |
 | `SIMKL_V2_SECRET` | Opcionális V2 titok szerver-típusú alkalmazásokhoz. Ne kerüljön a repóba; inkább `*_FILE`. |
 
+### Simkl AUTH V2 (Compose / `.env`)
+
+Ha a `SIMKL_V2_ID` be van állítva, az Import → Simkl összekapcsolás a V2 authorize URL-t nyitja (`simkl.com/oauth2/authorize`) S256 PKCE-vel, titkosított **refresh** tokent tárol, és az ütemezést `auth=v2` mellett futtatja. `SIMKL_V2_ID` nélkül a rendszer AUTH V1-re esik vissza (`/oauth/authorize`) és access tokent tárol.
+
+Példa környezeti blokk:
+
+```text
+SIMKL_V2_ID=sajat-v2-ugyfelazonosito
+# SIMKL_V2_SECRET=csak-szerver-tipusu-alkalmazashoz
+# Vagy fájlból:
+# SIMKL_V2_ID_FILE=/run/secrets/simkl_v2_id
+# SIMKL_V2_SECRET_FILE=/run/secrets/simkl_v2_secret
+```
+
+A redirect URI legyen pontosan a `URLS` + `/import/simkl_private` cím. V2 bekapcsolása után egyszer kapcsolódj újra, hogy az ütemezett feladatok ne V1-only access tokenre támaszkodjanak. A V1 a tervezett ~2027. áprilisi kivezetésig marad.
+
 A `MU_NSFW` a MangaUpdates felnőtt tartalmú szűrőjének kapcsolója.
 
 ## Külső fiókkal történő hitelesítés (SSO / OAuth)
