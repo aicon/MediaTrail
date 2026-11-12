@@ -48,10 +48,25 @@ Lock célok (újraszkennelésig **nyitottak**): PyJWT ~=2.14.0, certifi ≥2026.
 cryptography ~=50.0, DRF ~=3.18.2, dnspython ~=2.9.0, oauthlib ~=4.0.1
 (ehhez `django-allauth~=65.22`), soupsieve ~=2.8.4.
 
-## Nyitott kockázatok
+## Újraszkennelés `26af91a` után (HIGH/CRITICAL)
 
-- A fenti Trivy-sorok, amíg az új `:dev` image újraszkennelése nem igazolja a
-  javítást.
-- Pillow forrásbuild, amíg nincs hivatalos Brotli ≥1.2.1 wheel.
-- Az újraszkennelésen megjelenő új findingek külön listázandók.
-- A django-allauth 65.22 bővebb ugrás; SSO használatnál érdemes smoke-test.
+Image: `ghcr.io/aicon/mediatrail:dev` @ `26af91a`  
+Gate: Pillow 13.0.0 forrásbuild, Brotli 1.2.1, `krb5-libs` → **1.22.3-r0**.
+
+Trivy HIGH+CRITICAL: **Alpine 0**, **Python 0** — a fenti HIGH/CRITICAL
+tábla ezen a digesten tisztázott, de a nyomvonal dokumentálva marad.
+
+## Továbbra is nyitott (MEDIUM/LOW ugyanazon az image-en)
+
+| Sev | Típus | ID | Csomag | Telepítve | Fix |
+| --- | --- | --- | --- | --- | --- |
+| MEDIUM | alpine | CVE-2026-4738 | zlib | 1.3.2-r1 | 1.4-r0 |
+| MEDIUM | python | CVE-2026-101918 / 102275 | PyJWT | 2.14.0 | 2.15.0 |
+| MEDIUM | python | CVE-2026-104874 | multidict | 6.7.1 | 6.9.1 |
+| MEDIUM | python | CVE-2026-85999 / 86000 | soupsieve | 2.8.4 | 2.9.0 |
+| MEDIUM | python | több pip CVE | pip | 25.0.1 | 25.3–26.2.x |
+| LOW | python | CVE-2026-59180 | apprise | 1.9.9 | 1.11.0 |
+| LOW | python | CVE-2026-1703 | pip | 25.0.1 | 26.0 |
+
+Ezek **nincsenek lezárva**. Pillow forrásbuild és az allauth 65.22 SSO
+smoke-test szintén nyitott / figyelendő.

@@ -103,13 +103,46 @@ new pin after a scan—not an unscoped upgrade.
 `TRUSTED_PROXIES` (comma-separated IPs/CIDRs) configures nginx
 `set_real_ip_from` + `real_ip_header X-Forwarded-For` only when set.
 
-## Open risks (do not treat as fixed)
+## Rescan after `26af91a` (HIGH/CRITICAL)
 
-- **Post-`3a081e4` Trivy HIGH/CRITICAL rows above** until a new `:dev` image is
-  built and rescanned with zero matching findings for those IDs.
+Image: `ghcr.io/aicon/mediatrail:dev` @ `26af91a`  
+Workflow: https://github.com/aicon/MediaTrail/actions/runs/43233299217  
+Gate: Pillow 13.0.0 source build, `BrotliDecoderVersion=1.2.1`,
+`krb5-libs` upgraded `1.22.1-r0 → 1.22.3-r0`.
+
+Trivy `--severity HIGH,CRITICAL`: **Alpine 0**, **Python 0**.
+
+The HIGH/CRITICAL rows in the table above are therefore cleared **on this
+image digest**. They stay documented so the before/after trail is auditable.
+
+## Still open (MEDIUM/LOW on the same image — not closed)
+
+Trivy `--severity MEDIUM,LOW` after `26af91a`:
+
+| Severity | Type | ID | Package | Installed | Fixed |
+| --- | --- | --- | --- | --- | --- |
+| MEDIUM | alpine | CVE-2026-4738 | zlib | 1.3.2-r1 | 1.4-r0 |
+| MEDIUM | python-pkg | CVE-2026-101918 | PyJWT | 2.14.0 | 2.15.0 |
+| MEDIUM | python-pkg | CVE-2026-102275 | PyJWT | 2.14.0 | 2.15.0 |
+| MEDIUM | python-pkg | CVE-2026-104874 | multidict | 6.7.1 | 6.9.1 |
+| MEDIUM | python-pkg | CVE-2026-85999 | soupsieve | 2.8.4 | 2.9.0 |
+| MEDIUM | python-pkg | CVE-2026-86000 | soupsieve | 2.8.4 | 2.9.0 |
+| MEDIUM | python-pkg | CVE-2025-8869 | pip | 25.0.1 | 25.3 |
+| MEDIUM | python-pkg | CVE-2026-13346 | pip | 25.0.1 | 26.2.0 |
+| MEDIUM | python-pkg | CVE-2026-3219 | pip | 25.0.1 | 26.1 |
+| MEDIUM | python-pkg | CVE-2026-6357 | pip | 25.0.1 | 26.1 |
+| MEDIUM | python-pkg | CVE-2026-8643 | pip | 25.0.1 | 26.1.2 |
+| LOW | python-pkg | CVE-2026-59180 | apprise | 1.9.9 | 1.11.0 |
+| LOW | python-pkg | CVE-2026-1703 | pip | 25.0.1 | 26.0 |
+
+These are **open**. Do not treat them as fixed until pinned/upgraded and
+rescanned on a new image.
+
+## Other open risks
+
 - **Pillow still built from source** until upstream wheels embed Brotli ≥ 1.2.1
   (expected around Pillow 13.1.0).
-- **Any new Alpine / Python findings** that appear on the rescan stay open and
-  must be listed with installed vs fixed versions.
 - **django-allauth 65.22** is a broader upgrade than a leaf pin; smoke-test
   social login after deploy if SSO is in use.
+- Runtime `pip` inside the image is a transitive/tooling surface; bumping it
+  needs a deliberate lock/image change, not an implicit claim of closure.
