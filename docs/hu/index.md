@@ -1,4 +1,4 @@
-# MediaTrail
+﻿# MediaTrail
 
 [English](../index.md)
 
@@ -12,7 +12,7 @@ Ez a kötet a MediaTrail átfogó kézikönyve.
 
 - A [Telepítés](install.md) a konténer üzembe helyezését, az adattároló mappát és az első indítás lépéseit mutatja be.
 - A [Könyvtár](library.md) fejezet az élmények követéséről, a listák és a naptár kezeléséről, az egyéni tételek rögzítéséről, valamint a többeszközös „Most nézem” sávról nyújt tájékoztatást.
-- A [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md) az eszközönkénti lejátszási sávok működését, a kiegészítő eseményeit, az eszközök átnevezését és az inaktivitási időkorlátokat részletezi.
+- A [Live playback / Now Watching](../now-watching.md) az eszközönkénti lejátszási sávok működését, a kiegészítő eseményeit, az eszközök átnevezését és az inaktivitási időkorlátokat részletezi.
 - Az [Import](imports.md) fejezet a korábbi előzmények behozatalát ismerteti, kitérve a Nuvio-integrációra is.
 - A [Környezet](runtime.md) leírása azokat a rendszerszintű beállításokat foglalja össze, amelyek nem az egyes fiókokhoz, hanem magához az üzemeltetőhöz tartoznak.
 - A [Fiókok](accounts.md) a bejelentkezés, az új felhasználók regisztrációja és az adminisztrációs felület működését mutatja be.

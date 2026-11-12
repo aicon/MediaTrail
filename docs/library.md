@@ -1,4 +1,4 @@
-# Library
+﻿# Library
 
 [Magyar változat](hu/library.md)
 
@@ -8,7 +8,7 @@ While a title is playing or paused, **Now Watching** strips can sit at the top o
 
 ![Now Watching on the home page](screenshots/now-watching-en.png)
 
-Install the MediaTrail addon address from Settings → Integrations → Nuvio in each [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) or [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) client. Details: [Live playback / Now Watching](LIVE_PLAYBACK_NOW_WATCHING.md). Two-way watch-history sync (mark watched / unwatched) is optional on the same Integrations page; see [Imports → Nuvio](imports.md#two-way-interactive-sync).
+Install the MediaTrail addon address from Settings → Integrations → Nuvio in each [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) or [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) client. Details: [Live playback / Now Watching](now-watching.md). Two-way watch-history sync (mark watched / unwatched) is optional on the same Integrations page; see [Imports → Nuvio](imports.md#two-way-interactive-sync).
 
 Opening a title shows the catalog details and the tracking form. Status, score, progress, start and end dates, and a note belong to that entry. Repeating a finished title keeps another pass in the history. A series is a parent: seasons and episodes are separate rows, so marking one episode does not rewrite the whole show.
 

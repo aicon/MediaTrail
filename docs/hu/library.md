@@ -1,4 +1,4 @@
-# Könyvtár
+﻿# Könyvtár
 
 [English](../library.md)
 
@@ -8,7 +8,7 @@ Lejátszás vagy szüneteltetés közben a kezdőlap tetején megjelennek a dina
 
 ![A Most nézem sáv a kezdőlapon](../screenshots/now-watching-hu.png)
 
-A MediaTrail kiegészítő hivatkozását a **Beállítások → Integrációk → Nuvio** menüpontból másolhatod ki, amelyet valamennyi [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) és [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) kliensedben hozzá kell adnod a bővítményekhez. Részletes tájékoztató: [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md).
+A MediaTrail kiegészítő hivatkozását a **Beállítások → Integrációk → Nuvio** menüpontból másolhatod ki, amelyet valamennyi [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) és [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) kliensedben hozzá kell adnod a bővítményekhez. Részletes tájékoztató: [Live playback / Now Watching](../now-watching.md).
 
 Egy mű adatlapját megnyitva a külső katalógus adatai és a naplózási űrlap jelenik meg. A bejegyzéshez rögzítheted az aktuális állapotot, a személyes értékelésedet, a megtekintés előrehaladását, a kezdeti és befejezési dátumot, valamint az egyéni megjegyzéseidet. Amennyiben egy korábban befejezett művet újra megtekintesz vagy újraolvasol, a rendszer újabb bejegyzést fűz a megtekintési előzményeidhez. A sorozatok hierarchikus felépítésűek: az évadok és az epizódok különálló tételként szerepelnek a rendszerben, így egyetlen rész megtekintésének rögzítése nem írja felül a teljes műsort.
 

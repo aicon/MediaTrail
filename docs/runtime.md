@@ -1,4 +1,4 @@
-# Runtime
+﻿# Runtime
 
 [Magyar változat](hu/runtime.md)
 
@@ -6,7 +6,7 @@ These are environment variables on the container. They are not the Preferences p
 
 Do not put these values into the image build. The image is the program. The keys stay on the machine that runs it.
 
-Dependency and reverse-proxy hardening details (Pillow/Brotli verification, pinned Alpine packages, `TRUSTED_PROXIES`) are in [security.md](security.md).
+Dependency and reverse-proxy hardening details (Pillow/Brotli verification, pinned Alpine packages, `TRUSTED_PROXIES`) are in [security notes in the MediaTrail repository](https://github.com/aicon/MediaTrail/blob/main/docs/security.md).
 
 ## The ones you usually set
 
@@ -99,4 +99,4 @@ Companion apps drive live strips through the built-in MediaTrail addon. Missed `
 | `LIVE_PLAYBACK_WATCHING_STALE_SECONDS` | `180` | Drop a `watching` strip with no progress for this long |
 | `LIVE_PLAYBACK_PAUSED_STALE_SECONDS` | `600` | Drop a `paused` strip left idle this long |
 
-See [Live playback / Now Watching](LIVE_PLAYBACK_NOW_WATCHING.md).
+See [Live playback / Now Watching](now-watching.md).

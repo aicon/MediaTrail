@@ -1,4 +1,4 @@
-# Környezet és konfiguráció
+﻿# Környezet és konfiguráció
 
 [English](../runtime.md)
 
@@ -6,7 +6,7 @@ Az alábbi paraméterek a konténer környezeti változói, amelyeket nem a webe
 
 Ezeket az értékeket soha ne ágyazd be a lemezkép építési folyamatába. A konténerkép magát a programot testesíti meg, míg a hitelesítési kulcsok és adatok biztonságosan azon a kiszolgálón maradnak, amely a rendszert futtatja.
 
-A függőségi és reverse-proxy keményítés részletei (Pillow/Brotli ellenőrzés, pinelt Alpine csomagok, `TRUSTED_PROXIES`) a [security.md](security.md) oldalon találhatók.
+A függőségi és reverse-proxy keményítés részletei (Pillow/Brotli ellenőrzés, pinelt Alpine csomagok, `TRUSTED_PROXIES`) a [MediaTrail biztonsági jegyzetek](https://github.com/aicon/MediaTrail/blob/main/docs/hu/security.md) oldalon találhatók.
 
 ## Gyakran használt alapbeállítások
 
@@ -99,4 +99,4 @@ A társalkalmazások a beépített MediaTrail kiegészítőn keresztül frissít
 | `LIVE_PLAYBACK_WATCHING_STALE_SECONDS` | `180` | Az előrehaladás nélküli, aktív lejátszású (`watching`) sáv ennyi másodperc inaktivitás után automatikusan törlődik. |
 | `LIVE_PLAYBACK_PAUSED_STALE_SECONDS` | `600` | A szüneteltetett állapotban hagyott (`paused`) sáv ennyi másodperc elteltével automatikusan törlődik. |
 
-Részletes információk: [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md).
+Részletes információk: [Live playback / Now Watching](../now-watching.md).

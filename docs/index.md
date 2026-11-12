@@ -1,4 +1,4 @@
-# MediaTrail
+﻿# MediaTrail
 
 [Magyar változat](hu/index.md)
 
@@ -12,7 +12,7 @@ This book is the MediaTrail manual.
 
 - [Install](install.md) covers the container, the data folder, and the first start.
 - [Library](library.md) covers tracking, lists, the calendar, custom entries, and multi-device Now Watching.
-- [Live playback / Now Watching](LIVE_PLAYBACK_NOW_WATCHING.md) covers the per-device strips, addon events, rename, and stale timers.
+- [Live playback / Now Watching](now-watching.md) covers the per-device strips, addon events, rename, and stale timers.
 - [Imports](imports.md) covers bringing in an existing history, including Nuvio and optional two-way interactive watch-history sync.
 - [Runtime](runtime.md) covers the settings that belong to the operator, not to a single account.
 - [Accounts](accounts.md) covers sign-in, registration, and the admin site.

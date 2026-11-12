@@ -1,4 +1,4 @@
-# Imports
+﻿# Imports
 
 [Magyar változat](hu/imports.md)
 
@@ -13,7 +13,7 @@ The history list below the sources shows the last seven days. A task that says i
 
 ## Nuvio
 
-Nuvio is the first source. It reads movies and episodes from one Nuvio profile. Optional **two-way interactive watch-history sync** is configured under Settings → Integrations → Nuvio (see below). Live **Now Watching** from the companion apps is a separate path: the built-in MediaTrail addon receives `player` events with a per-device id. History import and watch-history sync do not replace those device strips. See [Library](library.md) and [Live playback / Now Watching](LIVE_PLAYBACK_NOW_WATCHING.md).
+Nuvio is the first source. It reads movies and episodes from one Nuvio profile. Optional **two-way interactive watch-history sync** is configured under Settings → Integrations → Nuvio (see below). Live **Now Watching** from the companion apps is a separate path: the built-in MediaTrail addon receives `player` events with a per-device id. History import and watch-history sync do not replace those device strips. See [Library](library.md) and [Live playback / Now Watching](now-watching.md).
 
 Credentials, cursor, and imported rows belong to the signed-in MediaTrail user only (`NuvioAccount` is one per account). Another MediaTrail user on the same site keeps a separate Nuvio login and library.
 

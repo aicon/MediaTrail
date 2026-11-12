@@ -1,4 +1,4 @@
-# Importálás
+﻿# Importálás
 
 [English](../imports.md)
 
@@ -15,7 +15,7 @@ A források alatt elhelyezkedő előzménytár az elmúlt hét nap feladatait so
 
 Az elsődleges adatforrás a Nuvio, amely közvetlenül egy kiválasztott Nuvio-profilhoz tartozó filmeket és epizódokat olvassa be. A kétirányú előzményszinkronizációt a Beállítások → Integrációk → Nuvio menüpontban tetszésed szerint engedélyezheted: a megtekintett, illetve a még nem látott jelölések átvétele helyben érvényesíti a Nuvio változásait, míg amikor a MediaTrailben bejegyzel vagy törölsz valamit, a rendszer automatikusan elindítja a megfelelő szinkronizációs hívásokat (`sync_push_watched_items` / `sync_delete_watched_items`). A kapcsolók bekapcsolása után a MediaTrail kb. **30 másodpercenként** lekéri a Nuvio deltát a háttérben, kb. **15 percenként** pedig teljes előzmény-ellenőrzést is futtat; a kapcsolók mentése azonnali delta-húzást is sorba állít. Egyszerre csak egy szinkron fut fiókonként (az átfedő poll kimarad). Ehhez elég egyszer sikeresen lefuttatnod az Adatimport → Nuvio importot (bootstrap); utána az interaktív jelölésekhez nem kell kézzel importálnod. Az első import a Nuvio delta-kurzort a history-snapshot **előtt** rögzíti, majd a tip utáni eseményeket a deltából húzza — így a lapozás közben változó megtekintések nem esnek ki a snapshot és a kurzor közül.
 
-A társalkalmazásokból érkező valós idejű **„Most nézem”** sáv működése ettől elkülönül: a MediaTrail beépített kiegészítője közvetlenül az eszközökhöz kötött lejátszási eseményeket fogadja. Az előzmények importálása ezeket az élő sávokat nem érinti. Erről bővebben a [Könyvtár](library.md) fejezetben és a [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md) dokumentumban olvashatsz.
+A társalkalmazásokból érkező valós idejű **„Most nézem”** sáv működése ettől elkülönül: a MediaTrail beépített kiegészítője közvetlenül az eszközökhöz kötött lejátszási eseményeket fogadja. Az előzmények importálása ezeket az élő sávokat nem érinti. Erről bővebben a [Könyvtár](library.md) fejezetben és a [Live playback / Now Watching](../now-watching.md) dokumentumban olvashatsz.
 
 A bejelentkezési adatok, az importálási mutatók (kurzor) és a beemelt sorok szigorúan az adott MediaTrail-felhasználóhoz tartoznak (minden fiókhoz egyetlen `NuvioAccount` rendelhető). Ha ugyanazon a szerveren több felhasználó is tevékenykedik, mindegyikük önálló Nuvio-fiókkal és független gyűjteménnyel rendelkezik.
 

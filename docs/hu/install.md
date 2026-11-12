@@ -1,4 +1,4 @@
-# Telepítés
+﻿# Telepítés
 
 [English](../install.md)
 
@@ -37,7 +37,7 @@ docker compose up -d
 
 Ezt követően nyisd meg a böngésződben a `http://localhost:8000` címet, és hozd létre az első felhasználói fiókot. A regisztráció alapértelmezés szerint nyitott, mindaddig, amíg le nem tiltod. Erről részletesebben a [Fiókok](accounts.md) fejezetben olvashatsz.
 
-A valós idejű „Most nézem” funkció használatához nyisd meg a MediaTrail felületén a **Beállítások → Integrációk → Nuvio** menüpontot, másold ki a bővítmény egyedi hivatkozását (amely tartalmazza a fiók személyes hitelesítési tokenjét), majd add hozzá a kapcsolódó alkalmazásokhoz a **Beállítások → Bővítmények** alatt. További részletek: [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md).
+A valós idejű „Most nézem” funkció használatához nyisd meg a MediaTrail felületén a **Beállítások → Integrációk → Nuvio** menüpontot, másold ki a bővítmény egyedi hivatkozását (amely tartalmazza a fiók személyes hitelesítési tokenjét), majd add hozzá a kapcsolódó alkalmazásokhoz a **Beállítások → Bővítmények** alatt. További részletek: [Live playback / Now Watching](../now-watching.md).
 
 Az elindulást követő első másodpercekben az automatikus állapotvizsgálat egyszer még hibát jelezhet, mivel az alkalmazás inicializálása éppen folyamatban van. Amennyiben a rá következő ellenőrzés sikeres, a rendszer indítása zökkenőmentesen befejeződött. További tudnivalók a [Karbantartás](care.md) oldalon találhatók.
 
