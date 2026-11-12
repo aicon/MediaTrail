@@ -763,10 +763,15 @@ class NuvioImporter:
         Partial progress must not move ``account.cursor``, otherwise the next
         run would skip the failed event (and any after it that were already
         consumed in this pass).
+
+        Events for the same title are coalesced to the latest ``event_id`` before
+        apply. A MediaTrail watch-then-unwatch round-trip often returns upserts
+        and deletes together; applying older upserts while skipping newer delete
+        echoes would recreate the title.
         """
         since = self.account.cursor
         start_cursor = since
-        last_applied = None
+        last_seen = None
         applied = 0
         deletes = 0
         logger.info(
@@ -775,6 +780,7 @@ class NuvioImporter:
             self.user.id,
         )
         try:
+            raw_rows = []
             for row in self.client.iter_delta(since):
                 event_id = row.get("event_id") if isinstance(row, dict) else None
                 if event_id is None:
@@ -783,7 +789,7 @@ class NuvioImporter:
                         "It will continue on the next run."
                     )
                     raise MediaImportError(msg)
-                operation = str(row.get("operation") or "upsert")
+                operation = str(row.get("operation") or "upsert").lower()
                 logger.info(
                     "Nuvio delta event_id=%s operation=%s content_id=%s "
                     "season=%s episode=%s user=%s",
@@ -794,14 +800,28 @@ class NuvioImporter:
                     row.get("episode"),
                     self.user.id,
                 )
+                raw_rows.append(row)
+                last_seen = int(event_id)
+
+            rows = self._coalesce_delta_rows(raw_rows)
+            if len(rows) != len(raw_rows):
+                logger.info(
+                    "Nuvio delta coalesced events=%s to %s user=%s",
+                    len(raw_rows),
+                    len(rows),
+                    self.user.id,
+                )
+
+            for row in rows:
+                event_id = int(row["event_id"])
+                operation = str(row.get("operation") or "upsert").lower()
                 before_removed = dict(self.removed)
-                if not self._apply(row, operation=operation, event_id=int(event_id)):
+                if not self._apply(row, operation=operation, event_id=event_id):
                     msg = (
                         "Nuvio import stopped on a failed record. "
                         "It will continue on the next run."
                     )
                     raise MediaImportError(msg)
-                last_applied = int(event_id)
                 applied += 1
                 if operation == "delete":
                     deletes += sum(
@@ -809,15 +829,17 @@ class NuvioImporter:
                         for kind in self.removed
                     )
             self._flush_progress()
-            if last_applied is not None and self.account.bootstrapped:
-                self.account.cursor = last_applied
+            # Advance past every consumed event, including ones dropped by coalesce.
+            if last_seen is not None and self.account.bootstrapped:
+                self.account.cursor = last_seen
                 self._save_account(["cursor"])
             logger.info(
                 "Nuvio delta finished user=%s start_cursor=%s end_cursor=%s "
-                "events=%s local_deletes=%s",
+                "events=%s applied=%s local_deletes=%s",
                 self.user.id,
                 start_cursor,
                 self.account.cursor,
+                len(raw_rows),
                 applied,
                 deletes,
             )
@@ -827,9 +849,39 @@ class NuvioImporter:
                 self._save_account(["cursor"])
             raise
 
+    def _coalesce_delta_rows(self, rows):
+        """Keep the latest event per content identity (last write wins)."""
+        best = {}
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            identity = self._delta_coalesce_identity(row)
+            if identity is None:
+                # Unparseable rows still need apply for error/skip handling.
+                identity = f"raw:{row.get('event_id')}"
+            event_id = int(row["event_id"])
+            previous = best.get(identity)
+            if previous is None or int(previous["event_id"]) < event_id:
+                best[identity] = row
+        return sorted(best.values(), key=lambda item: int(item["event_id"]))
+
+    def _delta_coalesce_identity(self, row):
+        content_id = str(row.get("content_id") or "").strip().lower()
+        if not content_id:
+            return None
+        season = row.get("season")
+        episode = row.get("episode")
+        if season is None or episode is None:
+            return content_id
+        try:
+            return f"{content_id}:{int(season)}:{int(episode)}"
+        except (TypeError, ValueError):
+            return content_id
+
     def _apply(self, row, *, operation, event_id):
         if not isinstance(row, dict):
             return False
+        operation = str(operation or "upsert").lower()
         try:
             record = record_from_nuvio(row, operation=operation, event_id=event_id)
         except RecordError as exc:

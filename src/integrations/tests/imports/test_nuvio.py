@@ -874,6 +874,73 @@ class NuvioImportTests(TestCase):
             ).sync_delta()
         self.assertEqual(Movie.objects.filter(user=self.user).count(), 1)
 
+    def test_delta_coalesce_keeps_later_delete_when_upsert_echo_missing(self):
+        """MT watch-then-unwatch: older upsert must not win over a later delete.
+
+        Simulates pending delete-echo (delete skipped) without pending upsert-echo.
+        Without coalesce the upsert would recreate the title; with coalesce only
+        the delete remains and the local library stays empty.
+        """
+        self.user.nuvio_sync_mark_played_enabled = True
+        self.user.nuvio_sync_mark_unplayed_enabled = True
+        self.user.save(
+            update_fields=[
+                "nuvio_sync_mark_played_enabled",
+                "nuvio_sync_mark_unplayed_enabled",
+            ],
+        )
+        self._run(FakeNuvio([], cursor=10))
+        self.account.refresh_from_db()
+        self.assertTrue(self.account.bootstrapped)
+        self.assertEqual(self.account.cursor, 10)
+
+        def echo_deletes_only(_importer, row):
+            return str(row.get("operation") or "").lower() == "delete"
+
+        client = FakeNuvio(
+            delta=[
+                {
+                    "event_id": 11,
+                    "operation": "upsert",
+                    "id": "up-1",
+                    "content_id": "tmdb:550",
+                    "content_type": "movie",
+                    "title": "Fight Club",
+                    "watched_at": WATCHED_AT,
+                },
+                {
+                    "event_id": 12,
+                    "operation": "upsert",
+                    "id": "up-2",
+                    "content_id": "tmdb:550",
+                    "content_type": "movie",
+                    "title": "Fight Club",
+                    "watched_at": WATCHED_AT,
+                },
+                {
+                    "event_id": 13,
+                    "operation": "delete",
+                    "id": "del-1",
+                    "content_id": "tmdb:550",
+                    "content_type": "movie",
+                    "title": "Fight Club",
+                },
+            ],
+        )
+        with (
+            patch("integrations.imports.nuvio.services.get_media_metadata", _metadata),
+            patch("app.models.providers.services.get_media_metadata", _metadata),
+            patch.object(nuvio.NuvioImporter, "_is_echo", echo_deletes_only),
+        ):
+            nuvio.NuvioImporter(
+                self.user,
+                client,
+                gate_upserts=True,
+            ).sync_delta()
+        self.assertEqual(Movie.objects.filter(user=self.user).count(), 0)
+        self.account.refresh_from_db()
+        self.assertEqual(self.account.cursor, 13)
+
     def test_tmdb_failure_keeps_the_cursor_unsaved(self):
         response = Mock(status_code=503, text="unavailable")
         error = requests.HTTPError("unavailable")
