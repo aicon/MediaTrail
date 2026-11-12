@@ -13,19 +13,21 @@
              data-journal-entry-day="{{ day.day_iso }}"
              x-data="{ confirmOpen: false }"
              class="group relative flex gap-4 bg-[#2a2f35] rounded-xl p-3 ring-1 ring-white/5 hover:ring-indigo-500/40 hover:bg-[#30363d] transition-all duration-200">
-      {# self-start: keep the absolute badge anchored to the poster, not the stretched card height #}
-      <a href="{{ entry.item|media_url }}" class="relative block shrink-0 self-start">
-        {% if entry.item.image and entry.item.image != IMG_NONE %}
-          <img alt="{{ entry.item.title }}"
-               class="w-30 aspect-2/3 rounded-lg object-cover bg-[#3e454d] shadow-md group-hover:opacity-90 transition-opacity"
-               src="{{ entry.item.image }}"
-               loading="lazy">
-        {% else %}
-          <img alt="{{ entry.item.title }}"
-               class="w-30 aspect-2/3 rounded-lg bg-[#3e454d] shadow-md"
-               src="{{ IMG_NONE }}">
-        {% endif %}
-        {% include "app/components/journal_badge.html" with accent=entry.accent %}
+      {# self-start: badge anchors to poster box, not stretched card height #}
+      <a href="{{ entry.item|media_url }}" class="block shrink-0 self-start">
+        <span class="relative block w-30">
+          {% if entry.item.image and entry.item.image != IMG_NONE %}
+            <img alt="{{ entry.item.title }}"
+                 class="w-30 aspect-2/3 rounded-lg object-cover bg-[#3e454d] shadow-md group-hover:opacity-90 transition-opacity"
+                 src="{{ entry.item.image }}"
+                 loading="lazy">
+          {% else %}
+            <img alt="{{ entry.item.title }}"
+                 class="w-30 aspect-2/3 rounded-lg bg-[#3e454d] shadow-md"
+                 src="{{ IMG_NONE }}">
+          {% endif %}
+          {% include "app/components/journal_badge.html" with accent=entry.accent %}
+        </span>
       </a>
       <div class="min-w-0 flex-1 flex flex-col py-0.5">
         <div class="flex items-start justify-between gap-3">
@@ -39,7 +41,7 @@
           </button>
         </div>
         <span class="mt-1 inline-flex items-center gap-1.5 text-xs font-medium {{ entry.media_type|media_color }}">
-          <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+          <span class="journal-type-dot" aria-hidden="true"></span>
           {{ entry.media_type|media_type_readable }}
         </span>
         {% for change in entry.changes %}<p class="mt-1 text-sm text-gray-200">{{ change.description }}</p>{% endfor %}
