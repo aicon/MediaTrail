@@ -37,31 +37,34 @@ covered by the 28 OAuth/lock tests):
 Hardcover genre-label assertion failure (`Fiction` vs API `Literary Fiction`);
 that path does not use BeautifulSoup. Full suite remains a separate question.
 
-### Open — deployment settings (live host; 2 items left)
+### Closed — deployment settings (live host)
 
-Live evidence reviewed: MediaTrail Compose service snippet +
+Live evidence: MediaTrail Compose +
 `Nuvio/nginx/vhosts/proxy.mediatrail.lan.776515.xyz.ssl.conf` +
-`Nuvio/nginx/include/proxy.conf`.
+`Nuvio/nginx/include/proxy.conf`, plus operator confirmation that the remaining
+two items are fixed (`TRUSTED_PROXIES` = peer as seen by MediaTrail; `8082`
+firewalled to the proxy source and/or internal Docker reachability).
 
-| Check | Status | Evidence |
-| --- | --- | --- |
-| TLS termination | **OK** | Edge nginx `listen 443 ssl` + `force-ssl`; app backend `192.168.1.80:8082` over HTTP |
-| `X-Forwarded-Proto` overwrite | **OK** | Edge `proxy.conf`: `X-Forwarded-Proto $scheme` (not client header) |
-| `URLS` | **OK** | `https://mediatrail.lan.776515.xyz` |
-| `SECRET` Compose requirement | **OK (mechanism)** | `SECRET: ${SECRET:?err}` — value not inspected/shared; operator confirms ≠ Django default / placeholders |
-| `TRUSTED_PROXIES` on MediaTrail | **Open** | Not set on the MediaTrail service |
-| Host port `8082` bypass | **Open** | Compose publishes host→`8000`; LAN clients can hit HTTP without the TLS vhost |
+| Check | Status |
+| --- | --- |
+| TLS at edge nginx; backend HTTP to app host | **OK** |
+| `X-Forwarded-Proto $scheme` (not client header) | **OK** |
+| `URLS=https://mediatrail.lan.776515.xyz` | **OK** |
+| `SECRET: ${SECRET:?err}` (value not shared) | **OK (mechanism)** |
+| `TRUSTED_PROXIES` = MediaTrail-visible proxy peer | **OK** (operator) |
+| `8082` not a public/LAN bypass of TLS | **OK** (operator) |
 
-**Close this section only after both:**
+### Not a release gate (still open for main / product release)
 
-1. **`TRUSTED_PROXIES`** = the source address **MediaTrail actually sees** on
-   connections from the reverse proxy (Docker path may differ from the proxy
-   host’s LAN IP). Do not guess from the proxy machine alone — verify from the
-   MediaTrail side (e.g. access/error log or a one-shot dump of the peer
-   address), then trust only that IP or a dedicated proxy subnet.
-2. **`8082` exposure:** if the proxy is on another host, firewall `8082` to that
-   proxy source only; if both share a Docker network, prefer internal reachability
-   over publishing the port.
+This security round does **not** replace a full release checklist. Still unset
+here:
+
+- Full pytest suite end-to-end (not claimed green)
+- Fresh live/dev checks: journal/stats, Nuvio sync, Trakt device flow
+- Hardcover live metadata assert `Fiction` ∈ genres — **external API tag drift**,
+  not a `dev` regression: `hardcover.py` / `test_hardcover_book` are **unchanged
+  vs `main`**; live API for book `377193` now returns e.g. `Literary Fiction`,
+  `Classics`, … and **not** exact `Fiction` / `Young Adult`
 
 ## Supported dependency install (reproducible)
 
@@ -138,8 +141,8 @@ entrypoint validator uses an ash-safe character class (no bare `"` inside
 - Future Trivy hits on a newer base image need a new pin + rescan before claiming
   closure again.
 
-## Open deployment checks (not closed by this image scan)
+## Deployment checks
 
-See **Status → Open — deployment settings**. Remaining: MediaTrail
-`TRUSTED_PROXIES` (peer address as seen by the container) and restricting or
-un-publishing host `8082`.
+Live deployment items are **closed** under Status above. Remaining gaps are
+**release** checks (full suite, product smoke, Hardcover API assert drift), not
+open CVE/proxy findings.

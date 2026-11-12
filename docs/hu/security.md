@@ -26,28 +26,23 @@ smoke. Egy tágabb szűrésben a Hardcover genre-assert elbukott (`Fiction` vs
 `Literary Fiction`) — ez nem BeautifulSoup. A teljes suite továbbra is külön
 kérdés.
 
-### Nyitva — éles deployment (élő hoszt; 2 tétel maradt)
+### Lezárva — éles deployment (élő hoszt)
 
-Élő bizonyíték: MediaTrail Compose részlet +
-`Nuvio/nginx/vhosts/proxy.mediatrail.lan.776515.xyz.ssl.conf` +
-`Nuvio/nginx/include/proxy.conf`.
+Compose + `Nuvio/nginx` vhost/`proxy.conf`, plusz üzemeltetői megerősítés:
+`TRUSTED_PROXIES` = MediaTrail felől látszó peer; `8082` tűzfal / belső háló.
 
 | Tétel | Állapot |
 | --- | --- |
-| TLS a külső nginxen; backend `192.168.1.80:8082` | **OK** |
-| `X-Forwarded-Proto $scheme` (nem kliens) | **OK** |
-| `URLS=https://mediatrail.lan.776515.xyz` | **OK** |
-| `SECRET: ${SECRET:?err}` (érték nem közölt) | **OK (mechanizmus)** |
-| MediaTrail `TRUSTED_PROXIES` | **Nyitva** |
-| Hoszt `8082` publish (proxy megkerülés) | **Nyitva** |
+| TLS, `$scheme` proto, `URLS`, `SECRET:?err` | **OK** |
+| `TRUSTED_PROXIES` + `8082` szűkítés | **OK** (üzemeltető) |
 
-**Lezárás feltétele:**
+### Nem release-kapu (main / kiadás előtt még nyitva)
 
-1. `TRUSTED_PROXIES` = a MediaTrail felől **ténylegesen látszó** proxy forráscím
-   (Docker útvonal ≠ feltételezett proxy-LAN-IP) — csak azt / dedikált
-   proxy-alhálózatot bízd meg.
-2. `8082`: másik gépen futó proxynál tűzfal a proxy forrására; közös
-   Docker-hálónál belső elérés a portpublikálás helyett.
+- Teljes pytest suite nincs végigfuttatva
+- Nincs friss élő/dev ellenőrzés: napló/statisztika, Nuvio sync, Trakt device flow
+- Hardcover `Fiction` assert: **külső API címke-drift**, nem `dev` regresszió
+  (`hardcover.py` / teszt = `main`; élő `377193` → pl. `Literary Fiction`, nincs
+  pontos `Fiction` / `Young Adult`)
 
 ## Támogatott telepítés (reprodukálható)
 
@@ -94,8 +89,8 @@ nincs hivatalos Brotli ≥ 1.2.1 wheel.
 - Pillow forrásbuild és az allauth 65.22 SSO smoke-test továbbra is
   üzemeltetési megjegyzés, nem nyitott CVE-lista.
 
-## Nyitott üzemeltetési ellenőrzések (nem zárja le az image scan)
+## Deployment ellenőrzések
 
-Lásd fent: **Nyitva — éles deployment**. Maradt: MediaTrail
-`TRUSTED_PROXIES` (konténer felől látszó peer) és a hoszt `8082`
-szűkítése / belső hálóra vitele.
+Az élő deployment tételek **lezárva** (lásd Status). Ami még nyitva: **kiadási**
+ellenőrzések (teljes suite, termék smoke, Hardcover API assert drift) — nem
+nyitott CVE/proxy.
