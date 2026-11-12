@@ -296,6 +296,51 @@ def import_trakt_public(request):
 
 
 @require_POST
+def import_trakt_export(request):
+    """Import from a Trakt website export ZIP after fail-closed validation."""
+    upload = request.FILES.get("trakt_export_zip")
+    if not upload:
+        messages.error(request, "A Trakt export ZIP file is required.")
+        return redirect("import_data")
+
+    mode = request.POST.get("mode", "new")
+    try:
+        preview = trakt.inspect_trakt_export(upload)
+    except helpers.MediaImportError as error:
+        messages.error(request, str(error))
+        return redirect("import_data")
+
+    if hasattr(upload, "seek"):
+        upload.seek(0)
+
+    counts = preview["counts"]
+    tasks.import_trakt.delay(
+        user_id=request.user.id,
+        mode=mode,
+        file=upload,
+    )
+    messages.info(
+        request,
+        _(
+            "Trakt ZIP import queued for %(user)s "
+            "(history %(history)s, watchlist %(watchlist)s, "
+            "ratings %(ratings)s, comments %(comments)s). "
+            "Mode “%(mode)s”: new skips titles you already have; "
+            "overwrite replaces matching Trakt rows."
+        )
+        % {
+            "user": preview["username"],
+            "history": counts["history"],
+            "watchlist": counts["watchlist"],
+            "ratings": counts["ratings"],
+            "comments": counts["comments"],
+            "mode": mode,
+        },
+    )
+    return redirect("import_data")
+
+
+@require_POST
 def simkl_oauth(request):
     """View for initiating the SIMKL OAuth2 authorization flow."""
     redirect_uri = app_helpers.build_absolute_app_url(

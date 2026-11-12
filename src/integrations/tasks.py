@@ -330,10 +330,11 @@ def import_trakt(
     username=None,
     redirect_uri=None,
     auth="legacy",
+    file=None,
 ):
     """Celery task for importing media data from Trakt.
 
-    Can import using either OAuth (token provided) or public username.
+    Can import using OAuth, public username, device auth, or a website export ZIP.
     auth "device" refreshes the token with the new Trakt API.
     """
     return import_media(
@@ -344,6 +345,7 @@ def import_trakt(
         username,
         redirect_uri=redirect_uri,
         auth=auth,
+        file=file,
     )
 
 

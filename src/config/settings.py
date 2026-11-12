@@ -371,7 +371,9 @@ AUTH_USER_MODEL = "users.User"
 # MediaTrail settings
 
 # For CSV imports
-FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 MB
+# Raised for Trakt website export ZIPs (see TRAKT_EXPORT_UPLOAD_MAX_MB in trakt.py).
+FILE_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50 MB
 
 # MediaTrail continues from 0.25.3 in small steps: 0.25.4, 0.25.5, 0.25.6, 0.25.7, ...
 VERSION = config("VERSION", default="0.25.27")

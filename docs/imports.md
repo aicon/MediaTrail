@@ -60,7 +60,7 @@ These sources use the same mode and frequency controls.
 
 | Source | What you provide | Notes |
 | --- | --- | --- |
-| Trakt | A public username, or a connect button for a private profile | A private profile needs your own Trakt application id and secret. See [Runtime](runtime.md). |
+| Trakt | A public username, API login (including device code), or a website export ZIP | Private API login needs your own Trakt app. The ZIP comes from Trakt → Settings → Export (max 50 MB). Corrupt or empty archives are rejected before the import starts. “Only new items” skips titles you already have. |
 | Simkl | A connect button | A private import needs your own Simkl id and secret if you replace the built-in client. |
 | MyAnimeList | A public username | |
 | AniList | A public username, or a connect button | A private profile needs your own AniList application. |

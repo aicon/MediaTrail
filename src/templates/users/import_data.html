@@ -126,20 +126,27 @@
 
         {# Trakt #}
         <div class="bg-[#39404b] p-4 rounded-lg"
-             x-data="{ usePrivateImport: false, traktLogin: 'current' }">
+             x-data="{ traktSource: 'public', traktLogin: 'current' }">
           <div class="flex items-center mb-3">{% source_display "trakt" %}</div>
           <p class="text-sm text-gray-400 mb-3">{% translate "Import TV shows and movies" %}</p>
 
           <div class="mb-3">
-            <label class="flex items-center text-sm text-gray-300">
-              <input type="checkbox"
-                     x-model="usePrivateImport"
-                     class="mr-2 rounded bg-[#2a2f35] border-gray-600 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0">
-              {% translate "Import private profile (requires authentication)" %}
+            <label class="block text-sm text-gray-400 mb-2" for="trakt-source">
+              {% translate "Import source" %}
             </label>
+            <div class="relative">
+              <select id="trakt-source"
+                      x-model="traktSource"
+                      class="w-full py-2 px-3 bg-[#2a2f35] rounded-md text-white text-sm border border-gray-600 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 appearance-none">
+                <option value="public">{% translate "Public username" %}</option>
+                <option value="private">{% translate "Private profile (API login)" %}</option>
+                <option value="export">{% translate "Website export ZIP" %}</option>
+              </select>
+              {% include "app/icons/chevron-down.svg" with classes="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" %}
+            </div>
           </div>
 
-          <div class="mb-3" x-show="usePrivateImport" x-cloak>
+          <div class="mb-3" x-show="traktSource === 'private'" x-cloak>
             <label class="block text-sm text-gray-400 mb-2" for="trakt-login">
               {% translate "Trakt login" %}
             </label>
@@ -159,7 +166,7 @@
 
           <form class="flex items-center"
                 method="post"
-                x-show="!usePrivateImport"
+                x-show="traktSource === 'public'"
                 action="{% url 'import_trakt_public' %}">
             {% csrf_token %}
             <input type="hidden" name="frequency" x-model="importFrequency">
@@ -181,7 +188,8 @@
 
           <form class="flex items-center"
                 method="post"
-                x-show="usePrivateImport"
+                x-show="traktSource === 'private'"
+                x-cloak
                 x-bind:action="traktLogin === 'device' ? '{% url 'trakt_device_start' %}' : '{% url 'trakt_oauth' %}'">
             {% csrf_token %}
             <input type="hidden" name="frequency" x-model="importFrequency">
@@ -192,6 +200,31 @@
                     class="w-full px-4 py-2 text-sm rounded-md transition-colors cursor-pointer bg-indigo-600 text-white hover:bg-indigo-700">
               <span x-show="traktLogin !== 'device'">{% translate "Connect with Trakt & Import" %}</span>
               <span x-show="traktLogin === 'device'" x-cloak>{% translate "Connect with the new Trakt API" %}</span>
+            </button>
+          </form>
+
+          <form method="post"
+                enctype="multipart/form-data"
+                x-show="traktSource === 'export'"
+                x-cloak
+                action="{% url 'import_trakt_export' %}">
+            {% csrf_token %}
+            <input type="hidden" name="mode" x-model="importMode">
+            <label class="block text-sm text-gray-400 mb-2" for="trakt-export-zip">
+              {% translate "Trakt export ZIP" %}
+            </label>
+            <input id="trakt-export-zip"
+                   name="trakt_export_zip"
+                   type="file"
+                   accept=".zip,application/zip"
+                   required
+                   class="block w-full text-sm text-gray-300 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 file:cursor-pointer">
+            <p class="mt-2 text-xs text-gray-500">
+              {% blocktranslate trimmed with limit=50 %}Download the ZIP from Trakt → Settings → Your Account → Export. Max upload {{ limit }} MB. Corrupt or partial archives are rejected before import. Use “New only” to skip titles you already have.{% endblocktranslate %}
+            </p>
+            <button type="submit"
+                    class="mt-3 w-full px-4 py-2 text-sm rounded-md transition-colors cursor-pointer bg-indigo-600 text-white hover:bg-indigo-700">
+              {% translate "Validate and import ZIP" %}
             </button>
           </form>
         </div>
