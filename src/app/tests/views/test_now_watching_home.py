@@ -280,6 +280,78 @@ class NowWatchingHomeTests(TestCase):
         self.assertContains(response, "TV")
         self.assertContains(response, 'hx-vals=\'{"device_id": "phone-1"}\'')
 
+    def test_strip_order_stays_stable_when_later_device_updates(self):
+        """Progress on the newer strip must not move it above the older one."""
+        upsert_live_playback(
+            user=self.user,
+            media_type=MediaTypes.MOVIE.value,
+            source=Sources.TMDB.value,
+            media_id="550",
+            position_ms=10_000,
+            duration_ms=100_000,
+            device_id="phone-1",
+            device_label="telefon",
+        )
+        upsert_live_playback(
+            user=self.user,
+            media_type=MediaTypes.TV.value,
+            source=Sources.TMDB.value,
+            media_id="1396",
+            season_number=2,
+            episode_number=21,
+            position_ms=20_000,
+            duration_ms=100_000,
+            device_id="tv-1",
+            device_label="TV",
+        )
+        LivePlayback.objects.filter(device_id="tv-1").update(
+            episode_title="The Committee",
+        )
+        # TV sends a fresher progress tick after the phone strip existed.
+        upsert_live_playback(
+            user=self.user,
+            media_type=MediaTypes.TV.value,
+            source=Sources.TMDB.value,
+            media_id="1396",
+            season_number=2,
+            episode_number=21,
+            position_ms=40_000,
+            duration_ms=100_000,
+            device_id="tv-1",
+            device_label="TV",
+        )
+        LivePlayback.objects.filter(device_id="tv-1").update(
+            episode_title="The Committee",
+        )
+        response = self.client.get(reverse("now_watching_partial"))
+        phone_at = response.content.find(b"telefon")
+        tv_at = response.content.find(b">TV<")
+        if tv_at < 0:
+            tv_at = response.content.find(b"TV")
+        self.assertGreater(phone_at, -1)
+        self.assertGreater(tv_at, -1)
+        self.assertLess(phone_at, tv_at)
+
+    def test_other_user_strip_is_not_shown(self):
+        """Home only lists Now Watching rows for the signed-in account."""
+        other = get_user_model().objects.create_user(
+            username="other-home",
+            password="testpass123",
+        )
+        upsert_live_playback(
+            user=other,
+            media_type=MediaTypes.MOVIE.value,
+            source=Sources.TMDB.value,
+            media_id="550",
+            position_ms=10_000,
+            duration_ms=100_000,
+            device_id="other-phone",
+            device_label="other-device",
+        )
+        response = self.client.get(reverse("now_watching_partial"))
+        self.assertNotContains(response, "Fight Club")
+        self.assertNotContains(response, "other-device")
+
     def test_dismiss_one_device_keeps_the_other(self):
         """Dismiss with device_id only clears that strip."""
         upsert_live_playback(

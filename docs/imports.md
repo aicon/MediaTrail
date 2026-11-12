@@ -17,6 +17,8 @@ Nuvio is the first source. It reads movies and episodes from one Nuvio profile. 
 
 Live **Now Watching** from the companion apps is separate: the built-in MediaTrail addon receives `player` events with a per-device id. History import does not replace those device strips. See [Library](library.md) and [Live playback / Now Watching](LIVE_PLAYBACK_NOW_WATCHING.md).
 
+Credentials, cursor, and imported rows belong to the signed-in MediaTrail user only (`NuvioAccount` is one per account). Another MediaTrail user on the same site keeps a separate Nuvio login and library.
+
 The form asks for the Nuvio email, the password, and the profile number. The first successful submit stores them encrypted on your MediaTrail account. The next time you open the page, the email and the profile are filled in. Leave the password blank to keep the saved one. Type a new password only when you want to replace it. A different email or a different profile starts that account's import cursor over.
 
 What a run does:

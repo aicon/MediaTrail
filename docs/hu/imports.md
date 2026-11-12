@@ -17,6 +17,8 @@ A Nuvio az első forrás. Egy Nuvio-profil filmjeit és epizódjait olvassa. A N
 
 Az élő **„Most nézem”** sáv más út: a beépített MediaTrail addon a társalkalmazások `player` eseményeit kapja, eszközönkénti azonosítóval. Az előzményimport ezeket a sávokat nem írja felül. Lásd a [Könyvtár](library.md) oldalt és a [Live playback / Now Watching](../LIVE_PLAYBACK_NOW_WATCHING.md) leírást.
 
+A bejelentkezési adatok, a kurzor és az importált sorok a bejelentkezett MediaTrail-felhasználóhoz tartoznak (`NuvioAccount` fiókonként egy). Ugyanazon a MediaTrailen egy másik felhasználónak külön Nuvio-belépése és könyvtára van.
+
 Az űrlap a Nuvio e-mailt, a jelszót és a profil számát kéri. Az első sikeres küldés titkosítva menti őket a MediaTrail-fiókodhoz. Legközelebb az e-mail és a profil ki van töltve. A jelszómezőt üresen hagyva a mentett jelszó marad. Új jelszót csak akkor írj be, ha cserélni akarod. Más e-mail vagy más profil elölről kezdi ennek a fióknak az importkurzort.
 
 Egy futás ezt csinálja:

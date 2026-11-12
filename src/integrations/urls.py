@@ -3,13 +3,27 @@ from django.urls import path, re_path
 from integrations import views
 
 urlpatterns = [
-    path("nuvio/manifest.json", views.nuvio_manifest, name="nuvio_manifest"),
+    # Per-account addon URL (token matches Jellyfin/Plex/Emby webhooks).
+    path(
+        "nuvio/<str:token>/manifest.json",
+        views.nuvio_manifest,
+        name="nuvio_manifest",
+    ),
+    re_path(r"^nuvio/(?P<token>[^/]+)/manifest/?$", views.nuvio_manifest),
+    re_path(
+        r"^nuvio/(?P<token>[^/]+)/player/(?P<media_type>[^/]+)/(?P<video_id>[^/]+)"
+        r"(?:/(?P<extra>.+))?$",
+        views.nuvio_player,
+        name="nuvio_player",
+    ),
+    # Legacy untokened routes: only safe when MediaTrail has a single account.
+    path("nuvio/manifest.json", views.nuvio_manifest, name="nuvio_manifest_legacy"),
     re_path(r"^nuvio/manifest/?$", views.nuvio_manifest),
     re_path(
         r"^nuvio/player/(?P<media_type>[^/]+)/(?P<video_id>[^/]+)"
         r"(?:/(?P<extra>.+))?$",
         views.nuvio_player,
-        name="nuvio_player",
+        name="nuvio_player_legacy",
     ),
     path("import/nuvio", views.import_nuvio, name="import_nuvio"),
     path("import/trakt-oauth", views.trakt_oauth, name="trakt_oauth"),

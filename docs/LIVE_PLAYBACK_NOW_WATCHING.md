@@ -34,9 +34,11 @@ The status badge is display only. MediaTrail does not send pause or resume comma
 
 ## Companion setup
 
-1. MediaTrail → Settings → Integrations → Nuvio → copy the addon address (`…/nuvio/manifest.json`).
-2. In each NuvioMobile-MT / NuvioTV-MT install: Settings → Addons → add that address; remove any old scrobbler URL.
-3. Play a title. Each device appears as its own strip. Rename on the home page if you want friendlier labels.
+1. MediaTrail → Settings → Integrations → Nuvio → copy the addon address (`…/nuvio/<account-token>/manifest.json`). The token is personal to that MediaTrail account.
+2. In each NuvioMobile-MT / NuvioTV-MT install: Settings → Addons → add that address; remove any old scrobbler URL or an untokened `/nuvio/manifest.json` URL.
+3. Play a title. Each device appears as its own strip for **that** MediaTrail account only. Rename on the home page if you want friendlier labels.
+
+With several MediaTrail users, each person must install **their own** Integrations URL. A legacy untokened `/nuvio/…` path is ignored when more than one account exists.
 
 ## Event mapping (Nuvio addon → MediaTrail)
 
@@ -75,10 +77,13 @@ Percent = `floor(100 * clamp(position,0,duration) / duration)` when `duration_ms
 
 ## HTTP surfaces
 
+**Home strip order:** first-seen (`created_at`), not last progress tick — updating one device does not jump its strip to the top.
+
 **Built-in addon (companions):**
 
-- `GET /nuvio/manifest.json`
-- `GET /nuvio/player/{type}/{id}/{extra}.json` — query/extra carries `action`, `currentTime`, `duration`, `deviceId`, `deviceName`
+- `GET /nuvio/<token>/manifest.json`
+- `GET /nuvio/<token>/player/{type}/{id}/{extra}.json` — query/extra carries `action`, `currentTime`, `duration`, `deviceId`, `deviceName`
+- Legacy untokened `/nuvio/manifest.json` and `/nuvio/player/…` only work when the site has exactly one account
 
 **Home (session user):**
 

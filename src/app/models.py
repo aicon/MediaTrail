@@ -2094,11 +2094,16 @@ class LivePlayback(models.Model):
                 name="live_playback_status_valid",
             ),
         ]
-        ordering = ["-updated_at"]
+        # Home strips use created_at so progress ticks do not reshuffle cards.
+        ordering = ["created_at", "id"]
         indexes = [
             models.Index(
                 fields=["user", "-updated_at"],
                 name="app_livepb_user_updated_idx",
+            ),
+            models.Index(
+                fields=["user", "created_at"],
+                name="app_livepb_user_created_idx",
             ),
         ]
 

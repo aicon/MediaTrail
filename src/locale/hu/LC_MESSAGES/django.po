@@ -609,8 +609,8 @@ msgstr "A Nuvio csatlakoztatása a nézési előrehaladás automatikus követés
 msgid "Addon address"
 msgstr "Bővítmény címe"
 
-msgid "Add this address in Nuvio under Settings, Addons. Remove the old scrobbler address."
-msgstr "A Nuvio alkalmazásban a Beállítások, Bővítmények alatt add hozzá ezt a címet. A régi scrobbler címet vedd ki."
+msgid "Add this address in Nuvio under Settings, Addons. It is personal to this MediaTrail account. Remove any old scrobbler or untokened MediaTrail address."
+msgstr "A Nuvio alkalmazásban a Beállítások, Bővítmények alatt add hozzá ezt a címet. Ez a cím ehhez a MediaTrail-fiókhoz tartozik. A régi scrobbler vagy token nélküli MediaTrail címet vedd ki."
 
 msgid "Add this address in Nuvio under Settings, Addons."
 msgstr "A Nuvio alkalmazásban a Beállítások, Bővítmények alatt add hozzá ezt a címet."

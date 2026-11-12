@@ -14,7 +14,7 @@
   {% absolute_app_url plex_webhook_path as plex_webhook_url %}
   {% url 'emby_webhook' request.user.token as emby_webhook_path %}
   {% absolute_app_url emby_webhook_path as emby_webhook_url %}
-  {% url 'nuvio_manifest' as nuvio_manifest_path %}
+  {% url 'nuvio_manifest' token=request.user.token as nuvio_manifest_path %}
   {% absolute_app_url nuvio_manifest_path as nuvio_manifest_url %}
   <div class="space-y-6">
     <div class="bg-[#2a2f35] rounded-lg p-6">
@@ -110,7 +110,7 @@
             <p class="text-gray-400 mb-4 text-sm">{% translate "Connect Nuvio to automatically track your watching progress." %}</p>
             <div class="bg-[#262a2f] p-4 rounded-md">
               <h4 class="text-sm font-medium mb-3">{% translate "Addon address" %}</h4>
-              <p class="text-gray-400 mb-3 text-sm">{% translate "Add this address in Nuvio under Settings, Addons. Remove the old scrobbler address." %}</p>
+              <p class="text-gray-400 mb-3 text-sm">{% translate "Add this address in Nuvio under Settings, Addons. It is personal to this MediaTrail account. Remove any old scrobbler or untokened MediaTrail address." %}</p>
               <div class="flex items-start gap-2 mb-4">
                 <textarea readonly
                           id="nuvio-manifest-url"

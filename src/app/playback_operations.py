@@ -150,12 +150,16 @@ def get_now_watching(user):
 
 
 def list_live_playbacks(user, *, limit=20):
-    """Return recent non-stale live sessions for the user."""
+    """Return non-stale live sessions for the user in stable strip order.
+
+    Order is first-seen (``created_at``), not last progress tick, so a phone
+    and a TV keep their places when either device sends updates.
+    """
     purge_stale_live_playbacks(user)
     return list(
         LivePlayback.objects.filter(user=user)
         .select_related("item")
-        .order_by("-updated_at")[:limit],
+        .order_by("created_at", "id")[:limit],
     )
 
 
