@@ -109,6 +109,12 @@ class BasicMediaForm(TestCase):
         form = EpisodeForm(data=form_data)
         self.assertTrue(form.is_valid())
 
+    def test_episode_form_allows_empty_end_date(self):
+        """Episodes can be tracked without a watch date (Yamtrack #1480)."""
+        form = EpisodeForm(data={"end_date": ""})
+        self.assertTrue(form.is_valid())
+        self.assertIsNone(form.cleaned_data["end_date"])
+
 
 class BasicGameForm(TestCase):
     """Test the game form."""

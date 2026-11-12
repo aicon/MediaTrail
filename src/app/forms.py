@@ -390,6 +390,8 @@ class EpisodeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         """Initialize the form."""
         super().__init__(*args, **kwargs)
+        # Allow tracking an episode without a watch date (Yamtrack #1480).
+        self.fields["end_date"].required = False
 
         if settings.TRACK_TIME:
             self.fields["end_date"].widget = forms.DateTimeInput(
