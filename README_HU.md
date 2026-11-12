@@ -2,9 +2,9 @@
 
 [🇺🇸 English description (README in English)](README.md)
 
-Saját üzemeltetésű személyes médiakatalógus és napló mindarról, amit megnézel, elolvasol vagy végigjátszol.
+Önállóan üzemeltethető személyes médiakatalógus és digitális krónika mindarról, amit megnézel, elolvasol vagy végigjátszol.
 
-[![Verzió](https://img.shields.io/badge/verzió-0.25.25-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Verzió](https://img.shields.io/badge/verzió-0.25.26-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![Licenc: AGPL v3](https://img.shields.io/badge/Licenc-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Dokumentáció](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/hu/)
@@ -12,64 +12,64 @@ Saját üzemeltetésű személyes médiakatalógus és napló mindarról, amit m
 
 ---
 
-A MediaTrail egy önálló, saját szerveren futtatható webes alkalmazás filmek, sorozatok, évadok, epizódok, animék, mangák, videojátékok, könyvek, képregények és társasjátékok naplózására. Rendszerezd a gyűjteményedet, jegyezz fel dátumokat, értékelj pontszámmal, kövesd a haladásodat, készíts egyéni listákat és böngészd a részletes statisztikákat.
+A MediaTrail egy önállóan üzemeltethető webes alkalmazás filmek, tévésorozatok, évadok, epizódok, animék, mangák, videojátékok, könyvek, képregények és társasjátékok egy helyen történő követésére és rendszerezésére. Gondozd a gyűjteményedet, jegyezz fel fontos dátumokat, értékeld a műveket, kövesd nyomon az előrehaladásodat, állíts össze egyéni listákat, és fedezd fel a személyes statisztikáidat.
 
-A projekt a [Yamtrack](https://github.com/FuzzyGrim/Yamtrack) független forkjaként indult, olyan hiánypótló funkciókkal kiegészülve, mint a beépített REST API, a részletes epizód-előzmények, a valós idejű lejátszáskövetés, a Nuvio-integráció és a teljes magyar nyelvű felület.
+A projekt a [Yamtrack](https://github.com/FuzzyGrim/Yamtrack) független leágazásaként (forkjaként) indult útjára, olyan alapvető képességekkel gazdagodva, mint a beépített REST API, a részletes epizód-előzmények, a valós idejű lejátszáskövetés, a mélyreható Nuvio-integráció, valamint a teljes körű magyar kezelőfelület.
 
 ---
 
 ## Főbb funkciók
 
-- **Napló mindenhez:** Filmek, sorozatok, anime, manga, videojátékok, könyvek, képregények és társasjátékok. Pontszám, állapot, haladás, ismétlések, kezdő- és záródátum, jegyzet.
-- **Évadok, és minden megtekintés:** Minden évad külön követhető. Egy epizódhoz több megtekintés is rögzíthető, saját dátummal és jegyzettel. A filmek és a sorozatok külön kezelhetők.
-- **A változtatások előzménye:** Pontosan visszakövethető, mikor vetted fel a tételt, mikor kezdted el nézni/olvasni, és mikor fejezted be vagy nézted újra.
-- **Kézi tételek:** Egyedi elem rögzítése, ha a támogatott online források egyike sem tartalmazza.
-- **Közös listák:** Egyéni listák létrehozása tetszőleges célra, más fiókok bevonásával.
-- **Közelgő megjelenések:** Beépített naptár a várható epizódokról és megjelenésekről, iCalendar (`.ics`) hivatkozással és Apprise értesítésekkel (Discord, Telegram, ntfy, Slack, e-mail stb.).
-- **Több felhasználó saját könyvtárral:** Minden fiók teljesen elkülönített gyűjteménnyel rendelkezik. Helyi regisztráció vagy OIDC / közösségi bejelentkezés (Google, GitHub, Discord) a django-allauthon keresztül.
-- **Magyar és angol felület:** A felület nyelve fiókonként választható a Beállításokban. A TMDB metaadatok nyelve külön szabályozható a `TMDB_LANG` változóval.
-- **Importálás, benne a Nuvio:** Nuvio profilok importálása (csak új tételek hozzáadása vagy meglévők frissítése) titkosított adatokkal és ütemezéssel. Automatikus szinkronizáció érhető el Trakt, SIMKL, MyAnimeList, AniList és Kitsu fiókokhoz is. Teljes könyvtárexport/import CSV-ben, valamint IMDb, Goodreads, Steam és HowLongToBeat listák importja.
-- **Beépített Scrobbler (Nuvio és médiaszerverek):** A MediaTrail közvetlenül tartalmazza a Stremio-protokollú addon végpontot, amely külön segédkonténer nélkül fogadja a lejátszási eseményeket a támogatott Nuvio appokból. Élő „Most nézem” sávokat biztosít és automatikusan bejegyzi a befejezéseket. A Jellyfin, Plex és Emby szerverek webhookon keresztül szinkronizálhatók.
-- **REST API (Preview):** Modern API a `/api/v1/`, OpenAPI séma a `/api/schema/`, valamint interaktív Swagger felület a `/api/docs/` címen. Részletes dokumentáció: [API_HU.md](API_HU.md) ([English](API.md)).
-- **Egyetlen konténeres működés:** Docker Compose telepítés beépített belső Redis-szel. Minden adat egyetlen csatolt mappában (`db`) marad.
+- **Minden műnek saját lapja van:** Filmek, sorozatok, animék, mangák, videojátékok, könyvek, képregények és társasjátékok. Rögzíthetsz személyes értékelést, megtekintési állapotot, előrehaladást, számlálhatod az ismétléseket, megadhatsz kezdő- és záródátumot, valamint egyéni jegyzeteket fűzhetsz hozzájuk.
+- **Évadok és teljes újranézési előzmények:** Az évadokat egymástól függetlenül követheted nyomon. Egyetlen epizódhoz több önálló megtekintési bejegyzést is fűzhetsz, mindegyikhez saját időbélyeggel és jegyzettel. A filmek és sorozatok áttekinthetően elkülönülnek egymástól.
+- **Részletes műveletnapló:** Lépésről lépésre visszakövetheted az eseményeket: mikor adtál hozzá egy tételt a gyűjteményedhez, mikor kezdted el nézni vagy olvasni, és mikor értél a végére vagy kezdted elölről.
+- **Egyéni tételek kézi rögzítése:** Tetszés szerint felvehetsz egyedi bejegyzéseket akkor is, ha az online katalógusok egyike sem ismeri az adott művet.
+- **Együttműködés és megosztott listák:** Bármilyen célra létrehozhatsz tematikus listákat, és a szerkesztésbe bevonhatod a szerver többi felhasználóját is.
+- **Közelgő megjelenések és naptár:** Mindig szem előtt tarthatod a várható bemutatókat a külső alkalmazásokba exportálható iCalendar (`.ics`) hivatkozás és az automatikus Apprise-értesítések (Discord, Telegram, ntfy, Slack, e-mail stb.) segítségével.
+- **Több felhasználó, teljesen elkülönülő gyűjtemények:** Minden felhasználó saját, elszeparált médiatárat kezel. A belépés történhet helyi jelszóval vagy közösségi / OIDC azonosítóval (Google, GitHub, Discord) a django-allauth modulon keresztül.
+- **Magyar és angol kezelőfelület:** A kívánt nyelvet fiókonként külön-külön megválaszthatod a Beállításokban. A TMDB-ből érkező leírások nyelve a `TMDB_LANG` környezeti változóval határozható meg.
+- **Előzmények importálása, Nuvio-integrációval:** Beemelheted a profilodat közvetlenül a Nuvióból (akár csak az új tételek hozzáadásával, akár a meglévők frissítésével), titkosított hitelesítő adatokkal és automatikus ütemezéssel. A szinkronizáció elérhető a Trakt, SIMKL, MyAnimeList, AniList és Kitsu rendszerekkel is. A teljes gyűjteményedet bármikor exportálhatod vagy importálhatod CSV formátumban, emellett feldolgozhatók az IMDb, Goodreads, Steam és HowLongToBeat listái is.
+- **Beépített lejátszáskövető (Scrobbler Nuvio és médiaszerverek számára):** A MediaTrail közvetlenül magában foglalja a Stremio protokollját támogató kiegészítő-végpontot, amely külső segédkonténer nélkül fogadja a lejátszási eseményeket a támogatott társalkalmazásokból. Élő „Most nézem” sávokat jelenít meg a kezdőlapon, és a megtekintés végén automatikusan rögzíti a befejezést. A Jellyfin, Plex és Emby szerverek webhookokon keresztül csatlakoztathatók.
+- **Korszerű REST API (előzetes változat):** Teljes értékű REST API a `/api/v1/`, OpenAPI séma a `/api/schema/`, és interaktív Swagger dokumentáció a `/api/docs/` címen. Részletes útmutató: [API_HU.md](API_HU.md) ([English](API.md)).
+- **Egyetlen, önálló konténer:** Azonnal futtatható Docker Compose konfiguráció beépített Redis-kiszolgálóval. Minden adat egyetlen csatolt mappában (`db`) marad a szervereden.
 
 ---
 
-## Előnézet: „Most nézem” és a beépített Scrobbler
+## Előnézet: „Most nézem” és a beépített lejátszáskövető
 
-A MediaTrail egy beépített Stremio-protokollú scrobbler szolgáltatást tartalmaz. **Nem streamel és nem játszik le médiát, valamint nem szolgáltat katalógust.** Kizárólag eseményfogadóként működik: fogadja a lejátszó állapotváltozásait (`start`, `pause`, `progress`, `stop`), és valós időben megjeleníti azokat a felületen.
+A MediaTrail egy beépített, Stremio-protokollú scrobbler szolgáltatást tartalmaz. **Fontos megjegyezni, hogy nem tárol és nem streamel médiatartalmakat, valamint nem nyújt saját katalógust sem.** Egyszerű, megbízható eseményfogadóként működik: figyeli a lejátszókból érkező állapotváltozásokat (`start`, `pause`, `progress`, `stop`), és ezek alapján valós időben frissíti a kezdőlapodat.
 
-Minden csatlakoztatott eszköz (telefon, nappali tévé, hálószobai tévé) saját, különálló sávot kap a kezdőlapon, így az egyidejű lejátszások nem írják felül egymást:
+Minden egyes csatlakoztatott eszköz (telefonok és tetszőleges számú televízió) saját, elkülönített sávot kap a kezdőlapon, így az egyidejű lejátszások soha nem írják felül egymást:
 
 ![Now Watching Banner](docs/screenshots/now-watching-desktop.png)
 
-*(Kompakt nézetben is elérhető a kisebb kijelzőkhöz)*
+*(Kisebb kijelzőkön vagy keskenyebb ablakban kompakt formátumban is megjelenik)*
 
 ![Now Watching Compact](docs/screenshots/now-watching-narrow.png)
 
-A sávok közvetlenül a kezdőlap tetején láthatók:
+A sávok jól láthatóan a kezdőlapod legfelső részén helyezkednek el:
 
 ![A Most nézem sáv a kezdőlapon](docs/screenshots/now-watching-desktop2.png)
 
 ### Hogyan működik a lejátszáskövetés?
 
-- **Szükséges társalkalmazások:** Mivel a hivatalos Nuvio alkalmazások jelenleg nem küldenek lejátszási eseményeket, a szinkronizációhoz a kifejezetten erre felkészített klienseink kellenek: **[NuvioTV-MT](https://github.com/aicon/NuvioTV-MT)** (Android TV) és **[NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT)** (Android telefon / táblagép).
-- **Nincs külön scrobbler konténer:** A scrobbler közvetlenül a MediaTrail része; nem kell külön hídprogramot vagy segédkonténert futtatnod.
-- **Egyszerű beállítás:** Elég a MediaTrail addon manifest hivatkozását bemásolni a kliensben a **Beállítások → Bővítmények** menüpont alatt.
-- **Eszközök elkülönítése:** Minden kliens stabil `deviceId`-t és automatikus nevet küld (pl. `TV · Shield` vagy `telefon · Pixel 8`).
-- **Egyéni elnevezés:** A sáv neve a kezdőlapon tetszés szerint átírható; az elnevezés eszközönként megmarad stop vagy bezárás után is.
-- **Befejezés stopnál:** Ha a kliens `stop` eseményt küld, és a haladás legalább **90%**, a MediaTrail egy befejezett megtekintést ír az előzménybe. A 90% átlépése lejátszás közben önmagában nem zárja le a címet.
-- **Automatikus lecsengés:** A szüneteltetés és a leállítás csak az adott eszköz sávját érinti. Ha az alkalmazást bezárják `stop` esemény nélkül, az inaktív sávot az időzítő automatikusan eltávolítja.
+- **Szükséges társalkalmazások:** Mivel a hivatalos Nuvio alkalmazások nem küldenek lejátszási eseményeket, a folyamatos követéshez a kifejezetten erre a célra felkészített klienseink szükségesek: a **[NuvioTV-MT](https://github.com/aicon/NuvioTV-MT)** (Android TV) és a **[NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT)** (Android telefon és táblagép).
+- **Nincs szükség plusz konténerekre:** A követőmodul közvetlenül a MediaTrail belsejében fut, így nem kell semmilyen külön hídalkalmazást vagy segédkonténert üzemeltetned.
+- **Egyszerű beállítás:** Mindössze annyi a teendőd, hogy kimásolod a MediaTrail kiegészítőd manifest hivatkozását, és beilleszted a társalkalmazásban a **Beállítások → Bővítmények** menüpont alatt.
+- **Több eszköz teljes elkülönítése:** Minden kliens egyedi, stabil `deviceId` azonosítót küld a csatlakozáskor, egy automatikus megnevezéssel kiegészítve (például `TV · Shield` vagy `telefon · Pixel 8`).
+- **Egyedi elnevezések:** A sávok nevét közvetlenül a kezdőlapon bármikor átírhatod; a megadott egyedi név a lejátszás leállítása vagy a sáv bezárása után is megmarad.
+- **Befejezés a lejátszás leállításakor:** Amikor a kliens leállítási (`stop`) eseményt küld, és az előrehaladás elérte a legalább **90%**-ot, a MediaTrail bejegyzi a befejezett megtekintést az előzményeidbe. A 90%-os határ átlépése folyamatban lévő lejátszás mellett önmagában még nem zárja le a tételt.
+- **Gondos időtúllépés-kezelés:** A szüneteltetés és a leállítás kizárólag az adott eszköz sávját érinti. Ha egy lejátszót váratlanul, leállítási esemény küldése nélkül zárnak be, az inaktivitási időzítő egy idő után önműködően eltávolítja a magára hagyott sávot.
 
 ---
 
-## Gyors indítás
+## Első lépések
 
-A MediaTrail egyetlen kész, beépített Redis-t tartalmazó Docker konténerként futtatható.
+A MediaTrail egy könnyen kezelhető, előre beállított Docker konténerként érhető el, amely magában foglalja a belső Redis-szolgáltatást is.
 
 ### Docker Compose
 
-Hozz létre egy `docker-compose.yml` fájlt:
+Hozz létre egy `docker-compose.yml` fájlt az alábbi tartalommal:
 
 ```yaml
 services:
@@ -80,7 +80,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      SECRET: longstring
+      SECRET: hosszu-veletlenszeru-karaktersor
       TMDB_LANG: hu
       TMDB_API:
       TVDB_API:
@@ -91,23 +91,23 @@ services:
       - ./db:/mediatrail/db
 ```
 
-### A környezeti értékek cseréje
+### A környezeti változók testreszabása
 
-Nyisd meg a Compose fájlt, és cseréld le a példa titkot:
+Nyisd meg a konfigurációs fájlt, és a példaként megadott kulcs helyére írj be egy saját értéket:
 
 ```text
-SECRET=longstring
+SECRET=hosszu-veletlenszeru-karaktersor
 ```
 
-A `SECRET` legyen egy hosszú, véletlenszerű karaktersorozat. Ha a MediaTrail fordított proxy (reverse proxy) mögött fut, a `URLS` változóban add meg a nyilvános elérést:
+A `SECRET` kulcshoz válassz egy biztonságos, hosszú és véletlenszerű karaktersorozatot. Amennyiben a MediaTrailt fordított proxy (reverse proxy) mögött futtatod, a `URLS` változóban add meg a nyilvános webcímedet:
 
 ```text
 URLS=https://mediatrail.pelda.hu
 ```
 
-A cím mindig tartalmazza a protokollt (`https` vagy `http`), és ne legyen a végén perjel vagy almappa. Több cím vesszővel választható el.
+A megadott címnek minden esetben tartalmaznia kell a protokollt (`https://` vagy `http://`), záró perjel vagy almappa-útvonal nélkül. Több domain esetén az értékeket vesszővel választhatod el.
 
-A támogatott beállítások teljes listája a kézikönyvben található: [Környezet](https://aicon.github.io/mediatrail-docs/hu/runtime/).
+A támogatott beállítások részletes leírását a kézikönyv [Környezet](https://aicon.github.io/mediatrail-docs/hu/runtime/) fejezetében találod.
 
 Indítsd el a konténert:
 
@@ -115,70 +115,70 @@ Indítsd el a konténert:
 docker compose up -d
 ```
 
-Nyisd meg a böngészőben a `http://localhost:8000` címet.
+Ezt követően nyisd meg a böngésződben a `http://localhost:8000` címet.
 
-> **Yamtrackről váltasz?**  
-> A MediaTrail konténeren belüli adatútvonala a korábbi `/yamtrack/db` helyett `/mediatrail/db`. Elég a meglévő helyi adatkönyvtáradat átcsatolni: `./db:/mediatrail/db`.
+> **Tudnivaló Yamtrackről történő áttérés esetén:**  
+> A MediaTrail belső tárolási útvonala `/mediatrail/db` (a korábbi `/yamtrack/db` helyett). Elegendő a meglévő helyi adatkönyvtáradat a fenti módon becsatolnod: `./db:/mediatrail/db`.
 
 ---
 
-## MediaTrail vs. Yamtrack
+## A MediaTrail és a Yamtrack viszonya
 
-A MediaTrail egy független, nem hivatalos fork; **nem áll kapcsolatban az eredeti Yamtrack fejlesztőivel**.
+A MediaTrail egy független, nem hivatalos leágazás; **nem áll kapcsolatban az eredeti Yamtrack fejlesztőivel, és nem annak hivatalos támogatásával működik**.
 
-### Miért készült a fork?
-A MediaTrail alapja a Yamtrack `dev` ága a `v0.25.3` kiadás utánról (a 2026. július 12-i füles részletes oldal), amelybe beolvasztásra került a `#1378`-as REST API és a `#1608`-as epizód-előzmény munka.
+### Háttér és célkitűzések
+A MediaTrail fejlesztése a Yamtrack `dev` ágából indult a `v0.25.3` kiadást követően (konkrétan a 2026. július 12-i, fülekkel ellátott részletes adatlap állapotából), beépítve a `#1378`-as számú REST API előzetest és a `#1608`-as epizód-előzménykezelést.
 
-Amikor a hivatalos Yamtrack átállt a `0.26`-os ágra, a MediaTrail szándékosan a bevált `0.25.x` ágon maradt a stabilitás, az önálló működés és a saját funkciók (pl. Nuvio) zavartalansága érdekében. A Yamtrack újabb részeiből szándékosan kimaradt az átírt naplóoldal, a statisztika újrarajzolása és a Trakt zip-import.
+Amikor az eredeti projekt áttért a `0.26`-os architektúrára, a MediaTrail szándékosan a bevált `0.25.x` alapokon maradt, a stabilitást, az önálló üzemeltethetőséget és a saját fejlesztésű integrációkat (például a Nuvio-támogatást) helyezve előtérbe. Az upstream projekt későbbi változtatásai – így az átírt naplózási felület, a statisztikák átdolgozása és a Trakt zip-fájlos import – szándékosan kimaradtak.
 
-| Funkció | Hivatalos Yamtrack (Stabil) | MediaTrail |
+| Funkció | Eredeti Yamtrack (Stabil) | MediaTrail |
 | :--- | :---: | :---: |
 | **REST API** (`/api/v1/`) | Nincs | Van |
-| **Többszöri Epizód-előzmény** | Nincs | Van |
-| **Beépített Scrobbler & Több eszközös „Most nézem”** | Nincs | Van |
-| **Nuvio szinkronizáció / import** | Nincs | Van |
-| **Magyar nyelvű felület** | Nincs | Van |
-| **Beépített belső Redis** | Nincs *(Külön Redis kell)* | Van *(A konténerben fut)* |
-| **Belső Python csomagnév** | `yamtrack` | `yamtrack` *(megtartva a stabilitásért)* |
+| **Többszöri epizód-megtekintési előzmények** | Nincs | Van |
+| **Beépített Scrobbler és többeszközös „Most nézem”** | Nincs | Van |
+| **Nuvio szinkronizáció és import** | Nincs | Van |
+| **Magyar nyelvű kezelőfelület** | Nincs | Van |
+| **Beépített belső Redis-kiszolgáló** | Nincs *(külön szolgáltatást igényel)* | Van *(a konténer része)* |
+| **Belső Python csomagnév** | `yamtrack` | `yamtrack` *(a kompatibilitás megőrzéséért)* |
 
 ---
 
 ## Kapcsolódó alkalmazások
 
-A MediaTrail beépített scrobbleréhez az alábbi társalkalmazások biztosítják a valós idejű lejátszási adatokat:
+A MediaTrail a kifejezetten hozzá fejlesztett társalkalmazásokra támaszkodik a lejátszási események valós idejű rögzítéséhez és a beépített scrobbler kiszolgálásához:
 
-| Név | Leírás |
+| Alkalmazás | Leírás |
 | :--- | :--- |
-| **[NuvioTV-MT](https://github.com/aicon/NuvioTV-MT)** | Android TV / Google TV kliens beépített MediaTrail scrobbler-támogatással. |
-| **[NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT)** | Android telefon / táblagép kliens beépített MediaTrail scrobbler-támogatással. |
+| **[NuvioTV-MT](https://github.com/aicon/NuvioTV-MT)** | Android TV / Google TV kliens közvetlen MediaTrail scrobbler-támogatással. |
+| **[NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT)** | Android telefonos és táblagépes kliens közvetlen MediaTrail scrobbler-támogatással. |
 
 ---
 
-## Dokumentáció
+## Részletes dokumentáció
 
-A részletes felhasználói kézikönyv külön felületen érhető el:
+A részletes felhasználói kézikönyv, a telepítési útmutató és a konfigurációs példák a hivatalos dokumentációs tárban találhatók:
 
 - **Kézikönyv:** [https://aicon.github.io/mediatrail-docs/hu/](https://aicon.github.io/mediatrail-docs/hu/)
-- **API-leírás:** [API_HU.md](API_HU.md) · [API.md](API.md)
+- **API-dokumentáció:** [API_HU.md](API_HU.md) · [API.md](API.md)
 
-A kézikönyv fejezetei: *Telepítés, Könyvtár, Live playback / Now Watching, Import (benne a Nuvio), Környezet, Fiókok, Karbantartás.*
+A kézikönyv fejezetei: *Telepítés, Könyvtár, Live playback / Now Watching, Importálás (benne a Nuvio), Környezet és konfiguráció, Fiókok, Karbantartás és üzemeltetés.*
 
 ---
 
 ## Támogatás
 
-Ha hasznosnak találod a MediaTrailt és szeretnéd támogatni a fejlesztést és karbantartást:
+Ha elnyerte a tetszésedet a MediaTrail, és szívesen hozzájárulnál a rendszer karbantartásához és további fejlesztéséhez:
 
-[![Ko-fi támogatás](https://img.shields.io/badge/Ko--fi-Támogatás-ff5e5b?style=for-the-badge&logo=ko-fi)](https://ko-fi.com/aiconwg)
+[![Ko-fi támogatás](https://img.shields.io/badge/Ko--fi-T%C3%A1mogat%C3%A1s-ff5e5b?style=for-the-badge&logo=ko-fi)](https://ko-fi.com/aiconwg)
 
 ---
 
-## Licenc és AGPL-3.0
+## Licencfeltételek és AGPL-3.0 megfelelőség
 
-A MediaTrail nyílt forráskódú szoftver a **GNU Affero General Public License v3.0 (AGPL-3.0)** alatt.  
-A Yamtrack eredeti szerzői jogi jelzései megmaradtak. A MediaTrail saját kiegészítő nyilatkozata a `NOTICE` fájlban olvasható.
+A MediaTrail nyílt forráskódú szabad szoftver, amely a **GNU Affero General Public License v3.0 (AGPL-3.0)** alatt áll.  
+Az eredeti Yamtrack projekt szerzői jogi jelzéseit mindvégig megőriztük. A MediaTrail saját kiegészítő szerzői jogi nyilatkozata a `NOTICE` fájlban található.
 
-### Hálózati használat (AGPL-3.0 13. szakasz)
-Amennyiben a programot hálózaton keresztül (több felhasználó számára) üzemelteted, a licenc megköveteli a futó pontos verzió forráskódjának nyilvános felkínálását:
-- Állítsd be a `MEDIATRAIL_SOURCE_URL` környezeti változót a futó verzió publikus HTTP(S) forráskód-címére, mielőtt mások számára elérhetővé tennéd.
-- Saját gépen futó, privát tesztpéldány esetén a változó üresen hagyható.
+### Hálózati használatra vonatkozó rendelkezés (AGPL-3.0 13. szakasz)
+Mivel a MediaTrail egy hálózaton keresztül igénybe vehető, módosított szoftver, az AGPL-3.0 licenc 13. szakasza előírja a futó változat pontos forráskódjának nyilvános felkínálását valamennyi hálózati felhasználó számára:
+- Állítsd be a `MEDIATRAIL_SOURCE_URL` környezeti változót a futó verzió nyilvános HTTP(S) forráskód-elérhetőségére, mielőtt a szervert mások számára is elérhetővé tennéd a hálózaton.
+- Kizárólag saját gépen futtatott, szigorúan zárt körű telepítés esetén a változó üresen hagyható.
