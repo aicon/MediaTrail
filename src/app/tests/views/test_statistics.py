@@ -196,7 +196,7 @@ class StatisticsViewTests(TestCase):
         self.assertTemplateUsed(response, "app/statistics.html")
 
         self.assertIn("media_count", response.context)
-        self.assertIn("activity_data", response.context)
+        self.assertNotIn("activity_data", response.context)
         self.assertIn("media_type_distribution", response.context)
         self.assertIn("score_distribution", response.context)
         self.assertIn("status_distribution", response.context)
@@ -204,6 +204,8 @@ class StatisticsViewTests(TestCase):
         self.assertIn("consumption_stats", response.context)
         self.assertIn("in_progress_count", response.context)
         self.assertIn("rated_percent", response.context)
+        self.assertNotContains(response, "Activity History")
+        self.assertContains(response, "chart_i18n")
 
     def test_statistics_view_custom_date_range(self):
         """Test the statistics view with custom date range."""
@@ -218,7 +220,7 @@ class StatisticsViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
         self.assertIn("media_count", response.context)
-        self.assertIn("activity_data", response.context)
+        self.assertNotIn("activity_data", response.context)
         self.assertIn("media_type_distribution", response.context)
         self.assertIn("score_distribution", response.context)
         self.assertIn("status_distribution", response.context)

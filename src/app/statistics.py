@@ -12,6 +12,8 @@ from django.db.models import (
 )
 from django.utils import timezone
 from django.utils.dateparse import parse_date
+from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 
 from app import config
 from app.models import TV, BasicMedia, Episode, MediaManager, MediaTypes, Season, Status
@@ -347,7 +349,7 @@ def _annotate_top_rated_media(top_rated_media):
         media_ids = [media.id for media in media_list]
 
         # Fetch fresh instances with proper relationships and annotations
-        queryset = model.objects.filter(id__in=media_ids)
+        queryset = model.objects.filter(id__in=media_ids).select_related("item")
         queryset = media_manager._apply_prefetch_related(queryset, media_type)
         media_manager.annotate_max_progress(queryset, media_type)
 
@@ -406,15 +408,72 @@ def _consumption_label(media_type):
 
 def _consumption_descriptor(media_type, value, unit_noun):
     """Build a descriptor like "TV episodes watched" or "Movies watched"."""
+    descriptors = {
+        MediaTypes.MOVIE.value: ngettext(
+            "Movie watched",
+            "Movies watched",
+            value,
+        ),
+        MediaTypes.SEASON.value: ngettext(
+            "TV episode watched",
+            "TV episodes watched",
+            value,
+        ),
+        MediaTypes.ANIME.value: ngettext(
+            "Anime episode watched",
+            "Anime episodes watched",
+            value,
+        ),
+        MediaTypes.MANGA.value: ngettext(
+            "Manga chapter read",
+            "Manga chapters read",
+            value,
+        ),
+        MediaTypes.BOOK.value: ngettext(
+            "Book page read",
+            "Book pages read",
+            value,
+        ),
+        MediaTypes.GAME.value: ngettext(
+            "Game hour played",
+            "Game hours played",
+            value,
+        ),
+        MediaTypes.COMIC.value: ngettext(
+            "Comic issue read",
+            "Comic issues read",
+            value,
+        ),
+        MediaTypes.BOARDGAME.value: ngettext(
+            "Boardgame play",
+            "Boardgame plays",
+            value,
+        ),
+    }
+    if media_type in descriptors:
+        return descriptors[media_type]
+
     label = _consumption_label(media_type)
     verb = config.get_verb(media_type, past_tense=True)
     plural = "" if value == 1 else "s"
-
     if unit_noun is None:
-        return f"{label}{plural} {verb}"
+        return _("%(label)s%(plural)s %(verb)s") % {
+            "label": label,
+            "plural": plural,
+            "verb": verb,
+        }
     if verb.startswith(unit_noun):
-        return f"{label} {unit_noun}{plural}"
-    return f"{label} {unit_noun}{plural} {verb}"
+        return _("%(label)s %(unit)s%(plural)s") % {
+            "label": label,
+            "unit": unit_noun,
+            "plural": plural,
+        }
+    return _("%(label)s %(unit)s%(plural)s %(verb)s") % {
+        "label": label,
+        "unit": unit_noun,
+        "plural": plural,
+        "verb": verb,
+    }
 
 
 def get_consumption_stats(user_media, media_count):

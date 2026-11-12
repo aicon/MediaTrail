@@ -1,6 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
   Chart.register(ChartDataLabels);
 
+  const i18nEl = document.getElementById("chart_i18n");
+  const i18n = i18nEl ? JSON.parse(i18nEl.textContent) : {};
+  const t = (key, fallback) => i18n[key] || fallback;
+
   // Custom external tooltip for bar charts
   function customBarTooltip(context) {
     // External custom tooltip
@@ -30,11 +34,11 @@ document.addEventListener("DOMContentLoaded", function () {
       // Format title based on chart type
       let formattedTitle = title;
       if (chart.canvas.id === "scoreStackedChart") {
-        const score = parseInt(title);
+        const score = parseInt(title, 10);
         if (score === 10) {
-          formattedTitle = `Score: 10`;
+          formattedTitle = `${t("score", "Score")}: 10`;
         } else {
-          formattedTitle = `Score: ${score}.0-${score}.9`;
+          formattedTitle = `${t("score", "Score")}: ${score}.0-${score}.9`;
         }
       }
 
@@ -45,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "</th></tr></thead><tbody>";
       let stackTotal = 0;
 
-      chart.data.datasets.forEach((dataset, i) => {
+      chart.data.datasets.forEach((dataset) => {
         if (dataset.data[dataIndex] && dataset.data[dataIndex] > 0) {
           const value = dataset.data[dataIndex];
           stackTotal += value;
@@ -69,7 +73,9 @@ document.addEventListener("DOMContentLoaded", function () {
       // Add total row
       tableBody +=
         '<tr class="total-row">' +
-        "<td>Total:</td>" +
+        "<td>" +
+        t("total", "Total:") +
+        "</td>" +
         '<td style="text-align:right;font-weight:bold;">' +
         stackTotal +
         "</td>" +
@@ -128,7 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // Create tooltip content
       let tooltipContent = `
         <div class="pie-label">${label}</div>
-        <div class="pie-value">Count: ${value}</div>
+        <div class="pie-value">${t("count", "Count:")} ${value}</div>
         <div class="pie-percent">${percentage}%</div>
       `;
 
@@ -336,23 +342,27 @@ document.addEventListener("DOMContentLoaded", function () {
     // Add score-specific configurations
     scoreChartOptions.scales.x.title = {
       display: true,
-      text: "Score",
+      text: t("score", "Score"),
       color: "#D1D5DB",
       padding: { top: 10, bottom: 0 },
     };
 
     scoreChartOptions.scales.y.title = {
       display: true,
-      text: "Number of Items",
+      text: t("numberOfItems", "Number of Items"),
       color: "#D1D5DB",
       padding: { top: 0, left: 10 },
     };
 
+    const itemLabel =
+      scoreData.total_scored === 1
+        ? t("item", "item")
+        : t("items", "items");
     scoreChartOptions.plugins.title = {
       display: true,
-      text: `Average Score: ${scoreData.average_score} (${
+      text: `${t("averageScore", "Average Score:")} ${scoreData.average_score} (${
         scoreData.total_scored
-      } ${scoreData.total_scored === 1 ? "item" : "items"})`,
+      } ${itemLabel})`,
       color: "#D1D5DB",
       padding: { bottom: 10 },
       font: { size: 14 },

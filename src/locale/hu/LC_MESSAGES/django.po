@@ -1210,6 +1210,64 @@ msgstr "Értékelt %"
 msgid "Consumption"
 msgstr "Fogyasztás"
 
+msgid "Movie watched"
+msgid_plural "Movies watched"
+msgstr[0] "Megnézett film"
+msgstr[1] "Megnézett filmek"
+
+msgid "TV episode watched"
+msgid_plural "TV episodes watched"
+msgstr[0] "Megnézett TV-epizód"
+msgstr[1] "Megnézett TV-epizódok"
+
+msgid "Anime episode watched"
+msgid_plural "Anime episodes watched"
+msgstr[0] "Megnézett anime epizód"
+msgstr[1] "Megnézett anime epizódok"
+
+msgid "Manga chapter read"
+msgid_plural "Manga chapters read"
+msgstr[0] "Elolvasott manga fejezet"
+msgstr[1] "Elolvasott manga fejezetek"
+
+msgid "Book page read"
+msgid_plural "Book pages read"
+msgstr[0] "Elolvasott könyvoldal"
+msgstr[1] "Elolvasott könyvoldalak"
+
+msgid "Game hour played"
+msgid_plural "Game hours played"
+msgstr[0] "Játszott játékóra"
+msgstr[1] "Játszott játékórák"
+
+msgid "Comic issue read"
+msgid_plural "Comic issues read"
+msgstr[0] "Elolvasott képregény szám"
+msgstr[1] "Elolvasott képregény számok"
+
+msgid "Boardgame play"
+msgid_plural "Boardgame plays"
+msgstr[0] "Társasjáték játszma"
+msgstr[1] "Társasjáték játszmák"
+
+msgid "Number of Items"
+msgstr "Elemek száma"
+
+msgid "Average Score:"
+msgstr "Átlagos pontszám:"
+
+msgid "item"
+msgstr "elem"
+
+msgid "items"
+msgstr "elem"
+
+msgid "Count:"
+msgstr "Darab:"
+
+msgid "Total:"
+msgstr "Összesen:"
+
 msgid "Most Active Day"
 msgstr "Legaktívabb nap"
 

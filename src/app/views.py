@@ -1018,13 +1018,10 @@ def statistics(request):
         round(score_distribution["total_scored"] / total * 100) if total else None
     )
 
-    activity_data = stats.get_activity_data(request.user, start_date, end_date)
-
     context = {
         "start_date": start_date,
         "end_date": end_date,
         "media_count": media_count,
-        "activity_data": activity_data,
         "media_type_distribution": media_type_distribution,
         "score_distribution": score_distribution,
         "top_rated": top_rated,

@@ -92,7 +92,7 @@
 
   <div class="space-y-8">
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
       <div class="bg-[#2a2f35] rounded-lg p-6 flex items-center">
         <div class="bg-indigo-600/20 p-4 rounded-full mr-4">
           {% include "app/icons/states/completed.svg" with classes="w-8 h-8 text-indigo-400" %}
@@ -151,38 +151,6 @@
           {% endif %}
         </div>
       </div>
-      <div class="bg-[#2a2f35] rounded-lg p-6 flex items-center">
-        <div class="bg-emerald-600/20 p-4 rounded-full mr-4">
-          {% include "app/icons/calendar.svg" with classes="w-8 h-8 text-emerald-400" %}
-        </div>
-        <div>
-          <h3 class="text-sm font-medium text-gray-400">{% translate "Most Active Day" %}</h3>
-          {% if activity_data.stats.most_active_day %}
-            <p class="text-2xl font-bold">{% translate activity_data.stats.most_active_day %}</p>
-            <p class="text-sm text-gray-500">{% blocktranslate with percent=activity_data.stats.most_active_day_percentage %}{{ percent }}% of activity{% endblocktranslate %}</p>
-          {% else %}
-            <p class="text-2xl font-bold text-gray-500">--</p>
-          {% endif %}
-        </div>
-      </div>
-      <div class="bg-[#2a2f35] rounded-lg p-6 flex items-center">
-        <div class="bg-red-600/20 p-4 rounded-full mr-4">
-          {% include "app/icons/flame.svg" with classes="w-8 h-8 text-red-400" %}
-        </div>
-        <div>
-          <h3 class="text-sm font-medium text-gray-400">{% translate "Current Streak" %}</h3>
-          {% if activity_data.stats.most_active_day %}
-            <p class="text-2xl font-bold">
-              {% blocktranslate count counter=activity_data.stats.current_streak %}{{ counter }} day{% plural %}{{ counter }} days{% endblocktranslate %}
-              <p class="text-sm text-gray-500">
-                {% blocktranslate count counter=activity_data.stats.longest_streak %}Longest: {{ counter }} day{% plural %}Longest: {{ counter }} days{% endblocktranslate %}
-              </p>
-            </p>
-          {% else %}
-            <p class="text-2xl font-bold text-gray-500">--</p>
-          {% endif %}
-        </div>
-      </div>
     </div>
 
     <!-- Consumption Section -->
@@ -202,64 +170,6 @@
         </div>
       </div>
     {% endif %}
-
-    <!-- Activity History Section -->
-    <div class="bg-[#2a2f35] rounded-lg p-6 max-w-[calc(100svw-4rem)]">
-      <h2 class="text-xl font-semibold mb-4 text-center">{% translate "Activity History" %}</h2>
-      <div class="overflow-x-auto flex flex-col justify-center"
-           x-data="{ graphTooWide: false }"
-           x-init="$nextTick(() => { const graphWidth = $refs.graphContainer.scrollWidth; const parentWidth = $el.clientWidth; graphTooWide = graphWidth > parentWidth; })"
-           :class="graphTooWide ? 'items-start' : 'items-center'">
-
-        <div class="p-4" x-ref="graphContainer">
-          <!-- Months row -->
-          <div class="flex mb-2 pl-[36.68px]">
-            {% for month, week_count in activity_data.months %}
-              <div class="text-xs text-gray-400"
-                   style="width: calc({{ week_count }} * 1rem + ({{ week_count }} * 0.25rem))">{% translate month %}</div>
-            {% endfor %}
-          </div>
-
-          <!-- Graph wrapper -->
-          <div class="flex">
-            <!-- Weekday labels -->
-            <div class="flex flex-col justify-between pr-2 text-sm text-gray-400">
-              {% for label in activity_data.weekday_labels %}
-                {% if forloop.counter|divisibleby:2 %}
-                  <div class="h-4"></div>
-                {% else %}
-                  <div class="h-4 flex items-center">{% translate label %}</div>
-                {% endif %}
-              {% endfor %}
-            </div>
-
-            <!-- Weeks grid -->
-            <div class="flex gap-1">
-              {% for week in activity_data.calendar_weeks %}
-                <div class="flex flex-col gap-1">
-                  {% for day in week %}
-                    <div class="w-4 h-4 rounded-sm transition-colors duration-200 hover:ring-2 hover:ring-white {% if day.level == 0 %}bg-[#2f353e]{% elif day.level == 1 %}bg-indigo-700{% elif day.level == 2 %}bg-indigo-600{% elif day.level == 3 %}bg-indigo-500{% elif day.level == 4 %}bg-indigo-400{% endif %}"
-                         title="{% blocktranslate count counter=day.count with date=day.date %}{{ date }}: {{ counter }} activity{% plural %}{{ date }}: {{ counter }} activities{% endblocktranslate %}"></div>
-                  {% endfor %}
-                </div>
-              {% endfor %}
-            </div>
-          </div>
-        </div>
-
-        <!-- Legend -->
-        <div class="flex items-center gap-2 pl-6 text-xs text-gray-400"
-             :class="graphTooWide ? 'mb-5 mt-2' : 'mt-4'">
-          <span>{% translate "Less" %}</span>
-          <div class="w-4 h-4 rounded-sm bg-[#2f353e]"></div>
-          <div class="w-4 h-4 rounded-sm bg-indigo-700"></div>
-          <div class="w-4 h-4 rounded-sm bg-indigo-600"></div>
-          <div class="w-4 h-4 rounded-sm bg-indigo-500"></div>
-          <div class="w-4 h-4 rounded-sm bg-indigo-400"></div>
-          <span>{% translate "More" %}</span>
-        </div>
-      </div>
-    </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <!-- Media Type Distribution Section -->
@@ -348,7 +258,7 @@
       {% if top_rated %}
         <div class="media-grid">
           {% for media in top_rated %}
-            {% include "app/components/media_card.html" with media=media item=media.item title=media.item from_grid=True secondary_color=True %}
+            {% include "app/components/media_card.html" with media=media item=media.item title=media.item.title from_grid=True secondary_color=True %}
           {% endfor %}
         </div>
       {% else %}
@@ -398,6 +308,25 @@
 
   <script src="{% static 'js/libraries/chartjs-4.4.9.min.js' %}"></script>
   <script src="{% static 'js/libraries/chartjs-datalabels-2.0.0.min.js' %}"></script>
+
+  {% translate "Score" as chart_score %}
+  {% translate "Number of Items" as chart_number_of_items %}
+  {% translate "Average Score:" as chart_average_score %}
+  {% translate "item" as chart_item %}
+  {% translate "items" as chart_items %}
+  {% translate "Count:" as chart_count %}
+  {% translate "Total:" as chart_total %}
+  <script id="chart_i18n" type="application/json">
+    {
+      "score": "{{ chart_score|escapejs }}",
+      "numberOfItems": "{{ chart_number_of_items|escapejs }}",
+      "averageScore": "{{ chart_average_score|escapejs }}",
+      "item": "{{ chart_item|escapejs }}",
+      "items": "{{ chart_items|escapejs }}",
+      "count": "{{ chart_count|escapejs }}",
+      "total": "{{ chart_total|escapejs }}"
+    }
+  </script>
 
   <!-- JSON data for charts -->
   {{ media_type_distribution|json_script:"media_type_distribution" }}
