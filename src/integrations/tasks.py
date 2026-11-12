@@ -115,11 +115,13 @@ def sync_nuvio_watch_history():
     for account in accounts:
         try:
             with disable_fetch_releases():
+                # Full snapshot + delta so unwatches are reconciled even when the
+                # cursor was previously advanced past delete events.
                 nuvio.NuvioImporter(
                     account.user,
                     mode="new",
                     gate_upserts=True,
-                ).sync_delta()
+                ).import_data()
         except Exception:
             logger.exception(
                 "Nuvio watch-history sync failed for %s",

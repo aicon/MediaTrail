@@ -50,10 +50,15 @@ class FakeNuvio:
 
 def _metadata(media_type, media_id, source, season_numbers=None, episode_number=None):
     if media_type == "tv_with_seasons":
+        seasons = season_numbers or [1]
         return {
-            "season/1": {
-                "episodes": [{"episode_number": 1, "still_path": None}],
-            },
+            f"season/{number}": {
+                "episodes": [
+                    {"episode_number": ep, "still_path": None}
+                    for ep in range(1, 25)
+                ],
+            }
+            for number in seasons
         }
     if media_type == MediaTypes.TV.value:
         return {"title": "Show", "image": "https://example.test/show.jpg"}
@@ -61,7 +66,10 @@ def _metadata(media_type, media_id, source, season_numbers=None, episode_number=
         return {
             "title": "Show",
             "image": "https://example.test/season.jpg",
-            "episodes": [{"episode_number": 1, "still_path": None}],
+            "episodes": [
+                {"episode_number": ep, "still_path": None}
+                for ep in range(1, 25)
+            ],
         }
     if media_type == MediaTypes.MOVIE.value:
         return {
@@ -322,6 +330,84 @@ class NuvioImportTests(TestCase):
             ),
         )
         self.assertEqual(Movie.objects.filter(user=self.user).count(), 0)
+
+    def test_reimport_applies_delete_even_when_tip_cursor_passed_event(self):
+        """Regression: replay must not jump the cursor past pending deletes."""
+        self.user.nuvio_sync_mark_unplayed_enabled = True
+        self.user.save(update_fields=["nuvio_sync_mark_unplayed_enabled"])
+        self._run(
+            FakeNuvio(
+                [_history("tmdb:550", "movie", "Fight Club", nuvio_id="m1")],
+                cursor=10,
+            ),
+        )
+        self.account.refresh_from_db()
+        self.assertEqual(self.account.cursor, 10)
+        self._run(
+            FakeNuvio(
+                history=[],
+                delta=[
+                    {
+                        "event_id": 11,
+                        "operation": "delete",
+                        "id": "m1-delete",
+                        "content_id": "tmdb:550",
+                        "content_type": "movie",
+                        "title": "Fight Club",
+                        "watched_at": WATCHED_AT,
+                    },
+                ],
+                cursor=11,
+            ),
+        )
+        self.assertEqual(Movie.objects.filter(user=self.user).count(), 0)
+
+    def test_reconcile_removes_mapped_episode_missing_from_snapshot(self):
+        self.user.nuvio_sync_mark_unplayed_enabled = True
+        self.user.save(update_fields=["nuvio_sync_mark_unplayed_enabled"])
+        self.account.imdb_map = {"tt0072567": "1532"}
+        self.account.save(update_fields=["imdb_map"])
+        history = [
+            _history(
+                "tmdb:1532",
+                "series",
+                "Starsky",
+                season=2,
+                episode=21,
+                nuvio_id="e21",
+            ),
+            _history(
+                "tmdb:1532",
+                "series",
+                "Starsky",
+                season=2,
+                episode=20,
+                nuvio_id="e20",
+            ),
+        ]
+        self._run(FakeNuvio(history, cursor=5))
+        self.assertEqual(Episode.objects.count(), 2)
+        # Nuvio unwatched E21; snapshot only has E20. Cursor tip already past deletes.
+        self._run(
+            FakeNuvio(
+                [
+                    _history(
+                        "tmdb:1532",
+                        "series",
+                        "Starsky",
+                        season=2,
+                        episode=20,
+                        nuvio_id="e20",
+                    ),
+                ],
+                cursor=99,
+            ),
+        )
+        seasons_eps = {
+            (ep.item.season_number, ep.item.episode_number)
+            for ep in Episode.objects.all()
+        }
+        self.assertEqual(seasons_eps, {(2, 20)})
 
     def test_delete_removes_episode_when_toggle_on(self):
         self.user.nuvio_sync_mark_unplayed_enabled = True

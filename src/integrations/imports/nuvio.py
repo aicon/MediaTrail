@@ -489,16 +489,20 @@ class NuvioImporter:
         self.client = client or NuvioClient(self.account)
         self.warnings = []
         self.created = {MediaTypes.MOVIE.value: 0, MediaTypes.EPISODE.value: 0}
+        self.removed = {MediaTypes.MOVIE.value: 0, MediaTypes.EPISODE.value: 0}
         self._pending_account_fields = set()
         self._imported = set(self.account.imported_ids)
         self._permanent = set(self.account.permanent_ids)
         self._imdb_map = dict(self.account.imdb_map)
+        self._watched_keys = set(self.account.watched_keys or [])
 
     def import_data(self):
         """Read history, then later changes, and store the cursor when it is safe."""
         try:
             self.client.assert_profile()
-            self._replay_history()
+            remote_keys = self._replay_history()
+            if self.user.nuvio_sync_mark_unplayed_enabled:
+                self._reconcile_unwatched(remote_keys)
             self._delta()
         except NuvioError as exc:
             self._raise_import_error(exc)
@@ -506,6 +510,12 @@ class NuvioImporter:
         counts = {
             media_type: count for media_type, count in self.created.items() if count
         }
+        removed = sum(self.removed.values())
+        if removed:
+            self.warnings.insert(
+                0,
+                f"Removed {removed} local watch(es) after Nuvio unwatch.",
+            )
         return counts, "\n".join(self.warnings)
 
     def sync_delta(self):
@@ -536,8 +546,15 @@ class NuvioImporter:
         raise MediaImportError(str(exc)) from exc
 
     def _replay_history(self):
-        """Check the full watch history and add anything missing locally."""
-        cursor = self.client.history_cursor()
+        """Check the full watch history and add anything missing locally.
+
+        On first bootstrap, capture the tip cursor after the snapshot. On later
+        imports, keep the saved cursor so delete events are still visible to
+        ``_delta`` (advancing to tip here would skip them forever).
+        """
+        tip = self.client.history_cursor()
+        self._previous_watched_keys = set(self.account.watched_keys or [])
+        remote_keys = set()
         logger.info("Nuvio import started")
         for index, row in enumerate(self.client.iter_history(), start=1):
             if not self._apply(row, operation="upsert", event_id=None):
@@ -547,13 +564,101 @@ class NuvioImporter:
                     "It will continue on the next run."
                 )
                 raise MediaImportError(msg)
+            key = self._watched_key_from_row(row)
+            if key:
+                remote_keys.add(key)
             if index % 25 == 0:
                 self._log_progress(index)
         self._flush_progress()
-        self.account.cursor = cursor
-        self.account.bootstrapped = True
-        self._save_account(["cursor", "bootstrapped"])
-        logger.info("Nuvio import history checked")
+        self.account.watched_keys = sorted(remote_keys)
+        fields = ["watched_keys"]
+        if not self.account.bootstrapped:
+            self.account.cursor = tip
+            self.account.bootstrapped = True
+            fields.extend(["cursor", "bootstrapped"])
+        self._save_account(fields)
+        logger.info("Nuvio import history checked (%s remote keys)", len(remote_keys))
+        return remote_keys
+
+    def _reconcile_unwatched(self, remote_keys):
+        """Remove local watches that disappeared from the Nuvio snapshot."""
+        if self._previous_watched_keys:
+            stale = self._previous_watched_keys - remote_keys
+        else:
+            # First run after enabling sync / empty snapshot cache: use mapped
+            # TMDB ids from prior imports so already-missed deletes still apply.
+            stale = self._local_keys_for_mapped_titles() - remote_keys
+        for key in stale:
+            if self._delete_watched_key(key) == "delete":
+                kind = key.split(":", 1)[0]
+                if kind in self.removed:
+                    self.removed[kind] += 1
+                    logger.info("Nuvio reconcile removed %s", key)
+
+    def _local_keys_for_mapped_titles(self):
+        """Local movie/episode keys for TMDB ids previously resolved from Nuvio."""
+        media_ids = {str(value) for value in self._imdb_map.values() if value}
+        if not media_ids:
+            return set()
+        keys = set()
+        for movie in app.models.Movie.objects.filter(
+            user=self.user,
+            item__source=Sources.TMDB.value,
+            item__media_id__in=media_ids,
+        ).select_related("item"):
+            keys.add(f"movie:{movie.item.media_id}")
+        for episode in app.models.Episode.objects.filter(
+            related_season__user=self.user,
+            item__source=Sources.TMDB.value,
+            item__media_id__in=media_ids,
+        ).select_related("item"):
+            keys.add(
+                "episode:"
+                f"{episode.item.media_id}:"
+                f"{episode.item.season_number}:"
+                f"{episode.item.episode_number}",
+            )
+        return keys
+
+    def _watched_key_from_row(self, row):
+        try:
+            record = record_from_nuvio(row, operation="upsert", event_id=None)
+        except RecordError:
+            return None
+        if record["source"] == "imdb":
+            mapped = self._map_imdb(record)
+            if not mapped:
+                return None
+            record = mapped
+        return self._watched_key_from_record(record)
+
+    def _watched_key_from_record(self, record):
+        if record["kind"] == MediaTypes.MOVIE.value:
+            return f"movie:{record['media_id']}"
+        return (
+            f"episode:{record['media_id']}:"
+            f"{record['season']}:{record['episode']}"
+        )
+
+    def _delete_watched_key(self, key):
+        parts = str(key).split(":")
+        if len(parts) == 2 and parts[0] == "movie":
+            return self._delete_movie(
+                {
+                    "media_id": parts[1],
+                    "title": key,
+                },
+            )
+        if len(parts) == 4 and parts[0] == "episode":
+            return self._delete_episode(
+                {
+                    "media_id": parts[1],
+                    "season": int(parts[2]),
+                    "episode": int(parts[3]),
+                    "title": key,
+                },
+            )
+        return "missing"
 
     def _delta(self):
         blocked = False
@@ -611,6 +716,12 @@ class NuvioImporter:
                 return False
             self._remember(nuvio_id)
             if action == "delete":
+                self.removed[record["kind"]] += 1
+                key = self._watched_key_from_record(record)
+                if key and key in self._watched_keys:
+                    self._watched_keys.discard(key)
+                    self.account.watched_keys = sorted(self._watched_keys)
+                    self._save_account(["watched_keys"])
                 logger.info(
                     "Nuvio sync deleted %s: %s",
                     record["kind"],
@@ -644,6 +755,12 @@ class NuvioImporter:
             self._permanent_skip(record, "not found in TMDB")
             return True
         self._remember(nuvio_id)
+        if action in {"create", "update", "skip"}:
+            key = self._watched_key_from_record(record)
+            if key and key not in self._watched_keys:
+                self._watched_keys.add(key)
+                self.account.watched_keys = sorted(self._watched_keys)
+                self._save_account(["watched_keys"])
         if action in {"create", "update"}:
             logger.info(
                 "Nuvio import %s %s: %s",

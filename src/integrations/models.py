@@ -18,6 +18,10 @@ class NuvioAccount(models.Model):
     imported_ids = models.JSONField(default=list)
     permanent_ids = models.JSONField(default=list)
     imdb_map = models.JSONField(default=dict)
+    watched_keys = models.JSONField(
+        default=list,
+        help_text="Last Nuvio watch-history snapshot keys for unwatch reconcile",
+    )
 
     def __str__(self):
         """Return the owning user."""
