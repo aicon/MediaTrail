@@ -48,8 +48,8 @@
                     {% translate "No date provided" %}
                   {% endif %}
                 </div>
-                <form method="post"
-                      action="{% url 'media_delete' %}?next={{ request.path }}">
+                <form hx-post="{% url 'media_delete' %}?next={{ request.path }}"
+                      hx-swap="none">
                   {% csrf_token %}
                   <input type="hidden" name="instance_id" value="{{ entry.id }}">
                   <input type="hidden" name="media_type" value="episode">
@@ -70,8 +70,8 @@
         {% now_plus_minutes episode.runtime_minutes as finish_datetime %}
       {% endif %}
       {# djlint:off #}
-      <form method="post"
-            action="{% url 'episode_save' %}?next={{ request.path }}"
+      <form hx-post="{% url 'episode_save' %}?next={{ request.path }}"
+            hx-swap="none"
             x-data="{
               inputDateTime: '{% if TRACK_TIME %}{% now "Y-m-d\TH:i" %}{% else %}{% now "Y-m-d" %}{% endif %}',
               inputType: '{% if TRACK_TIME %}datetime-local{% else %}date{% endif %}',

@@ -1,4 +1,7 @@
-document.addEventListener("alpine:init", () => {
+// Guard against re-registering when this script re-runs after an HTMX body swap.
+if (!window.__mediaFormRegistered) {
+  window.__mediaFormRegistered = true;
+  document.addEventListener("alpine:init", () => {
   Alpine.data("mediaForm", () => ({
     autoFilled: {
       start_date: false,
@@ -154,4 +157,5 @@ document.addEventListener("alpine:init", () => {
       return date.toISOString().slice(0, 10);
     },
   }));
-});
+  });
+}

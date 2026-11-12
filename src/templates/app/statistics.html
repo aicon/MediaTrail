@@ -92,7 +92,7 @@
 
   <div class="space-y-8">
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
       <div class="bg-[#2a2f35] rounded-lg p-6 flex items-center">
         <div class="bg-indigo-600/20 p-4 rounded-full mr-4">
           {% include "app/icons/states/completed.svg" with classes="w-8 h-8 text-indigo-400" %}
@@ -109,6 +109,19 @@
         </div>
       </div>
       <div class="bg-[#2a2f35] rounded-lg p-6 flex items-center">
+        <div class="bg-sky-600/20 p-4 rounded-full mr-4">
+          {% include "app/icons/states/in-progress.svg" with classes="w-8 h-8 text-sky-400" %}
+        </div>
+        <div>
+          <h3 class="text-sm font-medium text-gray-400">{% translate "In Progress" %}</h3>
+          {% if media_count.total %}
+            <p class="text-2xl font-bold">{{ in_progress_count }}</p>
+          {% else %}
+            <p class="text-2xl font-bold text-gray-500">--</p>
+          {% endif %}
+        </div>
+      </div>
+      <div class="bg-[#2a2f35] rounded-lg p-6 flex items-center">
         <div class="bg-yellow-600/20 p-4 rounded-full mr-4">
           {% include "app/icons/ribbon.svg" with classes="w-8 h-8 text-yellow-400" %}
         </div>
@@ -117,6 +130,21 @@
           {% if score_distribution.total_scored %}
             <p class="text-2xl font-bold">
               {{ score_distribution.average_score }} <span class="text-gray-500 text-lg">/ 10</span>
+            </p>
+          {% else %}
+            <p class="text-2xl font-bold text-gray-500">--</p>
+          {% endif %}
+        </div>
+      </div>
+      <div class="bg-[#2a2f35] rounded-lg p-6 flex items-center">
+        <div class="bg-emerald-600/20 p-4 rounded-full mr-4">
+          {% include "app/icons/star.svg" with classes="w-8 h-8 text-emerald-400" %}
+        </div>
+        <div>
+          <h3 class="text-sm font-medium text-gray-400">{% translate "% Rated" %}</h3>
+          {% if rated_percent is not None %}
+            <p class="text-2xl font-bold">
+              {{ rated_percent }}<span class="text-gray-500 text-lg">%</span>
             </p>
           {% else %}
             <p class="text-2xl font-bold text-gray-500">--</p>
@@ -156,6 +184,24 @@
         </div>
       </div>
     </div>
+
+    <!-- Consumption Section -->
+    {% if consumption_stats %}
+      <div class="bg-[#2a2f35] rounded-lg p-6">
+        <h2 class="text-xl font-semibold mb-4">{% translate "Consumption" %}</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {% for stat in consumption_stats %}
+            <div class="bg-[#39404b] rounded-lg p-4 flex items-center gap-3">
+              <div class="shrink-0 {{ stat.media_type|media_color }}">{% icon stat.media_type is_active=False extra_classes="w-7 h-7" %}</div>
+              <div class="min-w-0">
+                <p class="text-2xl font-bold leading-tight">{{ stat.value }}</p>
+                <p class="text-xs text-gray-400 truncate" title="{{ stat.descriptor }}">{{ stat.descriptor }}</p>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
 
     <!-- Activity History Section -->
     <div class="bg-[#2a2f35] rounded-lg p-6 max-w-[calc(100svw-4rem)]">
@@ -312,90 +358,6 @@
           </div>
           <h3 class="text-lg font-medium mb-2">{% translate "No ratings yet" %}</h3>
           <p class="text-gray-400 text-center max-w-md">{% translate "Rate your media items to see score distribution statistics." %}</p>
-        </div>
-      {% endif %}
-    </div>
-
-    <!-- Media Timeline Section -->
-    <div class="bg-[#2a2f35] rounded-lg p-6 max-w-[calc(100svw-4rem)]">
-      <h2 class="text-xl font-semibold mb-6 md:mb-10">{% translate "Media Timeline" %}</h2>
-
-      {% if timeline %}
-        <div class="relative flex justify-center">
-          <div class="absolute top-0 bottom-0 w-px bg-indigo-500/50 hidden md:block"></div>
-
-          <div class="w-full space-y-10 md:space-y-20">
-            {% for month_year, media_list in timeline.items %}
-              <div class="relative">
-
-                <h3 class="text-lg font-medium text-center md:hidden md:text-left md:absolute md:top-0 md:left-1/2 md:transform md:translate-y-0 md:-translate-x-1/2 md:whitespace-nowrap">
-                  {% with month=month_year|slice:":-5" year=month_year|slice:"-4:" %}{% translate month %} {{ year }}{% endwith %}
-                </h3>
-
-                <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10 hidden md:block">
-                  <div class="w-3 h-3 rounded-full bg-indigo-500 mx-auto mb-2"></div>
-                  <div class="absolute top-1.5 left-1/2 flex -translate-y-1/2">
-                    {% if forloop.counter|divisibleby:2 %}
-                      {# to the left #}
-                      <div class="h-px w-40 bg-indigo-500/50 transform -translate-x-full"></div>
-                      <div class="absolute -top-7 right-46 whitespace-nowrap">
-                        <h3 class="text-lg font-medium">{% with month=month_year|slice:":-5" year=month_year|slice:"-4:" %}{% translate month %} {{ year }}{% endwith %}</h3>
-                      </div>
-                    {% else %}
-                      {# to the right #}
-                      <div class="h-px w-40 bg-indigo-500/50"></div>
-                      <div class="absolute -top-7 left-4 whitespace-nowrap">
-                        <h3 class="text-lg font-medium">{% with month=month_year|slice:":-5" year=month_year|slice:"-4:" %}{% translate month %} {{ year }}{% endwith %}</h3>
-                      </div>
-                    {% endif %}
-                  </div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 md:w-[calc(50%-2rem)] lg:w-[calc(50%-1rem)] {% if forloop.counter|divisibleby:2 %}md:mr-auto md:ml-0{% else %}md:ml-auto md:mr-0{% endif %}">
-                  {% for media in media_list %}
-                    <div class="bg-[#39404b] p-4 rounded-lg hover:ring-2 hover:ring-indigo-500 transition-all duration-200">
-                      <div class="flex items-start gap-4">
-                        <div class="shrink-0 order-0">
-                          <a href="{{ media.item|media_url }}">
-                            <img alt="{{ media.item }}"
-                                 class="lazyload w-16 h-24 rounded-md bg-[#3e454d] {% if media.item.image != IMG_NONE %}object-cover{% endif %} hover:opacity-80 transition-opacity"
-                                 src="{{ IMG_NONE }}"
-                                 data-src="{{ media.item.image }}">
-                          </a>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                          <h4 class="font-medium">
-                            <a href="{{ media.item|media_url }}"
-                               class="hover:text-indigo-400 transition-colors line-clamp-2">{{ media.item }}</a>
-                          </h4>
-                          <div class="text-sm text-gray-400 mt-1">
-                            <p>
-                              {% if media.start_date %}{{ media.start_date|datetime_format:user }}{% endif %}
-                              {% if media.start_date and media.end_date %}-{% endif %}
-                              {% if media.end_date %}{{ media.end_date|datetime_format:user }}{% endif %}
-                            </p>
-                          </div>
-                          {% if media.score|show_media_score:user %}
-                            <div class="flex items-center text-sm text-yellow-400 mt-2">
-                              {% include "app/icons/star.svg" with classes="w-4 h-4 mr-1 fill-current" %}
-                              <span>{{ media.formatted_score }}</span>
-                            </div>
-                          {% endif %}
-                        </div>
-                      </div>
-                    </div>
-                  {% endfor %}
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        </div>
-      {% else %}
-        <div class="flex flex-col items-center justify-center py-16">
-          <div class="bg-[#39404b] rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-            {% include "app/icons/clock.svg" with classes="w-8 h-8 text-gray-400" %}
-          </div>
-          <h3 class="text-lg font-medium mb-2">{% translate "Your timeline is empty" %}</h3>
-          <p class="text-gray-400 text-center max-w-md">{% translate "Consume media items to see them appear on your timeline." %}</p>
         </div>
       {% endif %}
     </div>

@@ -383,6 +383,12 @@ def media_color(media_type):
 
 
 @register.filter
+def journal_accent(accent):
+    """Return the badge background class and icon template for a journal accent."""
+    return config.get_journal_accent(accent)
+
+
+@register.filter
 def status_color(status):
     """Return the color associated with the status."""
     return config.get_status_text_color(status)
