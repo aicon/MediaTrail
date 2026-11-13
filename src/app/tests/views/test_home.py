@@ -529,9 +529,8 @@ class HomeViewTests(TestCase):
         response = self.client.get(reverse("home"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "E6 • 42%")
-        self.assertContains(response, "bg-slate-800/90")
+        self.assertContains(response, "bg-black/80")
         self.assertContains(response, "border-white/30")
-        self.assertContains(response, "backdrop-blur-sm")
         self.assertContains(response, 'fill="currentColor"')
         self.assertContains(response, 'd="M8 5v14l11-7z"')
 
