@@ -164,6 +164,17 @@
   background-color: var(--color-slate-500);
 }
 
+/* Home poster pills: border-white/20 is not present in compiled main.css. */
+.border-white\/20 {
+  border-color: color-mix(in srgb, #fff 20%, transparent);
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+  .border-white\/20 {
+    border-color: color-mix(in oklab, #fff 20%, transparent);
+  }
+}
+
 @media (width >= 64rem) {
   .lg\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
