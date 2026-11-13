@@ -1,4 +1,5 @@
 import datetime
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
@@ -174,6 +175,44 @@ class EditMedia(TestCase):
             },
         )
         self.assertEqual(Movie.objects.get(item__media_id="10494").score, 10)
+
+    @patch(
+        "app.models.providers.services.get_media_metadata",
+        return_value={"max_progress": 1, "title": "Matchbox", "image": "x.jpg"},
+    )
+    def test_new_completed_entry_removes_mid_watch_sibling(self, _metadata):
+        """Add new entry Completed removes the prior In Progress resume row."""
+        item = Item.objects.create(
+            media_id="matchbox-1",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.MOVIE.value,
+            title="Matchbox",
+            image="http://example.com/matchbox.jpg",
+        )
+        mid_watch = Movie.objects.create(
+            item=item,
+            user=self.user,
+            status=Status.IN_PROGRESS.value,
+            resume_position_ms=2_954_100,
+            resume_duration_ms=7_567_309,
+        )
+
+        response = self.client.post(
+            reverse("media_save"),
+            {
+                "media_id": "matchbox-1",
+                "source": Sources.TMDB.value,
+                "media_type": MediaTypes.MOVIE.value,
+                "status": Status.COMPLETED.value,
+                "return_url": "/",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Movie.objects.filter(pk=mid_watch.pk).exists())
+        remaining = Movie.objects.filter(item=item, user=self.user)
+        self.assertEqual(remaining.count(), 1)
+        self.assertEqual(remaining.get().status, Status.COMPLETED.value)
 
     def test_cannot_edit_another_users_media(self):
         """Test users cannot edit another user's media by instance ID."""

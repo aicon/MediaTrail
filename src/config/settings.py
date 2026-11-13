@@ -375,8 +375,8 @@ AUTH_USER_MODEL = "users.User"
 FILE_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50 MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50 MB
 
-# MediaTrail versioning: 0.26.8 fixes activity-history delete for player-written rows.
-VERSION = config("VERSION", default="0.26.8")
+# MediaTrail versioning: 0.26.9 drops orphan In Progress movies when mark-watched.
+VERSION = config("VERSION", default="0.26.9")
 
 
 def _public_http_url(name):

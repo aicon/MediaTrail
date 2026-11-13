@@ -261,3 +261,29 @@ class NuvioPlayerTests(TestCase):
         self.assertEqual(movie.status, Status.COMPLETED.value)
         self.assertIsNone(movie.resume_position_ms)
         self.assertIsNone(movie.resume_duration_ms)
+
+    @patch(
+        "app.models.providers.services.get_media_metadata",
+        return_value={"max_progress": 1},
+    )
+    def test_new_completed_entry_removes_in_progress_sibling(self, _metadata):
+        """Add new entry → Completed deletes the prior mid-watch In Progress row."""
+        mid_watch = Movie.objects.create(
+            user=self.user,
+            item=self.movie_item,
+            status=Status.IN_PROGRESS.value,
+            resume_position_ms=2_954_100,
+            resume_duration_ms=7_567_309,
+        )
+        finished = Movie(
+            user=self.user,
+            item=self.movie_item,
+            status=Status.COMPLETED.value,
+        )
+        finished.save()
+
+        self.assertFalse(Movie.objects.filter(pk=mid_watch.pk).exists())
+        self.assertEqual(Movie.objects.filter(item=self.movie_item).count(), 1)
+        finished.refresh_from_db()
+        self.assertEqual(finished.status, Status.COMPLETED.value)
+        self.assertIsNone(finished.resume_position_ms)

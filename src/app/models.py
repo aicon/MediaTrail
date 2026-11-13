@@ -2008,6 +2008,35 @@ class Movie(Media):
 
     tracker = FieldTracker()
 
+    def save(self, *args, **kwargs):
+        """Persist the movie and drop orphan mid-watch siblings when completed."""
+        super().save(*args, **kwargs)
+        # "Add new entry" → Completed leaves the prior In Progress+resume row on
+        # the home grid; remove those siblings whenever this row is Completed.
+        # Runs after save so new Completed rows (default status) are covered even
+        # when FieldTracker does not see a status change.
+        if self.status == Status.COMPLETED.value and self.pk:
+            self._drop_in_progress_siblings()
+
+    def _drop_in_progress_siblings(self):
+        """Delete other In Progress rows for the same user+item."""
+        deleted, _ = (
+            type(self)
+            .objects.filter(
+                user_id=self.user_id,
+                item_id=self.item_id,
+                status=Status.IN_PROGRESS.value,
+            )
+            .exclude(pk=self.pk)
+            .delete()
+        )
+        if deleted:
+            logger.info(
+                "Removed %s in-progress sibling(s) for completed %s",
+                deleted,
+                self,
+            )
+
     @property
     def resume_bar_percent(self):
         """0–99 percent for the home card bar, or None when not a resume row."""
