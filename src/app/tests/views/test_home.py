@@ -60,7 +60,9 @@ class HomeViewTests(TestCase):
                     "image": "http://example.com/image.jpg",
                     "details": {"seasons": 1},
                     f"season/{season_number}": {
-                        "episodes": [{"id": i} for i in range(1, 11)],
+                        "episodes": [
+                            {"id": i, "episode_number": i} for i in range(1, 11)
+                        ],
                     },
                     "related": {
                         "seasons": [
@@ -77,8 +79,13 @@ class HomeViewTests(TestCase):
                     "title": "Test TV Show",
                     "image": "http://example.com/image.jpg",
                     "max_progress": 10,
+                    "episodes": [
+                        {"id": i, "episode_number": i} for i in range(1, 11)
+                    ],
                     "season/1": {
-                        "episodes": [{"id": i} for i in range(1, 11)],
+                        "episodes": [
+                            {"id": i, "episode_number": i} for i in range(1, 11)
+                        ],
                     },
                 }
 
@@ -343,23 +350,40 @@ class HomeViewTests(TestCase):
         self.assertEqual(len(response.context["media_list"]["items"]), 0)
         self.assertEqual(response.context["media_list"]["total"], 1)
 
-    @patch("app.providers.services.get_media_metadata")
-    def test_home_view_htmx_load_more(self, mock_get_media_metadata):
+    def test_home_view_htmx_load_more(self):
         """Test the HTMX load more functionality."""
-        mock_get_media_metadata.return_value = {
-            "title": "Test TV Show",
-            "image": "http://example.com/image.jpg",
-            "season/1": {
-                "episodes": [{"id": 1}, {"id": 2}, {"id": 3}],  # 3 episodes
-            },
-            "related": {
-                "seasons": [
-                    {"season_number": 1, "image": "http://example.com/image.jpg"},
-                ],  # Only one season
-            },
-        }
+        past = timezone.now() - timezone.timedelta(days=30)
 
-        for i in range(6, 20):  # Create 14 more TV shows (we already have 1)
+        def load_more_metadata(media_type, *_args, **_kwargs):
+            season_payload = {
+                "episodes": [
+                    {"id": 1, "episode_number": 1, "air_date": past},
+                    {"id": 2, "episode_number": 2, "air_date": past},
+                    {"id": 3, "episode_number": 3, "air_date": past},
+                ],
+                "image": "http://example.com/image.jpg",
+            }
+            return {
+                "title": "Test TV Show",
+                "image": "http://example.com/image.jpg",
+                "details": {"seasons": 1},
+                "max_progress": 3,
+                "episodes": season_payload["episodes"],
+                "season/1": season_payload,
+                "related": {
+                    "seasons": [
+                        {
+                            "season_number": 1,
+                            "image": "http://example.com/image.jpg",
+                            "first_air_date": past,
+                        },
+                    ],
+                },
+            }
+
+        self.mock_get_media_metadata.side_effect = load_more_metadata
+
+        for i in range(6, 20):  # Create 14 more seasons (setUp already has 1)
             season_item = Item.objects.create(
                 media_id=str(i),
                 source=Sources.TMDB.value,
@@ -389,7 +413,6 @@ class HomeViewTests(TestCase):
                 end_date=timezone.now(),
             )
 
-        # Now test the load more functionality
         response = self.client.get(
             reverse("home") + "?load_media_type=season", headers={"hx-request": "true"}
         )
@@ -403,13 +426,9 @@ class HomeViewTests(TestCase):
         self.assertIn("items", response.context["media_list"])
         self.assertIn("total", response.context["media_list"])
 
-        # Since we're loading more (items after the first 14),
-        # we should have at least 1 item in the response
-        self.assertEqual(len(response.context["media_list"]["items"]), 1)
-        self.assertEqual(
-            response.context["media_list"]["total"],
-            15,
-        )  # 15 TV shows total
+        # Home grid shows 6 first; load-more returns the remaining 9 of 15.
+        self.assertEqual(len(response.context["media_list"]["items"]), 9)
+        self.assertEqual(response.context["media_list"]["total"], 15)
 
     def test_home_view_htmx_load_more_for_planning(self):
         """Test the HTMX load more functionality for planning media."""
@@ -440,7 +459,8 @@ class HomeViewTests(TestCase):
         self.assertTemplateUsed(response, "app/components/home_grid.html")
         self.assertEqual(response.context["home_status"], Status.PLANNING.value)
         self.assertIn("media_list", response.context)
-        self.assertEqual(len(response.context["media_list"]["items"]), 2)
+        # setUp has 1 planning movie + 15 here = 16; first page 6, load-more 10.
+        self.assertEqual(len(response.context["media_list"]["items"]), 10)
         self.assertEqual(response.context["media_list"]["total"], 16)
 
     def test_home_season_resume_pill_and_recent_sort(self):
@@ -509,6 +529,9 @@ class HomeViewTests(TestCase):
         response = self.client.get(reverse("home"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "E6 • 42%")
+        self.assertContains(response, "bg-slate-900/90")
+        self.assertContains(response, "backdrop-blur-sm")
+        self.assertContains(response, 'fill="currentColor"')
         self.assertContains(response, 'polygon points="6 3 20 12 6 21 6 3"')
 
         in_progress = next(

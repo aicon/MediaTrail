@@ -165,6 +165,111 @@ class EpisodeStatusTests(TestCase):
         self.assertEqual(self.tv.status, Status.COMPLETED.value)
 
     @patch("app.models.providers.services.get_media_metadata")
+    def test_caught_up_when_len_differs_from_last_episode_number(
+        self,
+        mock_get_metadata,
+    ):
+        """Released catch-up completes even when len(episodes) != last number."""
+        past = datetime(2020, 1, 1, tzinfo=UTC)
+        mock_get_metadata.return_value = {
+            "season/1": {
+                "episodes": [
+                    {"episode_number": 0, "air_date": None},
+                    {"episode_number": 1, "air_date": past},
+                    {"episode_number": 2, "air_date": past},
+                ],
+            },
+            "related": {"seasons": [{"season_number": 1}]},
+        }
+        self.season.resume_episode_number = 2
+        self.season.resume_position_ms = 1000
+        self.season.resume_duration_ms = 5000
+        self.season.resume_updated_at = timezone.now()
+        Season.objects.filter(pk=self.season.pk).update(
+            resume_episode_number=2,
+            resume_position_ms=1000,
+            resume_duration_ms=5000,
+            resume_updated_at=timezone.now(),
+        )
+
+        Episode.objects.create(
+            item=self.episode_item,
+            related_season=self.season,
+            end_date=timezone.now(),
+        )
+        ep2_item = Item.objects.create(
+            media_id="123",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.EPISODE.value,
+            title="E2",
+            image="http://example.com/image.jpg",
+            season_number=1,
+            episode_number=2,
+        )
+        Episode.objects.create(
+            item=ep2_item,
+            related_season=self.season,
+            end_date=timezone.now(),
+        )
+
+        self.season.refresh_from_db()
+        self.assertEqual(self.season.status, Status.COMPLETED.value)
+        self.assertIsNone(self.season.resume_episode_number)
+        self.assertIsNone(self.season.resume_position_ms)
+        self.assertIsNone(self.season.resume_duration_ms)
+        self.assertIsNone(self.season.resume_updated_at)
+
+    @patch("app.models.TV._handle_completed_season")
+    @patch("app.models.providers.services.get_media_metadata")
+    def test_already_completed_rewatch_skips_complete_side_effects(
+        self,
+        mock_get_metadata,
+        mock_handle,
+    ):
+        """Rewatching when already Completed must not re-run completion cascade."""
+        past = datetime(2020, 1, 1, tzinfo=UTC)
+        mock_get_metadata.return_value = {
+            "season/1": {
+                "episodes": [
+                    {"episode_number": 1, "air_date": past},
+                    {"episode_number": 2, "air_date": past},
+                ],
+            },
+            "related": {"seasons": [{"season_number": 1}]},
+        }
+        Episode.objects.create(
+            item=self.episode_item,
+            related_season=self.season,
+            end_date=timezone.now(),
+        )
+        ep2_item = Item.objects.create(
+            media_id="123",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.EPISODE.value,
+            title="E2",
+            image="http://example.com/image.jpg",
+            season_number=1,
+            episode_number=2,
+        )
+        Episode.objects.create(
+            item=ep2_item,
+            related_season=self.season,
+            end_date=timezone.now(),
+        )
+        self.season.refresh_from_db()
+        self.assertEqual(self.season.status, Status.COMPLETED.value)
+        mock_handle.reset_mock()
+
+        Episode.objects.create(
+            item=self.episode_item,
+            related_season=self.season,
+            end_date=timezone.now(),
+        )
+        self.season.refresh_from_db()
+        self.assertEqual(self.season.status, Status.COMPLETED.value)
+        mock_handle.assert_not_called()
+
+    @patch("app.models.providers.services.get_media_metadata")
     def test_middle_episode_does_not_change_status(self, mock_get_metadata):
         """Test middle episode doesn't change season/TV status."""
         mock_metadata = {

@@ -1555,6 +1555,73 @@ class Season(Media):
         if persist:
             persist_cleared_resume(self)
 
+    def reconcile_status_from_progress(self, season_metadata):
+        """Align status with watched vs released episodes after an episode save.
+
+        Unlike ``get_completion_status`` (used when the user marks Completed and
+        remaining released eps are auto-created), this only flips to Completed
+        when there is nothing left to watch — no released backlog and no
+        unreleased leftovers after the highest watched episode number.
+
+        Returns True only when this call newly transitions the season to Completed
+        (already-Completed seasons are left alone — no re-cascade).
+        """
+        was_completed = self.status == Status.COMPLETED.value
+        current_date = timezone.localdate()
+        latest_watched = self._get_latest_watched_episode_number()
+        released_remaining = False
+        unreleased_remaining = False
+        for episode in season_metadata.get("episodes", []):
+            episode_number = episode.get("episode_number")
+            if episode_number is None or episode_number <= latest_watched:
+                continue
+            if app.helpers.is_released_date(episode.get("air_date"), current_date):
+                released_remaining = True
+            else:
+                unreleased_remaining = True
+
+        fully_complete = (
+            latest_watched > 0
+            and not released_remaining
+            and not unreleased_remaining
+        )
+
+        if fully_complete:
+            if was_completed:
+                return False
+            self.status = Status.COMPLETED.value
+            bulk_update_with_history(
+                [self],
+                Season,
+                fields=["status"],
+            )
+            self.clear_resume(persist=True)
+            self.create_user_message(
+                "was marked as completed automatically.",
+                level=UserMessageLevel.SUCCESS,
+            )
+            self.related_tv._handle_completed_season(self.item.season_number)
+            return True
+
+        if latest_watched <= 0:
+            return False
+
+        if self.status != Status.IN_PROGRESS.value:
+            self.status = Status.IN_PROGRESS.value
+            bulk_update_with_history(
+                [self],
+                Season,
+                fields=["status"],
+            )
+        if self.related_tv.status != Status.IN_PROGRESS.value:
+            self.related_tv.status = Status.IN_PROGRESS.value
+            bulk_update_with_history(
+                [self.related_tv],
+                TV,
+                fields=["status"],
+            )
+        return False
+
     @tracker  # postpone field reset until after the save
     def save(self, *args, **kwargs):
         """Save the media instance."""
@@ -1670,7 +1737,8 @@ class Season(Media):
         unreleased_remaining_exists = False
 
         for episode in season_metadata["episodes"]:
-            if episode["episode_number"] <= latest_watched_ep_num:
+            episode_number = episode.get("episode_number")
+            if episode_number is None or episode_number <= latest_watched_ep_num:
                 continue
 
             if app.helpers.is_released_date(episode.get("air_date"), current_date):
@@ -1990,47 +2058,10 @@ class Episode(models.Model):
             [season_number],
         )
         season_metadata = tv_with_seasons_metadata[f"season/{season_number}"]
-        max_progress = len(season_metadata["episodes"])
 
         # clear prefetch cache to get the updated episodes
         self.related_season.refresh_from_db()
-
-        is_finale = self.item.episode_number == max_progress
-        season_just_completed = False
-        if is_finale:
-            if self.related_season.status != Status.COMPLETED.value:
-                self.related_season.status = Status.COMPLETED.value
-                bulk_update_with_history(
-                    [self.related_season],
-                    Season,
-                    fields=["status"],
-                )
-                season_just_completed = True
-                self.related_season.create_user_message(
-                    "was marked as completed automatically.",
-                    level=UserMessageLevel.SUCCESS,
-                )
-
-        elif self.related_season.status != Status.IN_PROGRESS.value:
-            self.related_season.status = Status.IN_PROGRESS.value
-            bulk_update_with_history(
-                [self.related_season],
-                Season,
-                fields=["status"],
-            )
-
-        if season_just_completed:
-            self.related_season.related_tv._handle_completed_season(season_number)
-        elif (
-            not is_finale
-            and self.related_season.related_tv.status != Status.IN_PROGRESS.value
-        ):
-            self.related_season.related_tv.status = Status.IN_PROGRESS.value
-            bulk_update_with_history(
-                [self.related_season.related_tv],
-                TV,
-                fields=["status"],
-            )
+        self.related_season.reconcile_status_from_progress(season_metadata)
 
     def delete(self, *args, **kwargs):
         """Delete the episode instance and update parent statuses if needed."""
