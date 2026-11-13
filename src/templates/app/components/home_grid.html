@@ -31,6 +31,15 @@
         </div>
       {% endif %}
 
+      {% if media.status == Status.IN_PROGRESS.value and media.resume_episode_number and media.resume_bar_percent %}
+        <div class="absolute bottom-2 left-1/2 flex max-w-[98%] -translate-x-1/2 items-center gap-1.5 rounded-md bg-black/80 px-2 py-1.5 shadow-md whitespace-nowrap">
+          {% include "app/icons/play.svg" with classes="w-3.5 h-3.5 text-indigo-400" %}
+          <span class="text-xs font-medium text-white drop-shadow-sm truncate">
+            E{{ media.resume_episode_number }} • {{ media.resume_bar_percent }}%
+          </span>
+        </div>
+      {% endif %}
+
       <div class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover-tap:opacity-100{% if user.clickable_media_cards %} pointer-coarse:hidden{% endif %}">
         <a href="{{ media.item|media_url }}" class="absolute inset-0 z-0"></a>
 

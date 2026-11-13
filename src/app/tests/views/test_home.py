@@ -442,3 +442,95 @@ class HomeViewTests(TestCase):
         self.assertIn("media_list", response.context)
         self.assertEqual(len(response.context["media_list"]["items"]), 2)
         self.assertEqual(response.context["media_list"]["total"], 16)
+
+    def test_home_season_resume_pill_and_recent_sort(self):
+        """Resume pill renders and Recent sort floats the resumed Season."""
+        from datetime import timedelta
+
+        from app.models import TV, home_recent_at
+
+        older = timezone.now() - timedelta(days=2)
+        newer_resume = timezone.now()
+
+        tv_item = Item.objects.create(
+            media_id="resume-tv",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.TV.value,
+            title="Resume Show",
+            image="http://example.com/tv.jpg",
+        )
+        tv = TV.objects.create(
+            item=tv_item,
+            user=self.user,
+            status=Status.IN_PROGRESS.value,
+        )
+        season_a_item = Item.objects.create(
+            media_id="resume-tv",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.SEASON.value,
+            title="Resume Show",
+            image="http://example.com/s1.jpg",
+            season_number=1,
+        )
+        season_b_item = Item.objects.create(
+            media_id="resume-tv-b",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.SEASON.value,
+            title="Other Show",
+            image="http://example.com/s2.jpg",
+            season_number=1,
+        )
+        season_a = Season.objects.create(
+            item=season_a_item,
+            user=self.user,
+            related_tv=tv,
+            status=Status.IN_PROGRESS.value,
+            resume_episode_number=6,
+            resume_position_ms=756000,
+            resume_duration_ms=1800000,
+        )
+        season_b = Season.objects.create(
+            item=season_b_item,
+            user=self.user,
+            status=Status.IN_PROGRESS.value,
+        )
+        Season.objects.filter(pk=season_a.pk).update(
+            created_at=older,
+            resume_updated_at=newer_resume,
+        )
+        Season.objects.filter(pk=season_b.pk).update(
+            created_at=older - timedelta(days=1),
+        )
+        season_a.refresh_from_db()
+
+        self.user.home_sort = HomeSortChoices.RECENT
+        self.user.save(update_fields=["home_sort"])
+
+        response = self.client.get(reverse("home"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "E6 • 42%")
+        self.assertContains(response, 'polygon points="6 3 20 12 6 21 6 3"')
+
+        in_progress = next(
+            section
+            for section in response.context["home_sections"]
+            if section["key"] == Status.IN_PROGRESS.value
+        )
+        seasons = in_progress["media_types"][MediaTypes.SEASON.value]["items"]
+        self.assertEqual(seasons[0].id, season_a.id)
+        self.assertEqual(home_recent_at(season_a), newer_resume)
+
+    def test_home_recent_at_handles_date_and_none(self):
+        """home_recent_at mixes date/datetime/None without TypeError."""
+        from datetime import date, datetime
+
+        from app.models import home_recent_at
+
+        class Stub:
+            created_at = timezone.make_aware(datetime(2024, 1, 1, 12, 0, 0))
+            progressed_at = date(2024, 6, 1)
+            resume_updated_at = None
+
+        result = home_recent_at(Stub())
+        self.assertTrue(timezone.is_aware(result))
+        self.assertEqual(result.date(), date(2024, 6, 1))

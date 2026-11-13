@@ -13,7 +13,11 @@ from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from app.episode_operations import EpisodeNotFoundError, watch_episode
+from app.episode_operations import (
+    EpisodeNotFoundError,
+    get_or_create_season,
+    watch_episode,
+)
 from app.models import (
     LEGACY_DEVICE_ID,
     LivePlayback,
@@ -120,15 +124,26 @@ def handle_player(user, media_type, video_id, extra, query):
         device_id=device_id,
         device_label=device_label,
     )
-    # Pause mid-movie: keep a durable In Progress resume for the next day.
-    if action == "pause" and target["kind"] == "movie":
-        _maybe_save_movie_resume(
-            user,
-            tmdb_id,
-            current_ms,
-            duration_ms,
-            device_id=device_id,
-        )
+    # Pause mid-title: keep a durable In Progress resume for the next day.
+    if action == "pause":
+        if target["kind"] == "movie":
+            _maybe_save_movie_resume(
+                user,
+                tmdb_id,
+                current_ms,
+                duration_ms,
+                device_id=device_id,
+            )
+        elif target["kind"] == "episode":
+            _maybe_save_episode_resume(
+                user,
+                tmdb_id,
+                target["season"],
+                target["episode"],
+                current_ms,
+                duration_ms,
+                device_id=device_id,
+            )
 
 
 def _progress(
@@ -194,6 +209,17 @@ def _stop(user, target, tmdb_id, current_ms, duration_ms, *, device_id):
             _maybe_save_movie_resume(
                 user,
                 tmdb_id,
+                current_ms,
+                duration_ms,
+                device_id=device_id,
+                progress=progress,
+            )
+        elif target["kind"] == "episode":
+            _maybe_save_episode_resume(
+                user,
+                tmdb_id,
+                target["season"],
+                target["episode"],
                 current_ms,
                 duration_ms,
                 device_id=device_id,
@@ -267,6 +293,7 @@ def _maybe_save_movie_resume(
     movie.end_date = None
     movie.resume_position_ms = max(0, int(current_ms))
     movie.resume_duration_ms = max(1, int(duration_ms))
+    movie.resume_updated_at = timezone.now()
     movie._history_user = user
     movie.save()
     logger.info(
@@ -274,6 +301,63 @@ def _maybe_save_movie_resume(
         tmdb_id,
         movie.resume_position_ms,
         movie.resume_duration_ms,
+        user.id,
+        device_id,
+    )
+
+
+def _maybe_save_episode_resume(
+    user,
+    tmdb_id,
+    season_number,
+    episode_number,
+    current_ms,
+    duration_ms,
+    *,
+    device_id,
+    progress=None,
+):
+    """Put mid-watch episode progress on the Season home In Progress card."""
+    if progress is None:
+        progress = _progress_ratio(current_ms, duration_ms)
+    if (
+        progress is None
+        or progress < RESUME_MIN_THRESHOLD
+        or progress >= WATCHED_THRESHOLD
+    ):
+        return
+    if current_ms is None or duration_ms is None or duration_ms <= 0:
+        return
+    try:
+        season = get_or_create_season(
+            user=user,
+            media_id=tmdb_id,
+            source=Sources.TMDB.value,
+            season_number=season_number,
+        )
+    except (EpisodeNotFoundError, ValidationError, services.ProviderAPIError):
+        logger.exception(
+            "Episode resume resolve failed for tmdb=%s S%sE%s",
+            tmdb_id,
+            season_number,
+            episode_number,
+        )
+        return
+    season.status = Status.IN_PROGRESS.value
+    season.resume_episode_number = int(episode_number)
+    season.resume_position_ms = max(0, int(current_ms))
+    season.resume_duration_ms = max(1, int(duration_ms))
+    season.resume_updated_at = timezone.now()
+    season._history_user = user
+    season.save()
+    logger.info(
+        "Episode resume saved tmdb=%s S%sE%s position_ms=%s duration_ms=%s "
+        "user=%s device=%s",
+        tmdb_id,
+        season_number,
+        episode_number,
+        season.resume_position_ms,
+        season.resume_duration_ms,
         user.id,
         device_id,
     )
@@ -293,6 +377,7 @@ def _complete_movie(user, tmdb_id, when, *, device_id):
     movie.end_date = when
     movie.resume_position_ms = None
     movie.resume_duration_ms = None
+    movie.resume_updated_at = None
     movie._history_user = user
     movie.save()
     clear_live_playback(user=user, item=item, device_id=device_id)

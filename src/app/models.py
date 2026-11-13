@@ -1,5 +1,6 @@
 import logging
 import uuid
+from datetime import date, datetime, time
 
 from django.apps import apps
 from django.conf import settings
@@ -36,6 +37,68 @@ from app import providers
 from app.mixins import CalendarTriggerMixin
 
 logger = logging.getLogger(__name__)
+
+
+def home_recent_at(media):
+    """Aware datetime for home RECENT sort; safe with None / date / datetime."""
+    candidates = []
+    for value in (
+        getattr(media, "created_at", None),
+        getattr(media, "progressed_at", None),
+        getattr(media, "resume_updated_at", None),
+    ):
+        dt = _as_aware_datetime(value)
+        if dt is not None:
+            candidates.append(dt)
+    if not candidates:
+        return timezone.now()
+    return max(candidates)
+
+
+def _as_aware_datetime(value):
+    """Normalize date/datetime to timezone-aware datetime, or None."""
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        if timezone.is_naive(value):
+            return timezone.make_aware(value, timezone.get_current_timezone())
+        return value
+    if isinstance(value, date):
+        return timezone.make_aware(
+            datetime.combine(value, time.min),
+            timezone.get_current_timezone(),
+        )
+    return None
+
+
+def clear_media_resume(media):
+    """Clear mid-watch resume fields on Movie/Season instances (in memory)."""
+    if hasattr(media, "resume_position_ms"):
+        media.resume_position_ms = None
+    if hasattr(media, "resume_duration_ms"):
+        media.resume_duration_ms = None
+    if hasattr(media, "resume_updated_at"):
+        media.resume_updated_at = None
+    if hasattr(media, "resume_episode_number"):
+        media.resume_episode_number = None
+
+
+def persist_cleared_resume(media):
+    """Write cleared resume columns without re-entering full model save()."""
+    if media.pk is None:
+        return
+    fields = {}
+    for name in (
+        "resume_position_ms",
+        "resume_duration_ms",
+        "resume_updated_at",
+        "resume_episode_number",
+    ):
+        if hasattr(media, name):
+            fields[name] = None
+            setattr(media, name, None)
+    if fields:
+        type(media).objects.filter(pk=media.pk).update(**fields)
 
 
 class Sources(models.TextChoices):
@@ -500,9 +563,7 @@ class MediaManager(models.Manager):
                 x.next_event.datetime if x.next_event else None,
             ),
             users.models.HomeSortChoices.RECENT: lambda x: (
-                -timezone.datetime.timestamp(
-                    x.progressed_at if x.progressed_at is not None else x.created_at,
-                )
+                -home_recent_at(x).timestamp()
             ),
             users.models.HomeSortChoices.COMPLETION: lambda x: (
                 x.max_progress is None,
@@ -525,9 +586,7 @@ class MediaManager(models.Manager):
             media_list,
             key=lambda x: (
                 primary_sort_function(x),
-                -timezone.datetime.timestamp(
-                    x.progressed_at if x.progressed_at is not None else x.created_at,
-                ),
+                -home_recent_at(x).timestamp(),
                 x.item.title.lower(),
             ),
         )
@@ -1032,9 +1091,7 @@ class Media(models.Model):
             if max_progress:
                 self.progress = max_progress
             # Drop mid-watch resume so the home In Progress card disappears.
-            if hasattr(self, "resume_position_ms"):
-                self.resume_position_ms = None
-                self.resume_duration_ms = None
+            clear_media_resume(self)
 
         self.item.fetch_releases(delay=True)
 
@@ -1451,6 +1508,11 @@ class Season(Media):
         on_delete=models.CASCADE,
         related_name="seasons",
     )
+    # Companion mid-watch episode: home In Progress Season card resume pill/bar.
+    resume_episode_number = models.PositiveIntegerField(null=True, blank=True)
+    resume_position_ms = models.PositiveBigIntegerField(null=True, blank=True)
+    resume_duration_ms = models.PositiveBigIntegerField(null=True, blank=True)
+    resume_updated_at = models.DateTimeField(null=True, blank=True)
 
     tracker = FieldTracker()
 
@@ -1471,6 +1533,28 @@ class Season(Media):
         """Return the title of the media and season number."""
         return f"{self.item.title} S{self.item.season_number}"
 
+    @property
+    def resume_bar_percent(self):
+        """0–99 percent for the home card bar/pill, or None when not a resume row."""
+        if self.status != Status.IN_PROGRESS.value:
+            return None
+        if not self.resume_duration_ms or self.resume_position_ms is None:
+            return None
+        if self.resume_episode_number is None:
+            return None
+        if self.resume_duration_ms <= 0:
+            return None
+        ratio = self.resume_position_ms / self.resume_duration_ms
+        if ratio <= 0:
+            return None
+        return min(99, max(1, int(ratio * 100)))
+
+    def clear_resume(self, *, persist=True):
+        """Drop mid-watch resume so the home pill/bar revert to episode ratio."""
+        clear_media_resume(self)
+        if persist:
+            persist_cleared_resume(self)
+
     @tracker  # postpone field reset until after the save
     def save(self, *args, **kwargs):
         """Save the media instance."""
@@ -1481,6 +1565,8 @@ class Season(Media):
         super(Media, self).save(*args, **kwargs)
 
         if self.tracker.has_changed("status"):
+            if self.status != Status.IN_PROGRESS.value:
+                self.clear_resume(persist=True)
             if self.status == Status.COMPLETED.value:
                 season_metadata = providers.services.get_media_metadata(
                     MediaTypes.SEASON.value,
@@ -2005,6 +2091,7 @@ class Movie(Media):
     # Cleared when the movie is completed (player ≥90% or mark-watched).
     resume_position_ms = models.PositiveBigIntegerField(null=True, blank=True)
     resume_duration_ms = models.PositiveBigIntegerField(null=True, blank=True)
+    resume_updated_at = models.DateTimeField(null=True, blank=True)
 
     tracker = FieldTracker()
 

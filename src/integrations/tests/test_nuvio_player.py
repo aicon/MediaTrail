@@ -5,6 +5,7 @@ from unittest.mock import patch
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from app.models import Item, LivePlaybackStatus, MediaTypes, Movie, Sources, Status
 
@@ -287,3 +288,197 @@ class NuvioPlayerTests(TestCase):
         finished.refresh_from_db()
         self.assertEqual(finished.status, Status.COMPLETED.value)
         self.assertIsNone(finished.resume_position_ms)
+
+
+def _tv_metadata_for_resume(*_args, **_kwargs):
+    """Enough TMDB-shaped metadata for Season create + get_tv."""
+    return {
+        "title": "Test Show",
+        "image": "http://example.com/show.jpg",
+        "details": {"seasons": 1},
+        "max_progress": 6,
+        "season/1": {
+            "image": "http://example.com/s1.jpg",
+            "episodes": [
+                {"episode_number": 1, "air_date": "2020-01-01", "image": "x.jpg"},
+                {"episode_number": 2, "air_date": "2020-01-02", "image": "x.jpg"},
+                {"episode_number": 6, "air_date": "2020-01-06", "image": "x.jpg"},
+            ],
+        },
+        "related": {
+            "seasons": [{"season_number": 1, "image": "http://example.com/s1.jpg"}],
+        },
+    }
+
+
+class NuvioEpisodeResumeTests(TestCase):
+    """Episode mid-watch resume lands on the Season home card."""
+
+    def setUp(self):
+        """Create the account that receives Nuvio playback."""
+        self.user = get_user_model().objects.create_user(
+            username="nuvio-episode-user",
+            password="testpass123",
+        )
+
+    @patch("integrations.nuvio_player.clear_live_playback")
+    @patch(
+        "app.models.providers.services.get_media_metadata",
+        side_effect=_tv_metadata_for_resume,
+    )
+    @patch(
+        "app.episode_operations.services.get_media_metadata",
+        side_effect=_tv_metadata_for_resume,
+    )
+    @patch(
+        "integrations.nuvio_player.tmdb.find",
+        return_value={"movie_results": [], "tv_results": [{"id": 1396}]},
+    )
+    def test_stop_mid_episode_saves_season_resume(
+        self,
+        _find,
+        _ep_meta,
+        _model_meta,
+        _clear,
+    ):
+        """Stop between 2% and 90% stores resume on the Season, not an Episode."""
+        from app.models import Episode, Season
+
+        response = self.client.get(
+            reverse(
+                "nuvio_player",
+                kwargs={
+                    "token": self.user.token,
+                    "media_type": "series",
+                    "video_id": "tt0903747:1:6",
+                    "extra": "action=stop&currentTime=756000&duration=1800000.json",
+                },
+            ),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        season = Season.objects.get(user=self.user, item__media_id="1396")
+        self.assertEqual(season.status, Status.IN_PROGRESS.value)
+        self.assertEqual(season.resume_episode_number, 6)
+        self.assertEqual(season.resume_position_ms, 756000)
+        self.assertEqual(season.resume_duration_ms, 1800000)
+        self.assertEqual(season.resume_bar_percent, 42)
+        self.assertIsNotNone(season.resume_updated_at)
+        self.assertFalse(Episode.objects.filter(related_season=season).exists())
+
+    @patch("integrations.nuvio_player.upsert_live_playback")
+    @patch("integrations.nuvio_player.clear_live_playback")
+    @patch(
+        "app.models.providers.services.get_media_metadata",
+        side_effect=_tv_metadata_for_resume,
+    )
+    @patch(
+        "app.episode_operations.services.get_media_metadata",
+        side_effect=_tv_metadata_for_resume,
+    )
+    @patch(
+        "integrations.nuvio_player.tmdb.find",
+        return_value={"movie_results": [], "tv_results": [{"id": 1396}]},
+    )
+    def test_pause_mid_episode_saves_season_resume(
+        self,
+        _find,
+        _ep_meta,
+        _model_meta,
+        _clear,
+        _upsert,
+    ):
+        """Pause mid-episode also upserts Season resume."""
+        from app.models import Season
+
+        response = self.client.get(
+            reverse(
+                "nuvio_player",
+                kwargs={
+                    "token": self.user.token,
+                    "media_type": "series",
+                    "video_id": "tt0903747:1:6",
+                    "extra": "action=pause&currentTime=900000&duration=1800000.json",
+                },
+            ),
+        )
+        self.assertEqual(response.status_code, 200)
+        season = Season.objects.get(user=self.user, item__media_id="1396")
+        self.assertEqual(season.resume_episode_number, 6)
+        self.assertEqual(season.resume_position_ms, 900000)
+
+    @patch("integrations.nuvio_outbound.enqueue_watched_upsert")
+    @patch("integrations.nuvio_player.clear_live_playback")
+    @patch(
+        "app.models.providers.services.get_media_metadata",
+        side_effect=_tv_metadata_for_resume,
+    )
+    @patch(
+        "app.episode_operations.services.get_media_metadata",
+        side_effect=_tv_metadata_for_resume,
+    )
+    @patch(
+        "integrations.nuvio_player.tmdb.find",
+        return_value={"movie_results": [], "tv_results": [{"id": 1396}]},
+    )
+    def test_stop_finished_episode_clears_resume(
+        self,
+        _find,
+        _ep_meta,
+        _model_meta,
+        _clear,
+        _enqueue,
+    ):
+        """≥90% stop watches the episode and clears Season resume."""
+        from app.models import Item, Season, TV
+
+        tv_item = Item.objects.create(
+            media_id="1396",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.TV.value,
+            title="Test Show",
+            image="http://example.com/show.jpg",
+        )
+        tv = TV.objects.create(
+            user=self.user,
+            item=tv_item,
+            status=Status.IN_PROGRESS.value,
+        )
+        season_item = Item.objects.create(
+            media_id="1396",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.SEASON.value,
+            title="Test Show",
+            image="http://example.com/s1.jpg",
+            season_number=1,
+        )
+        season = Season.objects.create(
+            user=self.user,
+            item=season_item,
+            related_tv=tv,
+            status=Status.IN_PROGRESS.value,
+            resume_episode_number=6,
+            resume_position_ms=500000,
+            resume_duration_ms=1800000,
+            resume_updated_at=timezone.now(),
+        )
+
+        response = self.client.get(
+            reverse(
+                "nuvio_player",
+                kwargs={
+                    "token": self.user.token,
+                    "media_type": "series",
+                    "video_id": "tt0903747:1:6",
+                    "extra": "action=stop&currentTime=1700000&duration=1800000.json",
+                },
+            ),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        season.refresh_from_db()
+        self.assertIsNone(season.resume_episode_number)
+        self.assertIsNone(season.resume_position_ms)
+        self.assertIsNone(season.resume_duration_ms)
+        self.assertIsNone(season.resume_updated_at)
+        self.assertIsNone(season.resume_bar_percent)

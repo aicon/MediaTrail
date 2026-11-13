@@ -10,7 +10,7 @@ Lejátszás vagy szüneteltetés közben a kezdőlap tetején megjelennek a dina
 
 A MediaTrail kiegészítő hivatkozását a **Beállítások → Integrációk → Nuvio** menüpontból másolhatod ki, amelyet valamennyi [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) és [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) kliensedben hozzá kell adnod a bővítményekhez. Részletes tájékoztató: [Live playback / Now Watching](../now-watching.md).
 
-Ha egy **filmet** kb. **2–90%** között állítasz le, a főoldali **In Progress** listában megmarad folytatási csíkkal; a kártya törlésével veheted le. Epizódokra ez még nem vonatkozik.
+Ha egy **filmet** kb. **2–90%** között állítasz le, a főoldali **In Progress** listában megmarad folytatási csíkkal; a kártya törlésével veheted le. Ugyanez az epizódokra is: a **szezon** In Progress kártyáján alsó folytatás-pill (`E… • …%`) és folytatási csík jelenik meg; az epizód befejezése (vagy megnézettnek jelölése / In Progress elhagyása) törli a folytatást.
 
 Egy mű adatlapját megnyitva a külső katalógus adatai és a naplózási űrlap jelenik meg. A bejegyzéshez rögzítheted az aktuális állapotot, a személyes értékelésedet, a megtekintés előrehaladását, a kezdeti és befejezési dátumot, valamint az egyéni megjegyzéseidet. Amennyiben egy korábban befejezett művet újra megtekintesz vagy újraolvasol, a rendszer újabb bejegyzést fűz a megtekintési előzményeidhez. A sorozatok hierarchikus felépítésűek: az évadok és az epizódok különálló tételként szerepelnek a rendszerben, így egyetlen rész megtekintésének rögzítése nem írja felül a teljes műsort.
 
