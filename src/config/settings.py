@@ -375,8 +375,8 @@ AUTH_USER_MODEL = "users.User"
 FILE_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50 MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50 MB
 
-# MediaTrail versioning: 0.26.5 adds Bearer POST /nuvio/watched.json + daily reconcile.
-VERSION = config("VERSION", default="0.26.5")
+# MediaTrail versioning: 0.26.6 adds mid-watch movie resume on the home In Progress list.
+VERSION = config("VERSION", default="0.26.6")
 
 
 def _public_http_url(name):

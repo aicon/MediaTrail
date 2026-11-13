@@ -36,6 +36,8 @@ logger = logging.getLogger(__name__)
 
 IMDB_RE = re.compile(r"^tt\d+$", re.IGNORECASE)
 WATCHED_THRESHOLD = 0.9
+# Below this, treat as accidental open — do not keep an In Progress resume row.
+RESUME_MIN_THRESHOLD = 0.02
 DEDUPE_SECONDS = 120
 
 
@@ -118,6 +120,15 @@ def handle_player(user, media_type, video_id, extra, query):
         device_id=device_id,
         device_label=device_label,
     )
+    # Pause mid-movie: keep a durable In Progress resume for the next day.
+    if action == "pause" and target["kind"] == "movie":
+        _maybe_save_movie_resume(
+            user,
+            tmdb_id,
+            current_ms,
+            duration_ms,
+            device_id=device_id,
+        )
 
 
 def _progress(
@@ -168,8 +179,26 @@ def _stop(user, target, tmdb_id, current_ms, duration_ms, *, device_id):
     progress = _progress_ratio(current_ms, duration_ms)
     if progress is None:
         progress = _stored_progress(user, target, tmdb_id, device_id=device_id)
+        if progress is not None and (current_ms is None or duration_ms is None):
+            current_ms, duration_ms = _stored_position(
+                user,
+                target,
+                tmdb_id,
+                device_id=device_id,
+            )
     clear_live_playback(user=user, device_id=device_id)
-    if progress is None or progress < WATCHED_THRESHOLD:
+    if progress is None:
+        return
+    if progress < WATCHED_THRESHOLD:
+        if target["kind"] == "movie":
+            _maybe_save_movie_resume(
+                user,
+                tmdb_id,
+                current_ms,
+                duration_ms,
+                device_id=device_id,
+                progress=progress,
+            )
         return
     if cache.get(_dedupe_key(user, target)):
         return
@@ -201,6 +230,54 @@ def _stop(user, target, tmdb_id, current_ms, duration_ms, *, device_id):
     cache.set(_dedupe_key(user, target), 1, DEDUPE_SECONDS)
 
 
+def _maybe_save_movie_resume(
+    user,
+    tmdb_id,
+    current_ms,
+    duration_ms,
+    *,
+    device_id,
+    progress=None,
+):
+    """Put a mid-watch movie on the home In Progress list with a resume bar."""
+    if progress is None:
+        progress = _progress_ratio(current_ms, duration_ms)
+    if (
+        progress is None
+        or progress < RESUME_MIN_THRESHOLD
+        or progress >= WATCHED_THRESHOLD
+    ):
+        return
+    if current_ms is None or duration_ms is None or duration_ms <= 0:
+        return
+    try:
+        item = resolve_playback_item(
+            media_type=MediaTypes.MOVIE.value,
+            source=Sources.TMDB.value,
+            media_id=str(tmdb_id),
+        )
+    except (ValidationError, services.ProviderAPIError):
+        logger.exception("Movie resume resolve failed for tmdb=%s", tmdb_id)
+        return
+    movie = Movie.objects.filter(user=user, item=item).first()
+    if movie is None:
+        movie = Movie(user=user, item=item)
+    movie.status = Status.IN_PROGRESS.value
+    movie.progress = 0
+    movie.end_date = None
+    movie.resume_position_ms = max(0, int(current_ms))
+    movie.resume_duration_ms = max(1, int(duration_ms))
+    movie.save()
+    logger.info(
+        "Movie resume saved tmdb=%s position_ms=%s duration_ms=%s user=%s device=%s",
+        tmdb_id,
+        movie.resume_position_ms,
+        movie.resume_duration_ms,
+        user.id,
+        device_id,
+    )
+
+
 def _complete_movie(user, tmdb_id, when, *, device_id):
     """Mark the movie finished and drop this device's live row."""
     item = resolve_playback_item(
@@ -213,12 +290,29 @@ def _complete_movie(user, tmdb_id, when, *, device_id):
         movie = Movie(user=user, item=item)
     movie.status = Status.COMPLETED.value
     movie.end_date = when
+    movie.resume_position_ms = None
+    movie.resume_duration_ms = None
     movie.save()
     clear_live_playback(user=user, item=item, device_id=device_id)
 
 
 def _stored_progress(user, target, tmdb_id, *, device_id):
     """Use the saved Now Watching position when the stop event has no time."""
+    row = _live_row(user, target, tmdb_id, device_id=device_id)
+    if row is None or not row.duration_ms:
+        return None
+    return max(0.0, min(1.0, row.position_ms / row.duration_ms))
+
+
+def _stored_position(user, target, tmdb_id, *, device_id):
+    """Return (position_ms, duration_ms) from the live row, or (None, None)."""
+    row = _live_row(user, target, tmdb_id, device_id=device_id)
+    if row is None or not row.duration_ms:
+        return None, None
+    return row.position_ms, row.duration_ms
+
+
+def _live_row(user, target, tmdb_id, *, device_id):
     try:
         item = resolve_playback_item(
             media_type=_playback_type(target),
@@ -236,9 +330,7 @@ def _stored_progress(user, target, tmdb_id, *, device_id):
     ).first()
     if row is None and normalize_device_id(device_id) != LEGACY_DEVICE_ID:
         row = LivePlayback.objects.filter(user=user, item=item).first()
-    if row is None or not row.duration_ms:
-        return None
-    return max(0.0, min(1.0, row.position_ms / row.duration_ms))
+    return row
 
 
 def _tmdb_id(target):

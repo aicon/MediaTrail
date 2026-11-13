@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from app.models import LivePlaybackStatus
+from app.models import Item, LivePlaybackStatus, MediaTypes, Movie, Sources, Status
 
 
 class NuvioPlayerTests(TestCase):
@@ -17,6 +17,13 @@ class NuvioPlayerTests(TestCase):
         self.user = get_user_model().objects.create_user(
             username="nuvio-user",
             password="testpass123",
+        )
+        self.movie_item = Item.objects.create(
+            media_id="550",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.MOVIE.value,
+            title="Fight Club",
+            image="http://example.com/fc.jpg",
         )
 
     @override_settings(URLS=["https://mediatrail.example"])
@@ -132,3 +139,105 @@ class NuvioPlayerTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         mock_upsert.assert_not_called()
+
+    @patch("integrations.nuvio_player.clear_live_playback")
+    @patch(
+        "integrations.nuvio_player.resolve_playback_item",
+    )
+    @patch(
+        "integrations.nuvio_player.tmdb.find",
+        return_value={"movie_results": [{"id": 550}], "tv_results": []},
+    )
+    def test_stop_mid_movie_saves_in_progress_resume(self, _find, mock_resolve, _clear):
+        """Stop between 2% and 90% keeps the movie on the In Progress list."""
+        mock_resolve.return_value = self.movie_item
+        response = self.client.get(
+            reverse(
+                "nuvio_player",
+                kwargs={
+                    "token": self.user.token,
+                    "media_type": "movie",
+                    "video_id": "tt0137523",
+                    "extra": "action=stop&currentTime=900000&duration=1800000.json",
+                },
+            ),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        movie = Movie.objects.get(user=self.user, item=self.movie_item)
+        self.assertEqual(movie.status, Status.IN_PROGRESS.value)
+        self.assertEqual(movie.resume_position_ms, 900000)
+        self.assertEqual(movie.resume_duration_ms, 1800000)
+        self.assertEqual(movie.resume_bar_percent, 50)
+
+    @patch("integrations.nuvio_player.clear_live_playback")
+    @patch(
+        "integrations.nuvio_player.resolve_playback_item",
+    )
+    @patch(
+        "integrations.nuvio_player.tmdb.find",
+        return_value={"movie_results": [{"id": 550}], "tv_results": []},
+    )
+    def test_stop_near_start_skips_resume(self, _find, mock_resolve, _clear):
+        """Tiny progress should not create an In Progress resume row."""
+        mock_resolve.return_value = self.movie_item
+        response = self.client.get(
+            reverse(
+                "nuvio_player",
+                kwargs={
+                    "token": self.user.token,
+                    "media_type": "movie",
+                    "video_id": "tt0137523",
+                    "extra": "action=stop&currentTime=1000&duration=1800000.json",
+                },
+            ),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(
+            Movie.objects.filter(user=self.user, item=self.movie_item).exists(),
+        )
+
+    @patch("app.models.providers.services.get_media_metadata", return_value={"max_progress": 1})
+    @patch("integrations.nuvio_player.clear_live_playback")
+    @patch(
+        "integrations.nuvio_player.resolve_playback_item",
+    )
+    @patch(
+        "integrations.nuvio_player.tmdb.find",
+        return_value={"movie_results": [{"id": 550}], "tv_results": []},
+    )
+    def test_stop_finished_movie_clears_resume(
+        self,
+        _find,
+        mock_resolve,
+        _clear,
+        _metadata,
+    ):
+        """≥90% stop completes the movie and clears resume fields."""
+        mock_resolve.return_value = self.movie_item
+        Movie.objects.create(
+            user=self.user,
+            item=self.movie_item,
+            status=Status.IN_PROGRESS.value,
+            resume_position_ms=500000,
+            resume_duration_ms=1800000,
+        )
+        response = self.client.get(
+            reverse(
+                "nuvio_player",
+                kwargs={
+                    "token": self.user.token,
+                    "media_type": "movie",
+                    "video_id": "tt0137523",
+                    "extra": "action=stop&currentTime=1700000&duration=1800000.json",
+                },
+            ),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        movie = Movie.objects.get(user=self.user, item=self.movie_item)
+        self.assertEqual(movie.status, Status.COMPLETED.value)
+        self.assertIsNone(movie.resume_position_ms)
+        self.assertIsNone(movie.resume_duration_ms)
+        self.assertIsNone(movie.resume_bar_percent)

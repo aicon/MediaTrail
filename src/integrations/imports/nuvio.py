@@ -1096,6 +1096,8 @@ class NuvioImporter:
             existing.end_date = record["end_date"]
             existing.status = Status.COMPLETED.value
             existing.progress = 1
+            existing.resume_position_ms = None
+            existing.resume_duration_ms = None
             existing._history_date = record["end_date"]
             existing.save()
             return "update"
@@ -1110,6 +1112,8 @@ class NuvioImporter:
             progress=1,
             end_date=record["end_date"],
             notes="",
+            resume_position_ms=None,
+            resume_duration_ms=None,
         )
         movie._history_date = record["end_date"]
         movie.save()

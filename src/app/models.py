@@ -1997,7 +1997,26 @@ class Anime(Media):
 class Movie(Media):
     """Model for movies."""
 
+    # Companion stop mid-watch: keep a resume point for the home In Progress list.
+    # Cleared when the movie is completed (player ≥90% or mark-watched).
+    resume_position_ms = models.PositiveBigIntegerField(null=True, blank=True)
+    resume_duration_ms = models.PositiveBigIntegerField(null=True, blank=True)
+
     tracker = FieldTracker()
+
+    @property
+    def resume_bar_percent(self):
+        """0–99 percent for the home card bar, or None when not a resume row."""
+        if self.status != Status.IN_PROGRESS.value:
+            return None
+        if not self.resume_duration_ms or self.resume_position_ms is None:
+            return None
+        if self.resume_duration_ms <= 0:
+            return None
+        ratio = self.resume_position_ms / self.resume_duration_ms
+        if ratio <= 0:
+            return None
+        return min(99, max(1, int(ratio * 100)))
 
 
 class Game(Media):
