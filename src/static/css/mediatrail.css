@@ -164,6 +164,23 @@
   background-color: var(--color-slate-500);
 }
 
+/* Home poster pills: slate + blur not present in compiled main.css. */
+.bg-slate-800\/90 {
+  background-color: color-mix(in srgb, #1e293b 90%, transparent);
+}
+
+@supports (color: color-mix(in lab, red, red)) {
+  .bg-slate-800\/90 {
+    background-color: color-mix(in oklab, #1e293b 90%, transparent);
+  }
+}
+
+.backdrop-blur-sm {
+  --tw-backdrop-blur: blur(8px);
+  -webkit-backdrop-filter: var(--tw-backdrop-blur);
+  backdrop-filter: var(--tw-backdrop-blur);
+}
+
 @media (width >= 64rem) {
   .lg\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));

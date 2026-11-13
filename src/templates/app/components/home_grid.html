@@ -16,7 +16,7 @@
       </a>
 
       {% if media.next_event and not media.next_event.is_max_datetime %}
-        <div class="absolute top-2 left-1/2 flex max-w-[98%] -translate-x-1/2 items-center gap-1.5 rounded-md border border-white/20 bg-slate-900/90 px-2 py-1.5 shadow-md whitespace-nowrap backdrop-blur-sm">
+        <div class="absolute top-2 left-1/2 flex max-w-[98%] -translate-x-1/2 items-center gap-1.5 rounded-md border border-white/30 bg-slate-800/90 px-2 py-1.5 shadow-md whitespace-nowrap backdrop-blur-sm">
           {% if home_status == Status.PLANNING.value %}
             {% include "app/icons/clock.svg" with classes="w-3.5 h-3.5 text-sky-400" %}
           {% else %}
@@ -32,7 +32,7 @@
       {% endif %}
 
       {% if media.status == Status.IN_PROGRESS.value and media.resume_episode_number and media.resume_bar_percent %}
-        <div class="absolute bottom-2 left-1/2 flex max-w-[98%] -translate-x-1/2 items-center gap-1.5 rounded-md border border-white/20 bg-slate-900/90 px-2 py-1.5 shadow-md whitespace-nowrap backdrop-blur-sm">
+        <div class="absolute bottom-2 left-1/2 flex max-w-[98%] -translate-x-1/2 items-center gap-1.5 rounded-md border border-white/30 bg-slate-800/90 px-2 py-1.5 shadow-md whitespace-nowrap backdrop-blur-sm">
           {% include "app/icons/play.svg" with classes="w-3.5 h-3.5 text-indigo-400" %}
           <span class="text-xs font-medium text-white drop-shadow-sm truncate">
             E{{ media.resume_episode_number }} • {{ media.resume_bar_percent }}%

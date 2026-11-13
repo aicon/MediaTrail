@@ -529,10 +529,11 @@ class HomeViewTests(TestCase):
         response = self.client.get(reverse("home"))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "E6 • 42%")
-        self.assertContains(response, "bg-slate-900/90")
+        self.assertContains(response, "bg-slate-800/90")
+        self.assertContains(response, "border-white/30")
         self.assertContains(response, "backdrop-blur-sm")
         self.assertContains(response, 'fill="currentColor"')
-        self.assertContains(response, 'polygon points="6 3 20 12 6 21 6 3"')
+        self.assertContains(response, 'd="M8 5v14l11-7z"')
 
         in_progress = next(
             section
