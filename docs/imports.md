@@ -42,7 +42,23 @@ Turn it on under **Settings → Integrations → Nuvio**:
 | **Sync mark-watched** | Upserts from history import and from the watched-history delta | Queues `sync_push_watched_items` when you mark something watched |
 | **Sync mark-unwatched** | Applies delta deletes, and after a full successful history snapshot can remove local watches that Nuvio no longer has | Queues `sync_delete_watched_items` (and matching watch-progress keys) when you mark unwatched or delete history |
 
-With either toggle on, MediaTrail polls the Nuvio delta about every **30 seconds** in the background, and runs a full history snapshot reconcile about every **15 minutes**. Saving the toggles also queues an immediate delta pull. Only one sync runs per account at a time (overlapping polls are skipped). You still need one successful manual Import → Nuvio first (so the account is bootstrapped); after that, interactive mark/unmark should appear without starting Import by hand.
+With either toggle on, MediaTrail polls the Nuvio delta about every **30 seconds** in the background, and runs a full history snapshot reconcile about every **24 hours**. Saving the toggles also queues an immediate delta pull. Only one sync runs per account at a time (overlapping polls are skipped). You still need one successful manual Import → Nuvio first (so the account is bootstrapped); after that, interactive mark/unmark should appear without starting Import by hand.
+
+### Companion mark / unmark (`POST /nuvio/watched.json`)
+
+Nuvio-MT can push library mark watched / unwatched directly (in addition to Cloud delta). This is **not** the player / Now Watching path.
+
+| | |
+| --- | --- |
+| URL | `POST /nuvio/watched.json` — **no token in the path or query** (keeps the access token out of nginx access logs) |
+| Auth | `Authorization: Bearer <MediaTrail user token>` — same per-account token as the addon URL / Jellyfin webhook |
+| Body | JSON: `action` (`watched` \| `unwatched`), `type` (`movie` \| `series`), `id` (IMDb / content id), optional `season` / `episode` (required for series), optional `watched_at` (ISO-8601 or epoch ms) |
+| Success | `200` with `{"status":"ok",…}` |
+| Toggle off | `200` with `{"status":"skipped","reason":"mark_played_disabled"}` or `mark_unplayed_disabled` |
+| Bad / missing token | `401` |
+| Bad payload | `400` |
+
+Requires a configured Nuvio import account. Applies the same sync toggles and idempotent write path as delta import. After a successful push, the matching Cloud delta is treated as an echo so the 30s poller does not double-apply. Companions treat failures as best-effort: local Nuvio mark always succeeds even if MediaTrail is unreachable or on an older image without this route (`404`). Use **`ghcr.io/aicon/mediatrail:dev`** (or newer) for this endpoint until it ships on `:latest`.
 
 First import captures the Nuvio delta cursor **before** the history snapshot, then applies delta events after that tip. That matches Nuvio’s bootstrap order so watches that change while snapshot pages download are not missed by both the snapshot and the later cursor.
 

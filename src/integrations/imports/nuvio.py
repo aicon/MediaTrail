@@ -888,13 +888,13 @@ class NuvioImporter:
             nuvio_id = _nuvio_id(row, event_id)
             if nuvio_id and nuvio_id in self._imported:
                 return True
-            logger.info("skip unsupported Nuvio record: %s", exc)
+            logger.debug("skip unsupported Nuvio record: %s", exc)
             self._remember(nuvio_id)
             return True
 
         nuvio_id = record["nuvio_id"]
         if nuvio_id and nuvio_id in self._permanent:
-            logger.info(
+            logger.debug(
                 "Nuvio skip permanent id=%s content_id=%s operation=%s",
                 nuvio_id,
                 row.get("content_id"),
@@ -906,7 +906,7 @@ class NuvioImporter:
             if mapped is False:
                 return False
             if mapped is None:
-                logger.info(
+                logger.debug(
                     "Nuvio skip unmapped IMDb content_id=%s operation=%s",
                     row.get("content_id"),
                     record["operation"],
@@ -915,7 +915,7 @@ class NuvioImporter:
             record = mapped
         if record["operation"] == "delete":
             if not self.user.nuvio_sync_mark_unplayed_enabled:
-                logger.info(
+                logger.debug(
                     "Nuvio skip delete; mark-unplayed sync off content_id=%s "
                     "season=%s episode=%s",
                     row.get("content_id"),
@@ -925,7 +925,7 @@ class NuvioImporter:
                 self._remember(nuvio_id)
                 return True
             if self.gate_upserts and self._is_echo(row):
-                logger.info(
+                logger.debug(
                     "Nuvio skip outbound-echo delete content_id=%s "
                     "season=%s episode=%s",
                     row.get("content_id"),
@@ -967,7 +967,7 @@ class NuvioImporter:
         if record["operation"] != "upsert":
             return True
         if self.gate_upserts and not self.user.nuvio_sync_mark_played_enabled:
-            logger.info(
+            logger.debug(
                 "Nuvio skip upsert; mark-played sync off content_id=%s "
                 "season=%s episode=%s",
                 row.get("content_id"),
@@ -977,7 +977,7 @@ class NuvioImporter:
             self._remember(nuvio_id)
             return True
         if self.gate_upserts and self._is_echo(row):
-            logger.info(
+            logger.debug(
                 "Nuvio skip outbound-echo upsert content_id=%s "
                 "season=%s episode=%s",
                 row.get("content_id"),

@@ -25,6 +25,8 @@ urlpatterns = [
         views.nuvio_player,
         name="nuvio_player_legacy",
     ),
+    # Companion mark/unmark: Bearer only — never put the token in the path.
+    path("nuvio/watched.json", views.nuvio_watched, name="nuvio_watched"),
     path("import/nuvio", views.import_nuvio, name="import_nuvio"),
     path("import/trakt-oauth", views.trakt_oauth, name="trakt_oauth"),
     path("import/trakt/device", views.trakt_device_start, name="trakt_device_start"),

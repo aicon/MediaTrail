@@ -77,6 +77,18 @@ def is_pending_outbound(user_id, row):
     return bool(key and cache.get(key))
 
 
+def note_direct_watched_apply(user, row, *, operation):
+    """Mark a Bearer watched.json apply so the matching Cloud delta is skipped.
+
+    Does not push to Nuvio — the companion already wrote Cloud; this only
+    prevents a duplicate local apply when the 30s poller catches up.
+    """
+    operation = "delete" if operation == "delete" else "upsert"
+    opposite = "upsert" if operation == "delete" else "delete"
+    _clear_pending(user.id, row, operation=opposite)
+    _mark_pending(user.id, row, operation=operation)
+
+
 def _has_nuvio_account(user):
     return NuvioAccount.objects.filter(user=user).exists()
 

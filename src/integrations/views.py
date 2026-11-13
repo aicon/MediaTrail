@@ -22,6 +22,7 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 import users
 from app import helpers as app_helpers
 from integrations import exports, nuvio_player as nuvio_addon, tasks
+from integrations import nuvio_watched as nuvio_watched_api
 from integrations.imports import anilist, helpers, nuvio, simkl, trakt
 from integrations.webhooks import emby, jellyfin, plex
 
@@ -721,12 +722,21 @@ def export_csv(request):
     return response
 
 
-def _nuvio_cors(response):
+def _nuvio_cors(response, *, methods="GET, OPTIONS"):
     """Allow the Nuvio app to call the addon routes."""
     response["Access-Control-Allow-Origin"] = "*"
-    response["Access-Control-Allow-Methods"] = "GET, OPTIONS"
-    response["Access-Control-Allow-Headers"] = "Content-Type"
+    response["Access-Control-Allow-Methods"] = methods
+    response["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     return response
+
+
+def _nuvio_bearer_token(request):
+    """Read Authorization: Bearer <token>. Token must never appear in the URL."""
+    header = request.META.get("HTTP_AUTHORIZATION") or ""
+    scheme, _, value = header.partition(" ")
+    if scheme.lower() != "bearer" or not value.strip():
+        return None
+    return value.strip()
 
 
 def _nuvio_public_logo():
@@ -818,6 +828,55 @@ def nuvio_player(request, media_type, video_id, extra=None, token=None):
         except Exception:  # noqa: BLE001
             logger.exception("Nuvio player event failed")
     return _nuvio_cors(JsonResponse({}))
+
+
+@login_not_required
+@csrf_exempt
+@require_http_methods(["POST", "OPTIONS"])
+def nuvio_watched(request):
+    """Apply mark-watched / mark-unwatched from Nuvio over Bearer auth.
+
+    Token stays in the Authorization header so nginx access logs never see it.
+    Playback continues to use the separate player addon routes.
+    """
+    if request.method == "OPTIONS":
+        return _nuvio_cors(
+            HttpResponse(status=204),
+            methods="POST, OPTIONS",
+        )
+    token = _nuvio_bearer_token(request)
+    if not token:
+        return _nuvio_cors(
+            JsonResponse({"error": "missing_token"}, status=401),
+            methods="POST, OPTIONS",
+        )
+    user = _nuvio_account(token)
+    if user is None:
+        return _nuvio_cors(
+            JsonResponse({"error": "invalid_token"}, status=401),
+            methods="POST, OPTIONS",
+        )
+    try:
+        payload = json.loads(request.body or b"{}")
+    except json.JSONDecodeError:
+        return _nuvio_cors(
+            JsonResponse({"error": "invalid_json"}, status=400),
+            methods="POST, OPTIONS",
+        )
+    try:
+        result = nuvio_watched_api.apply_watched_request(user, payload)
+    except nuvio_watched_api.WatchedRequestError as exc:
+        return _nuvio_cors(
+            JsonResponse({"error": exc.code, "detail": exc.message}, status=exc.status),
+            methods="POST, OPTIONS",
+        )
+    except Exception:  # noqa: BLE001
+        logger.exception("Nuvio watched API failed")
+        return _nuvio_cors(
+            JsonResponse({"error": "internal_error"}, status=500),
+            methods="POST, OPTIONS",
+        )
+    return _nuvio_cors(JsonResponse(result), methods="POST, OPTIONS")
 
 
 @login_not_required

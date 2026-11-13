@@ -85,6 +85,8 @@ Percent = `floor(100 * clamp(position,0,duration) / duration)` when `duration_ms
 - `GET /nuvio/<token>/player/{type}/{id}/{extra}.json` — query/extra carries `action`, `currentTime`, `duration`, `deviceId`, `deviceName`
 - Legacy untokened `/nuvio/manifest.json` and `/nuvio/player/…` only work when the site has exactly one account
 
+Library mark watched / unwatched from the companion is a **separate** Bearer endpoint (`POST /nuvio/watched.json`) — do not use the player route for that. See [Imports → Companion mark / unmark](imports.md#companion-mark--unmark-post-nuviowatchedjson).
+
 **Home (session user):**
 
 - `GET /now-watching/` — partial for HTMX
