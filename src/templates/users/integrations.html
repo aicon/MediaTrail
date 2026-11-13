@@ -176,10 +176,20 @@
                     <div class="flex-1">
                       <div class="flex items-center text-gray-200 mb-1">
                         {% include "app/icons/list-add.svg" with classes="w-5 h-5 mr-2" %}
-                        <span class="text-sm font-medium">{% translate "Sync Nuvio Library watchlist" %}</span>
+                        <span class="text-sm font-medium">
+                          {% if LANGUAGE_CODE == "hu" %}
+                            Nuvio Library megnézendő lista szinkronizálása
+                          {% else %}
+                            {% translate "Sync Nuvio Library watchlist" %}
+                          {% endif %}
+                        </span>
                       </div>
                       <p class="text-xs text-gray-400 ml-7">
-                        {% translate "Two-way sync between your Nuvio Library (+) and one MediaTrail list. Movies leave both sides when completed or stopped at 90%+. Series leave when they become In Progress (including mid-watch resume)." %}
+                        {% if LANGUAGE_CODE == "hu" %}
+                          Kétirányú szinkron a Nuvio Library (+) és egy MediaTrail lista között. A filmek mindkét oldalról lekerülnek, ha befejezettnek vannak jelölve, vagy legalább 90%-nál megállítod őket. A sorozatok akkor kerülnek le, ha Folyamatban állapotba kerülnek (beleértve a félbehagyott folytatást is).
+                        {% else %}
+                          {% translate "Two-way sync between your Nuvio Library (+) and one MediaTrail list. Movies leave both sides when completed or stopped at 90%+. Series leave when they become In Progress (including mid-watch resume)." %}
+                        {% endif %}
                       </p>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer ml-4">
@@ -193,11 +203,23 @@
                   </div>
                   <div class="ml-7">
                     <label class="block text-xs text-gray-400 mb-1"
-                           for="nuvio_watchlist_list_id">{% translate "Watchlist list" %}</label>
+                           for="nuvio_watchlist_list_id">
+                      {% if LANGUAGE_CODE == "hu" %}
+                        Megnézendő lista
+                      {% else %}
+                        {% translate "Watchlist list" %}
+                      {% endif %}
+                    </label>
                     <select id="nuvio_watchlist_list_id"
                             name="nuvio_watchlist_list_id"
                             class="w-full bg-[#262a2f] text-gray-200 text-sm rounded-md border-0 focus:ring-1 focus:ring-indigo-500">
-                      <option value="">{% translate "Select a list…" %}</option>
+                      <option value="">
+                        {% if LANGUAGE_CODE == "hu" %}
+                          Válassz listát…
+                        {% else %}
+                          {% translate "Select a list…" %}
+                        {% endif %}
+                      </option>
                       {% for custom_list in nuvio_custom_lists %}
                         <option value="{{ custom_list.id }}"
                                 {% if nuvio_watchlist_list_id == custom_list.id %}selected{% endif %}>

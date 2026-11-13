@@ -101,9 +101,13 @@ COPY --from=builder /mediatrail/.venv /mediatrail/.venv
 COPY src ./
 COPY scripts/verify_pillow_native.py /mediatrail/scripts/verify_pillow_native.py
 # The base python image may still ship a system pip; the app never needs it.
+# Rebuild .mo from .po in-image so Windows-compiled catalogs cannot drift.
 RUN rm -rf /usr/local/lib/python*/site-packages/pip \
            /usr/local/lib/python*/site-packages/pip-*.dist-info \
            /usr/local/bin/pip /usr/local/bin/pip3 \
+    && python /mediatrail/locale/compile_mo.py \
+         /mediatrail/locale/hu/LC_MESSAGES/django.po \
+         /mediatrail/locale/hu/LC_MESSAGES/django.mo \
     && python /mediatrail/scripts/verify_pillow_native.py \
     && python manage.py collectstatic --noinput
 
