@@ -308,36 +308,55 @@ def list_item_toggle(request):
         ).distinct(),  # To prevent duplicates, when user is owner and collaborator
     )
 
+    from integrations.nuvio_library import (
+        designated_watchlist,
+        enqueue_library_upsert,
+        normalize_watchlist_item,
+        remove_from_nuvio_watchlist,
+    )
+
+    watchlist = designated_watchlist(request.user)
+    is_designated = watchlist is not None and custom_list.id == watchlist.id
+    # Designated Nuvio watchlist stores the parent TV/Movie, never "Show S1".
+    list_item = item
+    if is_designated:
+        parent = normalize_watchlist_item(request.user, item)
+        if parent is not None:
+            list_item = parent
+
     custom_list_item = CustomListItem.objects.filter(
         custom_list=custom_list,
-        item=item,
+        item=list_item,
     ).first()
+    if custom_list_item is None and is_designated and item.id != list_item.id:
+        # Season/episode row still counts as membership for toggle-off.
+        custom_list_item = CustomListItem.objects.filter(
+            custom_list=custom_list,
+            item=item,
+        ).first()
 
     if custom_list_item is not None:
-        custom_list_item.delete()
-        logger.info("%s removed from %s.", item, custom_list)
+        if is_designated:
+            remove_from_nuvio_watchlist(request.user, list_item)
+            logger.info("%s removed from designated watchlist %s.", list_item, custom_list)
+        else:
+            custom_list_item.delete()
+            logger.info("%s removed from %s.", list_item, custom_list)
         has_item = False
-        from integrations.nuvio_library import (
-            designated_watchlist,
-            enqueue_library_delete,
-        )
-
-        if designated_watchlist(request.user) == custom_list:
-            enqueue_library_delete(request.user, item)
     else:
-        CustomListItem.objects.create(custom_list=custom_list, item=item)
-        logger.info("%s added to %s.", item, custom_list)
+        if is_designated and item.id != list_item.id:
+            CustomListItem.objects.filter(
+                custom_list=custom_list,
+                item=item,
+            ).delete()
+        CustomListItem.objects.create(custom_list=custom_list, item=list_item)
+        logger.info("%s added to %s.", list_item, custom_list)
         has_item = True
-        from integrations.nuvio_library import (
-            designated_watchlist,
-            enqueue_library_upsert,
-        )
-
-        if designated_watchlist(request.user) == custom_list:
-            enqueue_library_upsert(request.user, item)
+        if is_designated:
+            enqueue_library_upsert(request.user, list_item)
 
     return render(
         request,
         "lists/components/list_item_button.html",
-        {"custom_list": custom_list, "item": item, "has_item": has_item},
+        {"custom_list": custom_list, "item": list_item, "has_item": has_item},
     )

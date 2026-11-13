@@ -49,22 +49,22 @@ def remove_from_nuvio_watchlist(user, item=None, *, tmdb_id=None, media_type=Non
     In Progress (including mid-watch episode resume / start).
     Always deletes every known Nuvio Library key for the Item (bare tt…,
     imdb:tt…, tmdb:…) so leftover ID variants cannot be re-pulled.
+
+    MediaTrail lists may hold a Season row ("Show S1") instead of the parent
+    TV Item — purge both so a stuck Season card cannot outlive Nuvio cleanup.
     """
-    if item is None and tmdb_id and media_type:
-        item = Item.objects.filter(
-            media_id=str(tmdb_id),
-            source=Sources.TMDB.value,
-            media_type=media_type,
-            season_number__isnull=True,
-            episode_number__isnull=True,
-        ).first()
-    if item is None:
-        return
-    if item.media_type not in {MediaTypes.MOVIE.value, MediaTypes.TV.value}:
-        # Season/episode progress maps to the parent show for Nuvio Library.
+    source = Sources.TMDB.value
+    media_id = str(tmdb_id).strip() if tmdb_id else None
+    root_type = media_type
+
+    if item is not None:
+        media_id = str(item.media_id)
+        source = item.source
         if item.media_type == MediaTypes.SEASON.value:
+            root_type = MediaTypes.TV.value
             item = _tv_item_for_season(user, item)
         elif item.media_type == MediaTypes.EPISODE.value:
+            root_type = MediaTypes.TV.value
             item = Item.objects.filter(
                 media_id=item.media_id,
                 source=item.source,
@@ -72,9 +72,24 @@ def remove_from_nuvio_watchlist(user, item=None, *, tmdb_id=None, media_type=Non
                 season_number__isnull=True,
                 episode_number__isnull=True,
             ).first()
+        elif item.media_type in {MediaTypes.MOVIE.value, MediaTypes.TV.value}:
+            root_type = item.media_type
         else:
             return
-    if item is None or item.media_type not in {
+
+    if item is None and tmdb_id and media_type:
+        media_id = str(tmdb_id).strip()
+        root_type = media_type
+        source = Sources.TMDB.value
+        item = Item.objects.filter(
+            media_id=media_id,
+            source=source,
+            media_type=media_type,
+            season_number__isnull=True,
+            episode_number__isnull=True,
+        ).first()
+
+    if not media_id or root_type not in {
         MediaTypes.MOVIE.value,
         MediaTypes.TV.value,
     }:
@@ -82,16 +97,40 @@ def remove_from_nuvio_watchlist(user, item=None, *, tmdb_id=None, media_type=Non
 
     watchlist = designated_watchlist(user)
     if watchlist is not None:
-        deleted, _ = CustomListItem.objects.filter(
-            custom_list=watchlist,
-            item=item,
-        ).delete()
+        deleted = _purge_watchlist_title(
+            watchlist,
+            media_id=media_id,
+            source=source,
+            root_media_type=root_type,
+        )
         if deleted:
-            logger.info("Removed %s from watchlist %s", item, watchlist)
+            logger.info(
+                "Removed %s (%s) from watchlist %s (%s row(s))",
+                media_id,
+                root_type,
+                watchlist,
+                deleted,
+            )
 
-    if not _has_nuvio_account(user):
-        return
-    keys = _library_keys_for_item(user, item)
+    if item is None or item.media_type not in {
+        MediaTypes.MOVIE.value,
+        MediaTypes.TV.value,
+    }:
+        # Season-only list row: still try Nuvio delete via synthetic keys.
+        if not _has_nuvio_account(user):
+            return
+        keys = [
+            {"content_id": content_id, "content_type": "series"}
+            for content_id in _content_id_variants(user, media_id, root_type)
+        ] if root_type == MediaTypes.TV.value else [
+            {"content_id": content_id, "content_type": "movie"}
+            for content_id in _content_id_variants(user, media_id, root_type)
+        ]
+    else:
+        if not _has_nuvio_account(user):
+            return
+        keys = _library_keys_for_item(user, item)
+
     if not keys:
         return
     for key in keys:
@@ -100,6 +139,52 @@ def remove_from_nuvio_watchlist(user, item=None, *, tmdb_id=None, media_type=Non
     from integrations.tasks import delete_nuvio_library_item
 
     delete_nuvio_library_item.delay(user.id, keys)
+
+
+def _purge_watchlist_title(watchlist, *, media_id, source, root_media_type):
+    """Delete Movie/TV list rows and any Season/Episode rows for the same id."""
+    types = [root_media_type]
+    if root_media_type == MediaTypes.TV.value:
+        types.extend([MediaTypes.SEASON.value, MediaTypes.EPISODE.value])
+    deleted, _ = CustomListItem.objects.filter(
+        custom_list=watchlist,
+        item__media_id=str(media_id),
+        item__source=source,
+        item__media_type__in=types,
+    ).delete()
+    return deleted
+
+
+def normalize_watchlist_item(user, item):
+    """Map Season/Episode to the parent TV Item for the designated watchlist.
+
+    Nuvio Library only knows movie/series; storing Season on the MediaTrail
+    watchlist leaves a sticky "Show S1" card after auto-remove.
+    """
+    if item is None:
+        return None
+    if item.media_type in {MediaTypes.MOVIE.value, MediaTypes.TV.value}:
+        return item
+    if item.media_type == MediaTypes.SEASON.value:
+        parent = _tv_item_for_season(user, item)
+        if parent is not None:
+            return parent
+        return Item.objects.filter(
+            media_id=item.media_id,
+            source=item.source,
+            media_type=MediaTypes.TV.value,
+            season_number__isnull=True,
+            episode_number__isnull=True,
+        ).first()
+    if item.media_type == MediaTypes.EPISODE.value:
+        return Item.objects.filter(
+            media_id=item.media_id,
+            source=item.source,
+            media_type=MediaTypes.TV.value,
+            season_number__isnull=True,
+            episode_number__isnull=True,
+        ).first()
+    return None
 
 
 def _tv_item_for_season(user, season_item):
@@ -123,13 +208,22 @@ def _tv_item_for_season(user, season_item):
         .select_related("item")
         .first()
     )
-    return tv.item if tv is not None else None
+    if tv is not None:
+        return tv.item
+    return Item.objects.filter(
+        media_id=season_item.media_id,
+        source=season_item.source,
+        media_type=MediaTypes.TV.value,
+        season_number__isnull=True,
+        episode_number__isnull=True,
+    ).first()
 
 
 def enqueue_library_upsert(user, item):
     """Queue a Nuvio Library push when an item is added to the watchlist."""
     if not library_sync_ready(user):
         return
+    item = normalize_watchlist_item(user, item) or item
     if item.media_type not in {MediaTypes.MOVIE.value, MediaTypes.TV.value}:
         return
     if item.source != Sources.TMDB.value:
@@ -149,7 +243,11 @@ def enqueue_library_delete(user, item):
     """Queue a Nuvio Library delete when an item leaves the watchlist."""
     if not library_sync_ready(user):
         return
+    item = normalize_watchlist_item(user, item) or item
     if item.media_type not in {MediaTypes.MOVIE.value, MediaTypes.TV.value}:
+        # Season row removed manually: still wipe Nuvio keys for the show.
+        if item.media_type in {MediaTypes.SEASON.value, MediaTypes.EPISODE.value}:
+            remove_from_nuvio_watchlist(user, item)
         return
     keys = _library_keys_for_item(user, item)
     if not keys:

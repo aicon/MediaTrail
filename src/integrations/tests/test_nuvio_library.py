@@ -93,7 +93,7 @@ class NuvioLibrarySyncTests(TestCase):
             media_id="1396",
             source=Sources.TMDB.value,
             media_type=MediaTypes.SEASON.value,
-            title="S1",
+            title="San Francisco utcáin",
             image="",
             season_number=1,
         )
@@ -116,6 +116,70 @@ class NuvioLibrarySyncTests(TestCase):
                 item=self.tv_item,
             ).exists(),
         )
+
+    def test_remove_also_clears_season_row_on_watchlist(self):
+        """Sticky 'Show S1' CustomListItem must leave with the parent TV."""
+        season_item = Item.objects.create(
+            media_id="2468",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.SEASON.value,
+            title="San Francisco utcáin",
+            image="",
+            season_number=1,
+        )
+        tv_item = Item.objects.create(
+            media_id="2468",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.TV.value,
+            title="San Francisco utcáin",
+            image="",
+        )
+        CustomListItem.objects.create(custom_list=self.watchlist, item=season_item)
+        with patch("integrations.tasks.delete_nuvio_library_item.delay") as mock_delay:
+            with patch(
+                "integrations.nuvio_library.resolve_imdb_id_cached",
+                return_value="tt0068135",
+            ):
+                nuvio_library.remove_from_nuvio_watchlist(
+                    self.user,
+                    tmdb_id="2468",
+                    media_type=MediaTypes.TV.value,
+                )
+        self.assertFalse(
+            CustomListItem.objects.filter(
+                custom_list=self.watchlist,
+                item=season_item,
+            ).exists(),
+        )
+        self.assertFalse(
+            CustomListItem.objects.filter(
+                custom_list=self.watchlist,
+                item=tv_item,
+            ).exists(),
+        )
+        mock_delay.assert_called_once()
+        deleted_ids = {k["content_id"] for k in mock_delay.call_args.args[1]}
+        self.assertEqual(
+            deleted_ids,
+            {"tt0068135", "imdb:tt0068135", "tmdb:2468"},
+        )
+
+    def test_normalize_watchlist_item_maps_season_to_tv(self):
+        season_item = Item.objects.create(
+            media_id="1396",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.SEASON.value,
+            title="Breaking Bad",
+            image="",
+            season_number=1,
+        )
+        TV.objects.create(
+            user=self.user,
+            item=self.tv_item,
+            status=Status.PLANNING.value,
+        )
+        parent = nuvio_library.normalize_watchlist_item(self.user, season_item)
+        self.assertEqual(parent, self.tv_item)
 
     def test_bootstrap_skips_completed_movie_and_deletes_remote(self):
         with patch("integrations.tasks.delete_nuvio_library_item.delay"):
