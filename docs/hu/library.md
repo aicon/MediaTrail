@@ -12,7 +12,7 @@ A MediaTrail kiegészítő hivatkozását a **Beállítások → Integrációk �
 
 ### Listák és Nuvio Library
 
-A **Listák** menüben saját gyűjtemények vannak (köztük a kijelölhető **Megnézendő** / watchlist a Nuvio Library kétirányú szinkronjához). Részletek: [Importálás → Nuvio Library](imports.md#nuvio-library-megnézendő-szinkron). Ugyanaz az addon a listákat catalog polcként is kínálja.
+A **Listák** menüben saját gyűjtemények vannak (köztük a kijelölhető **Megnézendő** / watchlist a Nuvio Library kétirányú szinkronjához). Részletek: [Importálás → Nuvio Library](imports.md#nuvio-library-megnézendő-szinkron). A szinkron egy kanonikus library azonosítót tol, és sorozat levételekor minden azonosító-változatot plusz a ragadós Season kártyákat is törli a Nuvióban. Ugyanaz az addon a listákat catalog polcként is kínálja.
 
 ### Folyamatban lévő folytatás
 

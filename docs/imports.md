@@ -37,7 +37,9 @@ Optional under Settings → Integrations → Nuvio: **Sync Nuvio Library watchli
 
 - Two-way with the native Nuvio Library (`+` / remove), via the same Cloud login already stored for history import (`sync_pull_library` / push / delete). No Trakt, Simkl, or MDBList.
 - Movies leave both sides when marked **Completed** or when companion playback stops at ≥ **90%**.
-- Series leave both sides when they become **In Progress** — including mid-watch episode resume (pause/stop about 2–90%) and manual status changes.
+- Series leave both sides when they become **In Progress** — including mid-watch episode resume (pause/stop about 2–90%), the first episode start, and manual status changes.
+- On series remove, MediaTrail deletes **every** matching Nuvio Library id variant for that title (canonical IMDb / `tt…` plus stored TMDB / other aliases), and clears both the parent **TV** row and any sticky **Season** (`Show S1`) CustomListItem cards so a leftover season tile cannot stay after the show left the list.
+- Push uses a **single canonical `content_id`** so the same title is not added twice under different id shapes.
 - **Bootstrap:** titles already **Completed** (movies) or **In Progress** / **Completed** (series) in MediaTrail are not pulled into the watchlist; matching stale Nuvio Library rows are deleted on first sync.
 
 The same tokened MediaTrail addon URL also exposes every MediaTrail list as Stremio **catalog** shelves (`mt-list-{id}-movie` / `mt-list-{id}-series`) for the home screen or tools like aiometadata. Mixed lists get `— Movies` / `— Series` name suffixes. Empty shelves return `metas: []` (the client may still show an empty row). Catalog IMDb ids use the stored `imdb_map` / cache so home loads do not hammer TMDB.
@@ -69,7 +71,7 @@ Nuvio-MT can push library mark watched / unwatched directly (in addition to Clou
 | Bad / missing token | `401` |
 | Bad payload | `400` |
 
-Requires a configured Nuvio import account. Applies the same sync toggles and idempotent write path as delta import. After a successful push, the matching Cloud delta is treated as an echo so the 30s poller does not double-apply. Companions treat failures as best-effort: local Nuvio mark always succeeds even if MediaTrail is unreachable or on an older image without this route (`404`). Use **`ghcr.io/aicon/mediatrail:dev`** (or newer) for this endpoint until it ships on `:latest`.
+Requires a configured Nuvio import account. Applies the same sync toggles and idempotent write path as delta import. After a successful push, the matching Cloud delta is treated as an echo so the 30s poller does not double-apply. Companions treat failures as best-effort: local Nuvio mark always succeeds even if MediaTrail is unreachable or on an older image without this route (`404`). Ships on **`ghcr.io/aicon/mediatrail:latest`** from **0.26.9** (and on `:dev` while iterating).
 
 First import captures the Nuvio delta cursor **before** the history snapshot, then applies delta events after that tip. That matches Nuvio’s bootstrap order so watches that change while snapshot pages download are not missed by both the snapshot and the later cursor.
 

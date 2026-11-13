@@ -270,7 +270,9 @@ Authorization: Bearer <token>
 
 ## Live playback vs. the Nuvio addon
 
-Multi-device **Now Watching** from NuvioMobile-MT / NuvioTV-MT does **not** use this REST API. Companions install the built-in MediaTrail addon and call `/nuvio/manifest.json` plus `/nuvio/player/…` with `deviceId` / `deviceName`. See [docs/LIVE_PLAYBACK_NOW_WATCHING.md](docs/LIVE_PLAYBACK_NOW_WATCHING.md).
+Multi-device **Now Watching** from NuvioMobile-MT / NuvioTV-MT does **not** use this REST API. Companions install the built-in MediaTrail addon (`…/nuvio/<token>/manifest.json`) and call `/nuvio/<token>/player/…` with `deviceId` / `deviceName`. See [docs/now-watching.md](docs/now-watching.md).
+
+Library mark watched / unwatched from the companion is a **separate** route: `POST /nuvio/watched.json` with `Authorization: Bearer <token>` (token never in the URL). Full contract: [docs/imports.md — Companion mark / unmark](docs/imports.md#companion-mark--unmark-post-nuviowatchedjson).
 
 The REST endpoints under `/api/v1/playback/` are a token-authenticated preview for tools. `PUT` currently upserts the legacy device bucket (no per-device id in the body yet). A finished watch from the addon is recorded on `stop` at **90%** or more — not by these REST routes alone.
 

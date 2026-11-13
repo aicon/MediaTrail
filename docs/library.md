@@ -12,7 +12,7 @@ Install the MediaTrail addon address from Settings → Integrations → Nuvio in
 
 ### Lists and Nuvio Library
 
-The **Lists** sidebar holds custom collections (including a designated **watchlist** for optional two-way sync with the Nuvio Library). Details: [Imports → Nuvio Library watchlist sync](imports.md#nuvio-library-watchlist-sync). The tokened MediaTrail addon also publishes those lists as catalog shelves for Nuvio / aiometadata.
+The **Lists** sidebar holds custom collections (including a designated **watchlist** for optional two-way sync with the Nuvio Library). Details: [Imports → Nuvio Library watchlist sync](imports.md#nuvio-library-watchlist-sync). Sync pushes one canonical library id and, on series leave, removes every id variant plus any sticky Season cards in Nuvio. The tokened MediaTrail addon also publishes those lists as catalog shelves for Nuvio / aiometadata.
 
 ### In Progress resume
 
