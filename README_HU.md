@@ -4,7 +4,7 @@
 
 Önállóan üzemeltethető személyes médiakatalógus és digitális krónika mindarról, amit megnézel, elolvasol vagy végigjátszol.
 
-[![Verzió](https://img.shields.io/badge/verzió-0.26.4-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Verzió](https://img.shields.io/badge/verzió-0.26.5-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![Licenc: AGPL v3](https://img.shields.io/badge/Licenc-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Dokumentáció](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/hu/)
@@ -153,7 +153,7 @@ A MediaTrail egy független, nem hivatalos leágazás; **nem áll kapcsolatban a
 ### Háttér és célkitűzések
 A MediaTrail fejlesztése a Yamtrack `dev` ágából indult a `v0.25.3` kiadást követően (konkrétan a 2026. július 12-i, fülekkel ellátott részletes adatlap állapotából), beépítve a `#1378`-as számú REST API előzetest és a `#1608`-as epizód-előzménykezelést.
 
-A MediaTrail a `0.26.4` után ismét kisebb patch-lépésekkel folytatódik, a stabilitást, az önálló üzemeltethetőséget és a saját integrációkat (Nuvio, napló, statisztikák, importeszközök) helyezve előtérbe.
+A MediaTrail a `0.26.5` után ismét kisebb patch-lépésekkel folytatódik, a stabilitást, az önálló üzemeltethetőséget és a saját integrációkat (Nuvio, napló, statisztikák, importeszközök) helyezve előtérbe.
 
 | Funkció | Eredeti Yamtrack (Stabil) | MediaTrail |
 | :--- | :---: | :---: |
