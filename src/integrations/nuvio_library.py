@@ -46,7 +46,9 @@ def remove_from_nuvio_watchlist(user, item=None, *, tmdb_id=None, media_type=Non
     """Drop a title from the designated watchlist and the Nuvio Library.
 
     Safe to call repeatedly. Covers movie Completed / 90% stop and series
-    In Progress (including mid-watch episode resume).
+    In Progress (including mid-watch episode resume / start).
+    Always deletes every known Nuvio Library key for the Item (bare tt…,
+    imdb:tt…, tmdb:…) so leftover ID variants cannot be re-pulled.
     """
     if item is None and tmdb_id and media_type:
         item = Item.objects.filter(
@@ -61,8 +63,7 @@ def remove_from_nuvio_watchlist(user, item=None, *, tmdb_id=None, media_type=Non
     if item.media_type not in {MediaTypes.MOVIE.value, MediaTypes.TV.value}:
         # Season/episode progress maps to the parent show for Nuvio Library.
         if item.media_type == MediaTypes.SEASON.value:
-            tv = TV.objects.filter(user=user, item__media_id=item.media_id).first()
-            item = tv.item if tv is not None else None
+            item = _tv_item_for_season(user, item)
         elif item.media_type == MediaTypes.EPISODE.value:
             item = Item.objects.filter(
                 media_id=item.media_id,
@@ -88,9 +89,6 @@ def remove_from_nuvio_watchlist(user, item=None, *, tmdb_id=None, media_type=Non
         if deleted:
             logger.info("Removed %s from watchlist %s", item, watchlist)
 
-    if not library_sync_ready(user) and watchlist is None:
-        # Still try Nuvio delete when sync was on earlier / account exists.
-        pass
     if not _has_nuvio_account(user):
         return
     keys = _library_keys_for_item(user, item)
@@ -102,6 +100,30 @@ def remove_from_nuvio_watchlist(user, item=None, *, tmdb_id=None, media_type=Non
     from integrations.tasks import delete_nuvio_library_item
 
     delete_nuvio_library_item.delay(user.id, keys)
+
+
+def _tv_item_for_season(user, season_item):
+    """Resolve a Season Item to its parent TV Item (never delete Season as Library)."""
+    from app.models import Season
+
+    season = (
+        Season.objects.filter(user=user, item=season_item)
+        .select_related("related_tv__item")
+        .first()
+    )
+    if season is not None and season.related_tv_id and season.related_tv.item_id:
+        return season.related_tv.item
+    tv = (
+        TV.objects.filter(
+            user=user,
+            item__media_id=season_item.media_id,
+            item__source=season_item.source,
+            item__media_type=MediaTypes.TV.value,
+        )
+        .select_related("item")
+        .first()
+    )
+    return tv.item if tv is not None else None
 
 
 def enqueue_library_upsert(user, item):
@@ -185,41 +207,75 @@ def _bootstrap(user, client, watchlist, account):
             local_keys.add(_key_identity(key))
 
     stale_remote_keys = []
+    remote_by_item = {}
     for row, parsed in remote_by_key.values():
         resolved = _resolve_parsed_to_tmdb(account, parsed)
         if resolved is None:
             continue
         if _should_skip_inbound(user, resolved):
-            stale_remote_keys.extend(_keys_from_parsed(parsed))
+            stale_remote_keys.extend(
+                _expanded_keys_for_resolved(user, resolved, parsed),
+            )
             continue
         item = _ensure_item(user, account, resolved)
         if item is None:
             continue
         CustomListItem.objects.get_or_create(custom_list=watchlist, item=item)
         local_keys.add(_row_key(parsed))
+        remote_by_item.setdefault(item.pk, []).append(parsed)
+
+    # Collapse historical ID-format duplicates (tt / imdb:tt / tmdb) to one key.
+    for item_pk, parsed_rows in remote_by_item.items():
+        if len(parsed_rows) < 2:
+            continue
+        item = Item.objects.filter(pk=item_pk).first()
+        if item is None:
+            continue
+        canonical = _canonical_content_id(user, item.media_id, item.media_type)
+        keep = None
+        for parsed in parsed_rows:
+            if str(parsed["content_id"]).strip().lower() == canonical.lower():
+                keep = parsed
+                break
+        if keep is None:
+            keep = parsed_rows[0]
+        for parsed in parsed_rows:
+            if parsed is keep:
+                continue
+            stale_remote_keys.extend(_keys_from_parsed(parsed))
+
+    remote_identities = {_row_key(p) for _, p in remote_by_key.values()}
 
     for item in local_items:
         if _local_progress_blocks_watchlist(user, item):
             CustomListItem.objects.filter(custom_list=watchlist, item=item).delete()
             enqueue_library_delete(user, item)
             continue
+        # Any ID format already on Nuvio counts — do not push a second format.
+        if any(
+            _key_identity(key) in remote_identities
+            for key in _library_keys_for_item(user, item)
+        ):
+            continue
         payloads = _library_payloads_for_item(user, item)
-        missing = [
-            payload
-            for payload in payloads
-            if _key_identity(payload) not in {
-                _row_key(p) for _, p in remote_by_key.values()
-            }
-        ]
-        if missing:
-            for payload in missing:
+        if payloads:
+            for payload in payloads:
                 _mark_pending(user.id, payload, operation="upsert")
-            client.push_library_items(missing)
+            client.push_library_items(payloads)
 
     if stale_remote_keys:
+        # Deduplicate delete keys (same content_id may appear twice).
+        unique = []
+        seen = set()
         for key in stale_remote_keys:
+            identity = _key_identity(key)
+            if identity in seen:
+                continue
+            seen.add(identity)
+            unique.append(key)
+        for key in unique:
             _mark_pending(user.id, key, operation="delete")
-        client.delete_library_items(stale_remote_keys)
+        client.delete_library_items(unique)
 
     account.library_cursor = tip
     account.library_bootstrapped = True
@@ -244,7 +300,7 @@ def _apply_library_row(user, watchlist, account, row):
         return
     if _should_skip_inbound(user, resolved):
         # Already watching/done in MediaTrail: keep Nuvio clean too.
-        keys = _keys_from_parsed(parsed)
+        keys = _expanded_keys_for_resolved(user, resolved, parsed)
         if keys:
             for key in keys:
                 _mark_pending(user.id, key, operation="delete")
@@ -537,23 +593,22 @@ def catalog_metas(user, catalog_id, catalog_type, *, skip=0, limit=100):
 
 
 def _library_payloads_for_item(user, item):
+    """Outbound push: exactly one canonical content_id (never all ID formats)."""
     content_type = "movie" if item.media_type == MediaTypes.MOVIE.value else "series"
-    added_at = int(timezone.now().timestamp() * 1000)
-    payloads = []
-    for content_id in _content_id_variants(user, item.media_id, item.media_type):
-        payloads.append(
-            {
-                "content_id": content_id,
-                "content_type": content_type,
-                "name": item.title or content_id,
-                "poster": item.image or None,
-                "added_at": added_at,
-            },
-        )
-    return payloads
+    content_id = _canonical_content_id(user, item.media_id, item.media_type)
+    return [
+        {
+            "content_id": content_id,
+            "content_type": content_type,
+            "name": item.title or content_id,
+            "poster": item.image or None,
+            "added_at": int(timezone.now().timestamp() * 1000),
+        },
+    ]
 
 
 def _library_keys_for_item(user, item):
+    """All ID formats Nuvio may hold for this Item — used only for deletes."""
     content_type = "movie" if item.media_type == MediaTypes.MOVIE.value else "series"
     return [
         {"content_id": content_id, "content_type": content_type}
@@ -570,18 +625,55 @@ def _keys_from_parsed(parsed):
     ]
 
 
+def _expanded_keys_for_resolved(user, resolved, parsed=None):
+    """Delete the row's own key plus every known variant for the TMDB Item."""
+    keys = []
+    seen = set()
+    if parsed is not None:
+        for key in _keys_from_parsed(parsed):
+            identity = _key_identity(key)
+            if identity not in seen:
+                seen.add(identity)
+                keys.append(key)
+    media_id = str(resolved.get("media_id") or "").strip()
+    media_type = resolved.get("media_type")
+    if media_id and media_type in {MediaTypes.MOVIE.value, MediaTypes.TV.value}:
+        content_type = (
+            "movie" if media_type == MediaTypes.MOVIE.value else "series"
+        )
+        for content_id in _content_id_variants(user, media_id, media_type):
+            key = {"content_id": content_id, "content_type": content_type}
+            identity = _key_identity(key)
+            if identity not in seen:
+                seen.add(identity)
+                keys.append(key)
+    return keys
+
+
+def _canonical_content_id(user, tmdb_id, media_type):
+    """Single id for outbound Library upserts: prefer bare IMDb tt…, else tmdb:…"""
+    tmdb_id = str(tmdb_id).strip()
+    imdb_id = resolve_imdb_id_cached(user, tmdb_id, media_type)
+    if imdb_id:
+        return imdb_id.lower()
+    return f"tmdb:{tmdb_id}"
+
+
 def _content_id_variants(user, tmdb_id, media_type):
+    """All formats that may already exist in Nuvio Library for one title."""
     tmdb_id = str(tmdb_id).strip()
     variants = [f"tmdb:{tmdb_id}"]
     imdb_id = resolve_imdb_id_cached(user, tmdb_id, media_type)
     if imdb_id:
+        imdb_id = imdb_id.lower()
         variants.append(imdb_id)
         variants.append(f"imdb:{imdb_id}")
     seen = set()
     ordered = []
     for value in variants:
-        if value not in seen:
-            seen.add(value)
+        lowered = value.lower()
+        if lowered not in seen:
+            seen.add(lowered)
             ordered.append(value)
     return ordered
 

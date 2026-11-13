@@ -131,6 +131,10 @@ def handle_player(user, media_type, video_id, extra, query):
         device_id=device_id,
         device_label=device_label,
     )
+    # Series: leaving Watchlist / Nuvio Library as soon as any episode starts
+    # (or continues). Do not wait for 2% pause / Season status flip.
+    if target["kind"] == "episode":
+        _drop_series_from_watchlist(user, tmdb_id)
     # Pause mid-title: keep a durable In Progress resume for the next day.
     if action == "pause":
         if target["kind"] == "movie":
@@ -222,6 +226,7 @@ def _stop(user, target, tmdb_id, current_ms, duration_ms, *, device_id):
                 progress=progress,
             )
         elif target["kind"] == "episode":
+            _drop_series_from_watchlist(user, tmdb_id)
             _maybe_save_episode_resume(
                 user,
                 tmdb_id,
@@ -240,6 +245,7 @@ def _stop(user, target, tmdb_id, current_ms, duration_ms, *, device_id):
         if target["kind"] == "movie":
             _complete_movie(user, tmdb_id, when, device_id=device_id)
         else:
+            _drop_series_from_watchlist(user, tmdb_id)
             watch_episode(
                 user=user,
                 media_id=tmdb_id,
@@ -357,6 +363,9 @@ def _maybe_save_episode_resume(
     season.resume_updated_at = timezone.now()
     season._history_user = user
     season.save()
+    # Explicit TV-item remove: covers resume updates where Season status
+    # did not change (already In Progress) so FieldTracker skipped the hook.
+    _drop_series_from_watchlist(user, tmdb_id)
     logger.info(
         "Episode resume saved tmdb=%s S%sE%s position_ms=%s duration_ms=%s "
         "user=%s device=%s",
@@ -367,6 +376,17 @@ def _maybe_save_episode_resume(
         season.resume_duration_ms,
         user.id,
         device_id,
+    )
+
+
+def _drop_series_from_watchlist(user, tmdb_id):
+    """Remove the parent TV show from Watchlist + every Nuvio Library ID variant."""
+    from integrations.nuvio_library import remove_from_nuvio_watchlist
+
+    remove_from_nuvio_watchlist(
+        user,
+        tmdb_id=str(tmdb_id),
+        media_type=MediaTypes.TV.value,
     )
 
 

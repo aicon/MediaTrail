@@ -198,3 +198,101 @@ class NuvioLibrarySyncTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["metas"][0]["id"], "tt0137523")
+
+    def test_outbound_push_uses_single_canonical_imdb_id(self):
+        """Never push tt + imdb:tt + tmdb: for the same title."""
+        with patch(
+            "integrations.nuvio_library.resolve_imdb_id_cached",
+            return_value="tt0137523",
+        ):
+            payloads = nuvio_library._library_payloads_for_item(
+                self.user,
+                self.movie_item,
+            )
+        self.assertEqual(len(payloads), 1)
+        self.assertEqual(payloads[0]["content_id"], "tt0137523")
+        self.assertEqual(payloads[0]["content_type"], "movie")
+
+    def test_delete_keys_cover_all_id_variants(self):
+        with patch(
+            "integrations.nuvio_library.resolve_imdb_id_cached",
+            return_value="tt0137523",
+        ):
+            keys = nuvio_library._library_keys_for_item(self.user, self.movie_item)
+        content_ids = {k["content_id"] for k in keys}
+        self.assertEqual(
+            content_ids,
+            {"tt0137523", "imdb:tt0137523", "tmdb:550"},
+        )
+
+    def test_remove_queues_all_id_variants(self):
+        CustomListItem.objects.create(custom_list=self.watchlist, item=self.movie_item)
+        with patch("integrations.tasks.delete_nuvio_library_item.delay") as mock_delay:
+            with patch(
+                "integrations.nuvio_library.resolve_imdb_id_cached",
+                return_value="tt0137523",
+            ):
+                nuvio_library.remove_from_nuvio_watchlist(self.user, self.movie_item)
+        keys = mock_delay.call_args.args[1]
+        content_ids = {k["content_id"] for k in keys}
+        self.assertEqual(
+            content_ids,
+            {"tt0137523", "imdb:tt0137523", "tmdb:550"},
+        )
+
+    def test_bootstrap_does_not_push_when_any_id_variant_exists(self):
+        CustomListItem.objects.create(custom_list=self.watchlist, item=self.movie_item)
+        client = MagicMock()
+        client.library_cursor.return_value = 3
+        client.iter_library.return_value = [
+            {
+                "content_id": "imdb:tt0137523",
+                "content_type": "movie",
+                "name": "Fight Club",
+            },
+        ]
+        self.account.imdb_map = {"tt0137523": "550"}
+        self.account.save(update_fields=["imdb_map"])
+        with patch(
+            "integrations.nuvio_library.resolve_imdb_id_cached",
+            return_value="tt0137523",
+        ):
+            nuvio_library._bootstrap(self.user, client, self.watchlist, self.account)
+        client.push_library_items.assert_not_called()
+
+    def test_bootstrap_dedupes_remote_id_variants(self):
+        CustomListItem.objects.create(custom_list=self.watchlist, item=self.movie_item)
+        client = MagicMock()
+        client.library_cursor.return_value = 5
+        client.iter_library.return_value = [
+            {
+                "content_id": "tt0137523",
+                "content_type": "movie",
+                "name": "Fight Club",
+            },
+            {
+                "content_id": "imdb:tt0137523",
+                "content_type": "movie",
+                "name": "Fight Club",
+            },
+            {
+                "content_id": "tmdb:550",
+                "content_type": "movie",
+                "name": "Fight Club",
+            },
+        ]
+        self.account.imdb_map = {"tt0137523": "550"}
+        self.account.save(update_fields=["imdb_map"])
+        with patch(
+            "integrations.nuvio_library.resolve_imdb_id_cached",
+            return_value="tt0137523",
+        ):
+            nuvio_library._bootstrap(self.user, client, self.watchlist, self.account)
+        client.push_library_items.assert_not_called()
+        client.delete_library_items.assert_called()
+        deleted_ids = {
+            k["content_id"] for k in client.delete_library_items.call_args.args[0]
+        }
+        self.assertIn("imdb:tt0137523", deleted_ids)
+        self.assertIn("tmdb:550", deleted_ids)
+        self.assertNotIn("tt0137523", deleted_ids)

@@ -7,7 +7,10 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
-from app.models import Item, LivePlaybackStatus, MediaTypes, Movie, Sources, Status
+from app.models import Item, LivePlaybackStatus, MediaTypes, Movie, Sources, Status, TV
+from integrations.models import NuvioAccount
+from integrations.imports import helpers as import_helpers
+from lists.models import CustomList, CustomListItem
 
 
 class NuvioPlayerTests(TestCase):
@@ -319,6 +322,81 @@ class NuvioEpisodeResumeTests(TestCase):
         self.user = get_user_model().objects.create_user(
             username="nuvio-episode-user",
             password="testpass123",
+        )
+
+    @patch("integrations.nuvio_player.upsert_live_playback")
+    @patch(
+        "app.models.providers.services.get_media_metadata",
+        side_effect=_tv_metadata_for_resume,
+    )
+    @patch(
+        "app.episode_operations.services.get_media_metadata",
+        side_effect=_tv_metadata_for_resume,
+    )
+    @patch(
+        "integrations.nuvio_player.tmdb.find",
+        return_value={"movie_results": [], "tv_results": [{"id": 1396}]},
+    )
+    def test_episode_start_removes_show_from_watchlist_and_nuvio(
+        self,
+        _find,
+        _ep_meta,
+        _model_meta,
+        _upsert,
+    ):
+        """Starting any episode drops the parent TV from Watchlist + Library."""
+        self.user.nuvio_sync_library_enabled = True
+        self.user.save(update_fields=["nuvio_sync_library_enabled"])
+        account = NuvioAccount.objects.create(
+            user=self.user,
+            email=import_helpers.encrypt("a@b.c"),
+            password=import_helpers.encrypt("pw"),
+            profile_id=1,
+        )
+        watchlist = CustomList.objects.create(name="WL", owner=self.user)
+        account.watchlist_list = watchlist
+        account.imdb_map = {"tt0903747": "1396"}
+        account.save(update_fields=["watchlist_list", "imdb_map"])
+        tv_item = Item.objects.create(
+            media_id="1396",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.TV.value,
+            title="Breaking Bad",
+            image="",
+        )
+        TV.objects.create(
+            user=self.user,
+            item=tv_item,
+            status=Status.PLANNING.value,
+        )
+        CustomListItem.objects.create(custom_list=watchlist, item=tv_item)
+
+        with patch("integrations.tasks.delete_nuvio_library_item.delay") as mock_delay:
+            with patch(
+                "integrations.nuvio_library.resolve_imdb_id_cached",
+                return_value="tt0903747",
+            ):
+                response = self.client.get(
+                    reverse(
+                        "nuvio_player",
+                        kwargs={
+                            "token": self.user.token,
+                            "media_type": "series",
+                            "video_id": "tt0903747:1:1",
+                            "extra": "action=start&currentTime=0&duration=1800000.json",
+                        },
+                    ),
+                )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(
+            CustomListItem.objects.filter(custom_list=watchlist, item=tv_item).exists(),
+        )
+        mock_delay.assert_called()
+        deleted_ids = {k["content_id"] for k in mock_delay.call_args.args[1]}
+        self.assertEqual(
+            deleted_ids,
+            {"tt0903747", "imdb:tt0903747", "tmdb:1396"},
         )
 
     @patch("integrations.nuvio_player.clear_live_playback")

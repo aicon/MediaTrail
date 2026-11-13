@@ -1634,7 +1634,11 @@ class Season(Media):
         if became_in_progress:
             from integrations.nuvio_library import remove_from_nuvio_watchlist
 
-            remove_from_nuvio_watchlist(self.user, self.item)
+            # Always the parent TV Item — never the Season row as Library key.
+            remove_from_nuvio_watchlist(
+                self.user,
+                self.related_tv.item if self.related_tv_id else self.item,
+            )
         return False
 
     @tracker  # postpone field reset until after the save
@@ -1652,7 +1656,10 @@ class Season(Media):
             if self.status == Status.IN_PROGRESS.value:
                 from integrations.nuvio_library import remove_from_nuvio_watchlist
 
-                remove_from_nuvio_watchlist(self.user, self.item)
+                remove_from_nuvio_watchlist(
+                    self.user,
+                    self.related_tv.item if self.related_tv_id else self.item,
+                )
             if self.status == Status.COMPLETED.value:
                 season_metadata = providers.services.get_media_metadata(
                     MediaTypes.SEASON.value,
