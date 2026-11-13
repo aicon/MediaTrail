@@ -957,6 +957,25 @@ msgstr ""
 " korábban Nuvióból szinkronizált megtekintéseket törli, és csak teljes "
 "Nuvio-előzmény snapshot után."
 
+msgid "Sync Nuvio Library watchlist"
+msgstr "Nuvio Library megnézendő lista szinkronizálása"
+
+msgid ""
+"Two-way sync between your Nuvio Library (+) and one MediaTrail list. Movies "
+"leave both sides when completed or stopped at 90%+. Series leave when they "
+"become In Progress (including mid-watch resume)."
+msgstr ""
+"Kétirányú szinkron a Nuvio Library (+) és egy MediaTrail lista között. A "
+"filmek mindkét oldalról lekerülnek, ha befejezettnek vannak jelölve, vagy "
+"legalább 90%-nál megállítod őket. A sorozatok akkor kerülnek le, ha "
+"Folyamatban állapotba kerülnek (beleértve a félbehagyott folytatást is)."
+
+msgid "Watchlist list"
+msgstr "Megnézendő lista"
+
+msgid "Select a list…"
+msgstr "Válassz listát…"
+
 msgid "Nuvio sync settings updated successfully"
 msgstr "A Nuvio szinkron-beállítások mentve."
 
