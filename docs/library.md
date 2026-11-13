@@ -4,11 +4,17 @@
 
 The home page and the sidebar are the library. Movies, series, seasons, and the other types each have their own list. Search on a list looks through that person's entries.
 
-While a title is playing or paused, **Now Watching** strips can sit at the top of the home page — one strip per companion device (phone, each TV). Each strip shows the title, the episode, how much is already watched, the time left, and a device label you can rename. Dismiss or stop on one device leaves the others alone. When the companion sends `stop` at **90%** or more, the MediaTrail addon saves one finished watch. When you stop a **movie** between about **2%** and **90%**, MediaTrail keeps it under home **In Progress** with a resume progress bar (delete the card to dismiss). The same mid-watch range for an **episode** updates that season’s In Progress card: a bottom poster pill shows `E… • …%`, the progress bar follows the resume point, and finishing the episode (or marking it watched / leaving In Progress) clears the resume.
+While a title is playing or paused, **Now Watching** strips can sit at the top of the home page — one strip per companion device (phone, each TV). Each strip shows the title, the episode, how much is already watched, the time left, and a device label you can rename. Dismiss or stop on one device leaves the others alone. When the companion sends `stop` at **90%** or more, the MediaTrail addon saves one finished watch.
 
 ![Now Watching on the home page](screenshots/now-watching-en.png)
 
 Install the MediaTrail addon address from Settings → Integrations → Nuvio in each [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) or [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) client. Details: [Live playback / Now Watching](now-watching.md). Two-way watch-history sync (mark watched / unwatched) is optional on the same Integrations page; see [Imports → Nuvio](imports.md#two-way-interactive-sync).
+
+### In Progress resume
+
+When you pause or stop a **movie** between about **2%** and **90%**, MediaTrail keeps it under home **In Progress** with a resume progress bar (delete the card to dismiss). The same mid-watch range for an **episode** updates that **season’s** In Progress card: a bottom poster pill shows `E… • …%`, and the progress bar follows the resume point. Finishing the episode (companion `stop` at ≥ **90%**), marking it watched, or leaving In Progress clears the resume.
+
+Home **Recent** sort also uses the last resume update, so a mid-watch stop can move that card up. When every episode in a season is watched, MediaTrail marks the season **Completed** and clears any leftover resume; an already-Completed season is left alone.
 
 Opening a title shows the catalog details and the tracking form. Status, score, progress, start and end dates, and a note belong to that entry. Repeating a finished title keeps another pass in the history. A series is a parent: seasons and episodes are separate rows, so marking one episode does not rewrite the whole show.
 

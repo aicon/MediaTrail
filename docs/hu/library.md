@@ -8,9 +8,13 @@ Lejátszás vagy szüneteltetés közben a kezdőlap tetején megjelennek a dina
 
 ![A Most nézem sáv a kezdőlapon](../screenshots/now-watching-hu.png)
 
-A MediaTrail kiegészítő hivatkozását a **Beállítások → Integrációk → Nuvio** menüpontból másolhatod ki, amelyet valamennyi [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) és [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) kliensedben hozzá kell adnod a bővítményekhez. Részletes tájékoztató: [Live playback / Now Watching](../now-watching.md).
+A MediaTrail kiegészítő hivatkozását a **Beállítások → Integrációk → Nuvio** menüpontból másolhatod ki, amelyet valamennyi [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) és [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) kliensedben hozzá kell adnod a bővítményekhez. Részletes tájékoztató: [Live playback / Now Watching](../now-watching.md). A kétirányú előzményszinkron (megnézett / nem látott) opcionális ugyanott; lásd: [Importálás → Nuvio](imports.md#two-way-interactive-sync).
 
-Ha egy **filmet** kb. **2–90%** között állítasz le, a főoldali **In Progress** listában megmarad folytatási csíkkal; a kártya törlésével veheted le. Ugyanez az epizódokra is: a **szezon** In Progress kártyáján alsó folytatás-pill (`E… • …%`) és folytatási csík jelenik meg; az epizód befejezése (vagy megnézettnek jelölése / In Progress elhagyása) törli a folytatást.
+### Folyamatban lévő folytatás
+
+Ha egy **filmet** kb. **2–90%** között szüneteltetsz vagy állítasz le, a főoldali **Folyamatban** (**In Progress**) listában megmarad folytatási csíkkal; a kártya törlésével veheted le. Ugyanez az epizódokra is: a **szezon** Folyamatban kártyáján alsó folytatás-pill (`E… • …%`) és folytatási csík jelenik meg. Az epizód befejezése (társalkalmazás `stop` ≥ **90%**), megnézettnek jelölése, vagy a Folyamatban állapot elhagyása törli a folytatást.
+
+A kezdőlap **Recent** rendezése a legutóbbi folytatás-frissítést is figyelembe veszi, így egy félbehagyott megállás feljebb viheti a kártyát. Ha egy évad minden epizódja megvan nézve, a MediaTrail automatikusan **Befejezett** (**Completed**) állapotra állítja az évadot, és törli a maradék folytatást; a már Befejezett évadot nem írja felül újra.
 
 Egy mű adatlapját megnyitva a külső katalógus adatai és a naplózási űrlap jelenik meg. A bejegyzéshez rögzítheted az aktuális állapotot, a személyes értékelésedet, a megtekintés előrehaladását, a kezdeti és befejezési dátumot, valamint az egyéni megjegyzéseidet. Amennyiben egy korábban befejezett művet újra megtekintesz vagy újraolvasol, a rendszer újabb bejegyzést fűz a megtekintési előzményeidhez. A sorozatok hierarchikus felépítésűek: az évadok és az epizódok különálló tételként szerepelnek a rendszerben, így egyetlen rész megtekintésének rögzítése nem írja felül a teljes műsort.
 

@@ -42,18 +42,18 @@ With several MediaTrail users, each person must install **their own** Integratio
 
 ## Event mapping (Nuvio addon → MediaTrail)
 
-| Client event | LivePlayback | History |
-|--------------|--------------|---------|
+| Client event | LivePlayback | History / library |
+|--------------|--------------|-------------------|
 | `start` / `progress` (position > 0) | upsert that device as `watching` | — |
-| `pause` | upsert that device as `paused` (strip stays) | — |
+| `pause` | upsert that device as `paused` (strip stays) | if about **2–90%**, durable home **In Progress** resume (movie or season) |
 | `start` with position 0 while row exists | no-op (keep last position) | — |
-| `stop` &lt; 90% watched | clear that device’s strip | **no** history |
-| `stop` ≥ 90% | clear that device’s strip, then history once | one row |
+| `stop` &lt; 90% watched | clear that device’s strip | **no** history; if about **2–90%**, same durable resume as pause |
+| `stop` ≥ 90% | clear that device’s strip, then history once | one finished watch; clears that title’s mid-watch resume |
 | repeated stop (dedupe) | clear again if leftover | **no** second history |
 | seek | client should emit `progress` so the strip updates | — |
 | back / exit player | client should send `stop` | — |
 
-Watched threshold: **90%** (`WATCHED_THRESHOLD = 0.9`). Clearing live playback never changes Episode/Movie history or tracked status.
+Watched threshold: **90%** (`WATCHED_THRESHOLD = 0.9`). Resume floor: **2%** (`RESUME_MIN_THRESHOLD = 0.02`) — below that, MediaTrail does not keep an In Progress resume row. Clearing live playback never changes Episode/Movie history by itself; mid-watch resume and season Completed status live on the tracked Movie/Season rows (see [Library → In Progress resume](library.md#in-progress-resume)).
 
 Nuvio **watch-history import / two-way interactive sync** is separate (Settings → Import and Settings → Integrations → Nuvio). That path updates movie/episode history; it must not wipe per-device Now Watching strips. Details: [Imports → Nuvio](imports.md#nuvio).
 
