@@ -8,7 +8,7 @@ Lejátszás vagy szüneteltetés közben a kezdőlap tetején megjelennek a dina
 
 ![A Most nézem sáv a kezdőlapon](../screenshots/now-watching-hu.png)
 
-A MediaTrail kiegészítő hivatkozását a **Beállítások → Integrációk → Nuvio** menüpontból másolhatod ki, amelyet valamennyi [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) és [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) kliensedben hozzá kell adnod a bővítményekhez. Részletes tájékoztató: [Live playback / Now Watching](../now-watching.md). A kétirányú előzményszinkron (megnézett / nem látott) opcionális ugyanott; lásd: [Importálás → Nuvio](imports.md#two-way-interactive-sync).
+A MediaTrail kiegészítő hivatkozását a **Beállítások → Integrációk → Nuvio** menüpontból másolhatod ki, amelyet valamennyi [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) és [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) kliensedben hozzá kell adnod a bővítményekhez. Részletes tájékoztató: [Live playback / Now Watching](../now-watching.md). A kétirányú előzményszinkron (megnézett / nem látott) opcionális ugyanott; lásd: [Importálás → Nuvio](imports.md#nuvio).
 
 ### Folyamatban lévő folytatás
 
