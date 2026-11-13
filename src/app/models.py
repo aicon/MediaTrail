@@ -1031,6 +1031,10 @@ class Media(models.Model):
 
             if max_progress:
                 self.progress = max_progress
+            # Drop mid-watch resume so the home In Progress card disappears.
+            if hasattr(self, "resume_position_ms"):
+                self.resume_position_ms = None
+                self.resume_duration_ms = None
 
         self.item.fetch_releases(delay=True)
 

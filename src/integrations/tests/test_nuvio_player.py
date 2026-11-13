@@ -241,3 +241,23 @@ class NuvioPlayerTests(TestCase):
         self.assertIsNone(movie.resume_position_ms)
         self.assertIsNone(movie.resume_duration_ms)
         self.assertIsNone(movie.resume_bar_percent)
+
+    @patch(
+        "app.models.providers.services.get_media_metadata",
+        return_value={"max_progress": 1},
+    )
+    def test_mark_completed_in_mediatrail_clears_resume(self, _metadata):
+        """UI / form save to Completed drops the home In Progress resume card."""
+        movie = Movie.objects.create(
+            user=self.user,
+            item=self.movie_item,
+            status=Status.IN_PROGRESS.value,
+            resume_position_ms=400000,
+            resume_duration_ms=1800000,
+        )
+        movie.status = Status.COMPLETED.value
+        movie.save()
+        movie.refresh_from_db()
+        self.assertEqual(movie.status, Status.COMPLETED.value)
+        self.assertIsNone(movie.resume_position_ms)
+        self.assertIsNone(movie.resume_duration_ms)

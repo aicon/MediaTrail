@@ -375,8 +375,8 @@ AUTH_USER_MODEL = "users.User"
 FILE_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50 MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50 MB
 
-# MediaTrail versioning: 0.26.6 adds mid-watch movie resume on the home In Progress list.
-VERSION = config("VERSION", default="0.26.6")
+# MediaTrail versioning: 0.26.7 shrinks home grids to one row (6) and clears resume on complete.
+VERSION = config("VERSION", default="0.26.7")
 
 
 def _public_http_url(name):

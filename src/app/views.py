@@ -61,7 +61,8 @@ def home(request):
         "home_hide_unreleased",
         None if hide_unreleased_param is None else hide_unreleased_param == "true",
     )
-    items_limit = 14
+    # One media-grid row on typical desktop widths; "Load all" reveals the rest.
+    items_limit = 6
 
     # If this is an HTMX request to load more items for a specific media type
     if request.headers.get("HX-Request") and media_type_to_load:
