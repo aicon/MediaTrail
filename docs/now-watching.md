@@ -81,7 +81,8 @@ Percent = `floor(100 * clamp(position,0,duration) / duration)` when `duration_ms
 
 **Built-in addon (companions):**
 
-- `GET /nuvio/<token>/manifest.json`
+- `GET /nuvio/<token>/manifest.json` — `player` plus optional `catalog` resources for MediaTrail lists
+- `GET /nuvio/<token>/catalog/{type}/{id}.json` — list shelves (`mt-list-{listId}-movie` / `-series`)
 - `GET /nuvio/<token>/player/{type}/{id}/{extra}.json` — query/extra carries `action`, `currentTime`, `duration`, `deviceId`, `deviceName`
 - Legacy untokened `/nuvio/manifest.json` and `/nuvio/player/…` only work when the site has exactly one account
 

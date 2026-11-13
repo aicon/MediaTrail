@@ -31,6 +31,17 @@ What a run does:
 
 The profile number is the Nuvio profile, not a MediaTrail user. Most people have one profile, numbered 1.
 
+### Nuvio Library watchlist sync
+
+Optional under Settings → Integrations → Nuvio: **Sync Nuvio Library watchlist** plus a designated MediaTrail list (Lists menu).
+
+- Two-way with the native Nuvio Library (`+` / remove), via the same Cloud login already stored for history import (`sync_pull_library` / push / delete). No Trakt, Simkl, or MDBList.
+- Movies leave both sides when marked **Completed** or when companion playback stops at ≥ **90%**.
+- Series leave both sides when they become **In Progress** — including mid-watch episode resume (pause/stop about 2–90%) and manual status changes.
+- **Bootstrap:** titles already **Completed** (movies) or **In Progress** / **Completed** (series) in MediaTrail are not pulled into the watchlist; matching stale Nuvio Library rows are deleted on first sync.
+
+The same tokened MediaTrail addon URL also exposes every MediaTrail list as Stremio **catalog** shelves (`mt-list-{id}-movie` / `mt-list-{id}-series`) for the home screen or tools like aiometadata. Mixed lists get `— Movies` / `— Series` name suffixes. Empty shelves return `metas: []` (the client may still show an empty row). Catalog IMDb ids use the stored `imdb_map` / cache so home loads do not hammer TMDB.
+
 ### Two-way interactive sync
 
 This mirrors Jellyfin-style mark played / mark unplayed between Nuvio Cloud watch history and MediaTrail movie/episode rows. It is **not** remote pause or Now Watching scrobble.

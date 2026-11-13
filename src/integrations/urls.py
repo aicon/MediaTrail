@@ -16,6 +16,17 @@ urlpatterns = [
         views.nuvio_player,
         name="nuvio_player",
     ),
+    re_path(
+        r"^nuvio/(?P<token>[^/]+)/catalog/(?P<media_type>[^/]+)/(?P<catalog_id>[^/]+)"
+        r"(?:/(?P<extra>.+))?\.json$",
+        views.nuvio_catalog,
+        name="nuvio_catalog",
+    ),
+    re_path(
+        r"^nuvio/(?P<token>[^/]+)/catalog/(?P<media_type>[^/]+)/(?P<catalog_id>[^/]+)"
+        r"(?:/(?P<extra>.+))?/?$",
+        views.nuvio_catalog,
+    ),
     # Legacy untokened routes: only safe when MediaTrail has a single account.
     path("nuvio/manifest.json", views.nuvio_manifest, name="nuvio_manifest_legacy"),
     re_path(r"^nuvio/manifest/?$", views.nuvio_manifest),
@@ -24,6 +35,12 @@ urlpatterns = [
         r"(?:/(?P<extra>.+))?$",
         views.nuvio_player,
         name="nuvio_player_legacy",
+    ),
+    re_path(
+        r"^nuvio/catalog/(?P<media_type>[^/]+)/(?P<catalog_id>[^/]+)"
+        r"(?:/(?P<extra>.+))?\.json$",
+        views.nuvio_catalog,
+        name="nuvio_catalog_legacy",
     ),
     # Companion mark/unmark: Bearer only — never put the token in the path.
     path("nuvio/watched.json", views.nuvio_watched, name="nuvio_watched"),

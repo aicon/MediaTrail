@@ -416,6 +416,88 @@ class NuvioClient:
             },
         )
 
+    def library_cursor(self):
+        """Return the current end of the Nuvio library delta log."""
+        payload = self._rpc(
+            "sync_get_library_delta_cursor",
+            {"p_profile_id": self._profile_id},
+        )
+        if isinstance(payload, bool) or not isinstance(payload, (int, float)):
+            raise NuvioError("Nuvio library cursor was not an integer")
+        if isinstance(payload, float) and not payload.is_integer():
+            raise NuvioError("Nuvio library cursor was not an integer")
+        return int(payload)
+
+    def iter_library(self, page_size=PAGE_SIZE):
+        """Yield every Nuvio Library item for the selected profile."""
+        offset = 0
+        while True:
+            payload = self._rpc(
+                "sync_pull_library",
+                {
+                    "p_profile_id": self._profile_id,
+                    "p_limit": page_size,
+                    "p_offset": offset,
+                },
+            )
+            if not isinstance(payload, list):
+                raise NuvioError("Nuvio library page was not a list")
+            if not payload:
+                return
+            yield from payload
+            if len(payload) < page_size:
+                return
+            offset += len(payload)
+
+    def iter_library_delta(self, since_event_id, limit=PAGE_SIZE):
+        """Yield library changes after the saved cursor."""
+        since = since_event_id or 0
+        while True:
+            payload = self._rpc(
+                "sync_pull_library_delta",
+                {
+                    "p_profile_id": self._profile_id,
+                    "p_since_event_id": since,
+                    "p_limit": limit,
+                },
+            )
+            if not isinstance(payload, list):
+                raise NuvioError("Nuvio library delta was not a list")
+            if not payload:
+                return
+            rows = sorted(payload, key=lambda row: int(row.get("event_id") or 0))
+            highest = int(rows[-1].get("event_id") or 0)
+            if highest <= since:
+                raise NuvioError("Nuvio library delta did not advance the cursor")
+            yield from rows
+            since = highest
+            if len(rows) < limit:
+                return
+
+    def push_library_items(self, items):
+        """Upsert Nuvio Library rows. Safe to retry the same items."""
+        if not items:
+            return
+        self._rpc(
+            "sync_push_library_items",
+            {
+                "p_profile_id": self._profile_id,
+                "p_items": items,
+            },
+        )
+
+    def delete_library_items(self, keys):
+        """Delete Nuvio Library rows by content keys. Safe to retry."""
+        if not keys:
+            return
+        self._rpc(
+            "sync_delete_library_items",
+            {
+                "p_profile_id": self._profile_id,
+                "p_keys": keys,
+            },
+        )
+
     def _rpc(self, name, body):
         try:
             return self._request(f"/rest/v1/rpc/{name}", body)

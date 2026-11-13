@@ -22,6 +22,15 @@ class NuvioAccount(models.Model):
         default=list,
         help_text="Last Nuvio watch-history snapshot keys for unwatch reconcile",
     )
+    library_cursor = models.BigIntegerField(null=True, blank=True)
+    library_bootstrapped = models.BooleanField(default=False)
+    watchlist_list = models.ForeignKey(
+        "lists.CustomList",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="nuvio_watchlist_accounts",
+    )
 
     def __str__(self):
         """Return the owning user."""

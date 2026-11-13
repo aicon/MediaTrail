@@ -1164,6 +1164,14 @@ class TV(Media):
             ):
                 self._start_next_available_season()
 
+            if self.status in {
+                Status.IN_PROGRESS.value,
+                Status.COMPLETED.value,
+            }:
+                from integrations.nuvio_library import remove_from_nuvio_watchlist
+
+                remove_from_nuvio_watchlist(self.user, self.item)
+
             self.item.fetch_releases(delay=True)
 
     @property
@@ -1606,6 +1614,7 @@ class Season(Media):
         if latest_watched <= 0:
             return False
 
+        became_in_progress = False
         if self.status != Status.IN_PROGRESS.value:
             self.status = Status.IN_PROGRESS.value
             bulk_update_with_history(
@@ -1613,6 +1622,7 @@ class Season(Media):
                 Season,
                 fields=["status"],
             )
+            became_in_progress = True
         if self.related_tv.status != Status.IN_PROGRESS.value:
             self.related_tv.status = Status.IN_PROGRESS.value
             bulk_update_with_history(
@@ -1620,6 +1630,11 @@ class Season(Media):
                 TV,
                 fields=["status"],
             )
+            became_in_progress = True
+        if became_in_progress:
+            from integrations.nuvio_library import remove_from_nuvio_watchlist
+
+            remove_from_nuvio_watchlist(self.user, self.item)
         return False
 
     @tracker  # postpone field reset until after the save
@@ -1634,6 +1649,10 @@ class Season(Media):
         if self.tracker.has_changed("status"):
             if self.status != Status.IN_PROGRESS.value:
                 self.clear_resume(persist=True)
+            if self.status == Status.IN_PROGRESS.value:
+                from integrations.nuvio_library import remove_from_nuvio_watchlist
+
+                remove_from_nuvio_watchlist(self.user, self.item)
             if self.status == Status.COMPLETED.value:
                 season_metadata = providers.services.get_media_metadata(
                     MediaTypes.SEASON.value,
@@ -2135,6 +2154,9 @@ class Movie(Media):
         # when FieldTracker does not see a status change.
         if self.status == Status.COMPLETED.value and self.pk:
             self._drop_in_progress_siblings()
+            from integrations.nuvio_library import remove_from_nuvio_watchlist
+
+            remove_from_nuvio_watchlist(self.user, self.item)
 
     def _drop_in_progress_siblings(self):
         """Delete other In Progress rows for the same user+item."""

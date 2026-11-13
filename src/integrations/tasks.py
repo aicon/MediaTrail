@@ -322,6 +322,106 @@ def delete_nuvio_watched_item(user_id, keys, progress_keys=None):
         client.delete_watch_progress(
             [key for key in progress_keys if isinstance(key, str) and key],
         )
+
+
+def _library_sync_lock(user_id, *, timeout):
+    from django.core.cache import cache
+
+    return cache.add(f"nuvio-library-sync:{user_id}", "1", timeout=timeout)
+
+
+def _library_sync_unlock(user_id):
+    from django.core.cache import cache
+
+    cache.delete(f"nuvio-library-sync:{user_id}")
+
+
+@shared_task(name="Sync Nuvio library")
+def sync_nuvio_library():
+    """Apply Nuvio Library deltas for accounts with watchlist sync enabled."""
+    from integrations import nuvio_library
+    from integrations.models import NuvioAccount
+
+    accounts = NuvioAccount.objects.select_related("user", "watchlist_list").filter(
+        user__nuvio_sync_library_enabled=True,
+        watchlist_list__isnull=False,
+    )
+    for account in accounts:
+        user_id = account.user_id
+        if not _library_sync_lock(user_id, timeout=120):
+            continue
+        try:
+            nuvio_library.sync_library_for_user(account.user)
+        except Exception:
+            logger.exception("Nuvio library sync failed for %s", user_id)
+        finally:
+            _library_sync_unlock(user_id)
+
+
+@shared_task(name="Sync Nuvio library for user")
+def sync_nuvio_library_for_user(user_id, bootstrap=False):
+    """One-shot library sync after watchlist settings are saved."""
+    from integrations import nuvio_library
+
+    user = get_user_model().objects.get(id=user_id)
+    if not user.nuvio_sync_library_enabled:
+        return
+    if not _library_sync_lock(user_id, timeout=300):
+        return
+    try:
+        nuvio_library.sync_library_for_user(user, bootstrap=bootstrap)
+    except Exception:
+        logger.exception("Nuvio library sync failed for %s", user_id)
+    finally:
+        _library_sync_unlock(user_id)
+
+
+@shared_task(
+    name="Push Nuvio library item",
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 5},
+)
+def push_nuvio_library_item(user_id, items):
+    """Upsert library item variants to Nuvio."""
+    user = get_user_model().objects.get(id=user_id)
+    if not user.nuvio_sync_library_enabled:
+        return
+    if isinstance(items, dict):
+        items = [items]
+    if not isinstance(items, list):
+        return
+    payload = [
+        item
+        for item in items
+        if isinstance(item, dict) and item.get("content_id")
+    ]
+    if not payload:
+        return
+    nuvio.NuvioClient(user.nuvio_account).push_library_items(payload)
+
+
+@shared_task(
+    name="Delete Nuvio library item",
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 5},
+)
+def delete_nuvio_library_item(user_id, keys):
+    """Delete library keys from Nuvio."""
+    user = get_user_model().objects.get(id=user_id)
+    if isinstance(keys, dict):
+        keys = [keys]
+    if not isinstance(keys, list):
+        return
+    payload = [
+        key for key in keys if isinstance(key, dict) and key.get("content_id")
+    ]
+    if not payload:
+        return
+    nuvio.NuvioClient(user.nuvio_account).delete_library_items(payload)
+
+
 @shared_task(name="Import from Trakt")
 def import_trakt(
     user_id,

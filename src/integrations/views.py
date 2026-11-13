@@ -2,6 +2,7 @@
 
 import json
 import logging
+import re
 import secrets
 import time
 from urllib.parse import urlencode
@@ -755,13 +756,22 @@ def _nuvio_public_logo():
     return ""
 
 
-def _nuvio_manifest_body():
+def _nuvio_manifest_body(user=None):
     """JSON manifest. A logo problem must not turn the addon into an error page."""
+    catalogs = []
+    if user is not None:
+        try:
+            from integrations.nuvio_library import catalog_manifest_entries
+
+            catalogs = catalog_manifest_entries(user)
+        except Exception:  # noqa: BLE001
+            logger.exception("Nuvio catalog list failed")
+            catalogs = []
     try:
-        return json.dumps(nuvio_addon.manifest(_nuvio_public_logo()))
+        return json.dumps(nuvio_addon.manifest(_nuvio_public_logo(), catalogs=catalogs))
     except Exception:  # noqa: BLE001
         logger.exception("Nuvio manifest failed")
-        return json.dumps(nuvio_addon.manifest(None))
+        return json.dumps(nuvio_addon.manifest(None, catalogs=catalogs))
 
 
 def _nuvio_account(token=None):
@@ -801,10 +811,45 @@ def nuvio_manifest(request, token=None):
     """Serve the addon manifest Nuvio installs."""
     if request.method == "OPTIONS":
         return _nuvio_cors(HttpResponse(status=204))
-    if token is not None and _nuvio_account(token) is None:
+    user = _nuvio_account(token)
+    if token is not None and user is None:
         return _nuvio_cors(HttpResponse(status=401))
     return _nuvio_cors(
-        HttpResponse(_nuvio_manifest_body(), content_type="application/json"),
+        HttpResponse(
+            _nuvio_manifest_body(user),
+            content_type="application/json",
+        ),
+    )
+
+
+@login_not_required
+@csrf_exempt
+@require_http_methods(["GET", "OPTIONS"])
+def nuvio_catalog(request, media_type, catalog_id, extra=None, token=None):
+    """Serve one MediaTrail list as a Stremio catalog shelf."""
+    if request.method == "OPTIONS":
+        return _nuvio_cors(HttpResponse(status=204))
+    user = _nuvio_account(token)
+    if user is None:
+        return _nuvio_cors(HttpResponse(status=401))
+    skip = 0
+    if extra:
+        match = re.search(r"skip[=:](\d+)", extra)
+        if match:
+            skip = int(match.group(1))
+    skip_param = request.GET.get("skip")
+    if skip_param and str(skip_param).isdigit():
+        skip = int(skip_param)
+    from integrations.nuvio_library import catalog_metas
+
+    metas = catalog_metas(user, catalog_id, media_type, skip=skip)
+    if metas is None:
+        return _nuvio_cors(HttpResponse(status=404))
+    return _nuvio_cors(
+        HttpResponse(
+            json.dumps({"metas": metas}),
+            content_type="application/json",
+        ),
     )
 
 

@@ -45,17 +45,24 @@ RESUME_MIN_THRESHOLD = 0.02
 DEDUPE_SECONDS = 120
 
 
-def manifest(logo=None):
+def manifest(logo=None, catalogs=None):
     """Return the Stremio addon manifest Nuvio installs."""
+    catalogs = list(catalogs or [])
+    resources = ["player"]
+    if catalogs:
+        resources.append("catalog")
     payload = {
         "id": "community.mediatrail.nuvio",
-        "version": "1.0.2",
+        "version": "1.1.0",
         "name": "MediaTrail",
-        "description": "Sends Nuvio playback to this MediaTrail.",
-        "resources": ["player"],
+        "description": (
+            "Sends Nuvio playback to this MediaTrail and exposes MediaTrail lists "
+            "as catalogs."
+        ),
+        "resources": resources,
         "types": ["movie", "series"],
-        "idPrefixes": ["tt"],
-        "catalogs": [],
+        "idPrefixes": ["tt", "tmdb"],
+        "catalogs": catalogs,
         "behaviorHints": {
             "configurable": True,
             "configurationRequired": False,
@@ -381,6 +388,11 @@ def _complete_movie(user, tmdb_id, when, *, device_id):
     movie._history_user = user
     movie.save()
     clear_live_playback(user=user, item=item, device_id=device_id)
+    # Movie.save already clears the watchlist on Completed; keep an explicit
+    # call for clarity if save skips the status-change path.
+    from integrations.nuvio_library import remove_from_nuvio_watchlist
+
+    remove_from_nuvio_watchlist(user, item)
 
 
 def _stored_progress(user, target, tmdb_id, *, device_id):

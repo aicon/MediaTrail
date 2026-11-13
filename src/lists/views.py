@@ -317,10 +317,24 @@ def list_item_toggle(request):
         custom_list_item.delete()
         logger.info("%s removed from %s.", item, custom_list)
         has_item = False
+        from integrations.nuvio_library import (
+            designated_watchlist,
+            enqueue_library_delete,
+        )
+
+        if designated_watchlist(request.user) == custom_list:
+            enqueue_library_delete(request.user, item)
     else:
         CustomListItem.objects.create(custom_list=custom_list, item=item)
         logger.info("%s added to %s.", item, custom_list)
         has_item = True
+        from integrations.nuvio_library import (
+            designated_watchlist,
+            enqueue_library_upsert,
+        )
+
+        if designated_watchlist(request.user) == custom_list:
+            enqueue_library_upsert(request.user, item)
 
     return render(
         request,

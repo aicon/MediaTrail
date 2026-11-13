@@ -10,6 +10,10 @@ Lejátszás vagy szüneteltetés közben a kezdőlap tetején megjelennek a dina
 
 A MediaTrail kiegészítő hivatkozását a **Beállítások → Integrációk → Nuvio** menüpontból másolhatod ki, amelyet valamennyi [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) és [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) kliensedben hozzá kell adnod a bővítményekhez. Részletes tájékoztató: [Live playback / Now Watching](../now-watching.md). A kétirányú előzményszinkron (megnézett / nem látott) opcionális ugyanott; lásd: [Importálás → Nuvio](imports.md#nuvio).
 
+### Listák és Nuvio Library
+
+A **Listák** menüben saját gyűjtemények vannak (köztük a kijelölhető **Megnézendő** / watchlist a Nuvio Library kétirányú szinkronjához). Részletek: [Importálás → Nuvio Library](imports.md#nuvio-library-megnézendő-szinkron). Ugyanaz az addon a listákat catalog polcként is kínálja.
+
 ### Folyamatban lévő folytatás
 
 Ha egy **filmet** kb. **2–90%** között szüneteltetsz vagy állítasz le, a főoldali **Folyamatban** (**In Progress**) listában megmarad folytatási csíkkal; a kártya törlésével veheted le. Ugyanez az epizódokra is: a **szezon** Folyamatban kártyáján alsó folytatás-pill (`E… • …%`) és folytatási csík jelenik meg. Az epizód befejezése (társalkalmazás `stop` ≥ **90%**), megnézettnek jelölése, vagy a Folyamatban állapot elhagyása törli a folytatást.

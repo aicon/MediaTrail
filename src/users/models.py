@@ -446,6 +446,13 @@ class User(AbstractUser):
         default=False,
         help_text="Sync Nuvio mark-unwatched changes with MediaTrail watch history",
     )
+    nuvio_sync_library_enabled = models.BooleanField(
+        default=False,
+        help_text=(
+            "Two-way sync between the Nuvio Library and a designated "
+            "MediaTrail watchlist"
+        ),
+    )
 
     class Meta:
         """Meta options for the model."""

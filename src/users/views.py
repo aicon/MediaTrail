@@ -299,7 +299,22 @@ def preferences(request):
 @require_GET
 def integrations(request):
     """Render the integrations settings page."""
-    return render(request, "users/integrations.html")
+    from lists.models import CustomList
+
+    custom_lists = CustomList.objects.get_user_lists(request.user).order_by("name")
+    watchlist_list_id = None
+    try:
+        watchlist_list_id = request.user.nuvio_account.watchlist_list_id
+    except Exception:  # noqa: BLE001
+        watchlist_list_id = None
+    return render(
+        request,
+        "users/integrations.html",
+        {
+            "nuvio_custom_lists": custom_lists,
+            "nuvio_watchlist_list_id": watchlist_list_id,
+        },
+    )
 
 
 @require_GET
@@ -411,19 +426,45 @@ def update_jellyfin_webhook_events(request):
 
 @require_POST
 def update_nuvio_sync_events(request):
-    """Update optional Nuvio watch-history sync for the user."""
+    """Update optional Nuvio watch-history and library sync for the user."""
+    from lists.models import CustomList
+
     request.user.nuvio_sync_mark_played_enabled = (
         "nuvio_sync_mark_played_enabled" in request.POST
     )
     request.user.nuvio_sync_mark_unplayed_enabled = (
         "nuvio_sync_mark_unplayed_enabled" in request.POST
     )
+    request.user.nuvio_sync_library_enabled = (
+        "nuvio_sync_library_enabled" in request.POST
+    )
     request.user.save(
         update_fields=[
             "nuvio_sync_mark_played_enabled",
             "nuvio_sync_mark_unplayed_enabled",
+            "nuvio_sync_library_enabled",
         ],
     )
+    watchlist_raw = (request.POST.get("nuvio_watchlist_list_id") or "").strip()
+    try:
+        account = request.user.nuvio_account
+    except Exception:  # noqa: BLE001
+        account = None
+    if account is not None:
+        watchlist = None
+        if watchlist_raw.isdigit():
+            watchlist = (
+                CustomList.objects.filter(
+                    Q(owner=request.user) | Q(collaborators=request.user),
+                    id=int(watchlist_raw),
+                )
+                .distinct()
+                .first()
+            )
+        account.watchlist_list = watchlist
+        if not request.user.nuvio_sync_library_enabled:
+            account.library_bootstrapped = False
+        account.save(update_fields=["watchlist_list", "library_bootstrapped"])
     if (
         request.user.nuvio_sync_mark_played_enabled
         or request.user.nuvio_sync_mark_unplayed_enabled
@@ -432,6 +473,10 @@ def update_nuvio_sync_events(request):
 
         # Pull any pending Nuvio delta right away instead of waiting for beat.
         sync_nuvio_watch_history_for_user.delay(request.user.id)
+    if request.user.nuvio_sync_library_enabled and account and account.watchlist_list_id:
+        from integrations.tasks import sync_nuvio_library_for_user
+
+        sync_nuvio_library_for_user.delay(request.user.id, bootstrap=True)
     messages.success(request, _("Nuvio sync settings updated successfully"))
 
     return redirect("integrations")

@@ -10,6 +10,10 @@ While a title is playing or paused, **Now Watching** strips can sit at the top o
 
 Install the MediaTrail addon address from Settings → Integrations → Nuvio in each [NuvioMobile-MT](https://github.com/aicon/NuvioMobile-MT) or [NuvioTV-MT](https://github.com/aicon/NuvioTV-MT) client. Details: [Live playback / Now Watching](now-watching.md). Two-way watch-history sync (mark watched / unwatched) is optional on the same Integrations page; see [Imports → Nuvio](imports.md#two-way-interactive-sync).
 
+### Lists and Nuvio Library
+
+The **Lists** sidebar holds custom collections (including a designated **watchlist** for optional two-way sync with the Nuvio Library). Details: [Imports → Nuvio Library watchlist sync](imports.md#nuvio-library-watchlist-sync). The tokened MediaTrail addon also publishes those lists as catalog shelves for Nuvio / aiometadata.
+
 ### In Progress resume
 
 When you pause or stop a **movie** between about **2%** and **90%**, MediaTrail keeps it under home **In Progress** with a resume progress bar (delete the card to dismiss). The same mid-watch range for an **episode** updates that **season’s** In Progress card: a bottom poster pill shows `E… • …%`, and the progress bar follows the resume point. Finishing the episode (companion `stop` at ≥ **90%**), marking it watched, or leaving In Progress clears the resume.
