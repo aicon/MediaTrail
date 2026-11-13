@@ -267,6 +267,7 @@ def _maybe_save_movie_resume(
     movie.end_date = None
     movie.resume_position_ms = max(0, int(current_ms))
     movie.resume_duration_ms = max(1, int(duration_ms))
+    movie._history_user = user
     movie.save()
     logger.info(
         "Movie resume saved tmdb=%s position_ms=%s duration_ms=%s user=%s device=%s",
@@ -292,6 +293,7 @@ def _complete_movie(user, tmdb_id, when, *, device_id):
     movie.end_date = when
     movie.resume_position_ms = None
     movie.resume_duration_ms = None
+    movie._history_user = user
     movie.save()
     clear_live_playback(user=user, item=item, device_id=device_id)
 

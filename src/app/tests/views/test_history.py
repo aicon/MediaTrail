@@ -94,13 +94,12 @@ class DeleteHistoryRecordViewTests(TestCase):
 
         self.history = self.movie.history.first()
         self.history_id = self.history.history_id
-
-        # Manually update the history_user field
-        self.history.history_user = self.user
-        self.history.save()
+        # Leave history_user empty (player/Celery writes) — delete must still work
+        # via media ownership (user=), not history_user.
 
     def test_delete_history_record(self):
         """Test deleting a history record."""
+        self.assertIsNone(self.history.history_user_id)
         response = self.client.delete(
             reverse(
                 "delete_history_record",
@@ -116,6 +115,41 @@ class DeleteHistoryRecordViewTests(TestCase):
         self.assertEqual(
             self.movie.history.filter(history_id=self.history_id).count(),
             0,
+        )
+
+    def test_delete_history_record_rejects_other_users_media(self):
+        """Cannot delete another account's history row."""
+        other = get_user_model().objects.create_user(
+            username="other",
+            password="12345",
+        )
+        other_item = Item.objects.create(
+            media_id="550",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.MOVIE.value,
+            title="Other Movie",
+            image="http://example.com/o.jpg",
+        )
+        other_movie = Movie.objects.create(
+            item=other_item,
+            user=other,
+            status=Status.COMPLETED.value,
+            progress=1,
+        )
+        other_history_id = other_movie.history.first().history_id
+
+        response = self.client.delete(
+            reverse(
+                "delete_history_record",
+                kwargs={
+                    "media_type": MediaTypes.MOVIE.value,
+                    "history_id": other_history_id,
+                },
+            ),
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(
+            other_movie.history.filter(history_id=other_history_id).exists(),
         )
 
     def test_delete_nonexistent_history_record(self):

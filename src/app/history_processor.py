@@ -257,6 +257,8 @@ def process_history_entries(history_records, media_type, media_entry_number, use
     last = history_records.first()
 
     for _ in range(history_records.count()):
+        if last is None:
+            break
         entry = process_history_entry((last, last.prev_record), media_type, user)
         if entry["changes"]:
             entry["media_entry_number"] = media_entry_number

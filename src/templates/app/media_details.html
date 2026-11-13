@@ -335,7 +335,7 @@
                     hx-get="{% media_view_url 'history_modal' media %}"
                     hx-vals='{"return_url": "{{ request.get_full_path|urlencode }}"}'
                     hx-target="#{% component_id 'history' media %}"
-                    hx-trigger="click once"
+                    hx-trigger="click"
                     @click="historyOpen = true">
               <span class="flex items-center justify-center w-8 h-8 rounded-md bg-amber-600/15 text-amber-400 shrink-0">
                 {% include "app/icons/history.svg" with classes="w-4 h-4" %}
@@ -635,7 +635,7 @@
                                       hx-get="{% media_view_url 'history_modal' episode %}"
                                       hx-vals='{"return_url": "{{ request.get_full_path|urlencode }}"}'
                                       hx-target="#{% component_id 'history' episode %}"
-                                      hx-trigger="click once"
+                                      hx-trigger="click"
                                       @click="historyOpen = true">
                                 {% include "app/icons/history.svg" with classes="w-4 h-4" %}
                               </button>

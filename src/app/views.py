@@ -955,33 +955,42 @@ def history_modal(
 
 @require_http_methods(["DELETE"])
 def delete_history_record(request, media_type, history_id):
-    """Delete a specific history record."""
+    """Delete a specific history record owned by this account.
+
+    Historical media tables exclude the ``user`` FK, and companion player /
+    Celery writes often leave ``history_user`` empty. Authorize by the live
+    media row (``record.id`` → Movie/Episode/… ``user``), with ``history_user``
+    as a fallback when the live row is already gone.
+    """
+    historical_model = apps.get_model(
+        app_label="app",
+        model_name=f"historical{media_type.lower()}",
+    )
+    media_model = apps.get_model(app_label="app", model_name=media_type)
     try:
-        historical_model = apps.get_model(
-            app_label="app",
-            model_name=f"historical{media_type.lower()}",
-        )
-
-        historical_model.objects.get(
-            history_id=history_id,
-            history_user=request.user,
-        ).delete()
-
-        logger.info(
-            "Deleted history record %s",
-            str(history_id),
-        )
-
-        # Return empty 200 response - the element will be removed by HTMX
-        return HttpResponse()
-
+        record = historical_model.objects.get(history_id=history_id)
     except historical_model.DoesNotExist:
-        logger.exception(
+        logger.warning(
             "History record %s not found for user %s",
-            str(history_id),
-            str(request.user),
+            history_id,
+            request.user,
         )
         return HttpResponse("Record not found", status=404)
+
+    owns_media = media_model.objects.filter(pk=record.id, user=request.user).exists()
+    owns_history = record.history_user_id == request.user.id
+    if not owns_media and not owns_history:
+        logger.warning(
+            "History record %s rejected for user %s",
+            history_id,
+            request.user,
+        )
+        return HttpResponse("Record not found", status=404)
+
+    record.delete()
+    logger.info("Deleted history record %s", history_id)
+    # Empty 200 — HTMX removes the card via hx-swap=outerHTML.
+    return HttpResponse()
 
 
 @require_GET
