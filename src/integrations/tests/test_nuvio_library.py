@@ -216,7 +216,10 @@ class NuvioLibrarySyncTests(TestCase):
         CustomListItem.objects.create(custom_list=self.watchlist, item=self.movie_item)
         self.account.imdb_map = {"tt0137523": "550"}
         self.account.save(update_fields=["imdb_map"])
-        with patch("app.providers.services.get_media_metadata") as mock_meta:
+        with (
+            patch("app.providers.services.get_media_metadata") as mock_meta,
+            patch("integrations.nuvio_library._catalog_display_meta", return_value={}),
+        ):
             metas = nuvio_library.catalog_metas(
                 self.user,
                 f"mt-list-{self.watchlist.id}-movie",
@@ -250,18 +253,77 @@ class NuvioLibrarySyncTests(TestCase):
         CustomListItem.objects.create(custom_list=self.watchlist, item=self.movie_item)
         self.account.imdb_map = {"tt0137523": "550"}
         self.account.save(update_fields=["imdb_map"])
-        response = self.client.get(
-            reverse(
-                "nuvio_catalog",
-                kwargs={
-                    "token": self.user.token,
-                    "media_type": "movie",
-                    "catalog_id": f"mt-list-{self.watchlist.id}-movie",
-                },
-            ),
-        )
+        with patch("integrations.nuvio_library._catalog_display_meta", return_value={}):
+            response = self.client.get(
+                reverse(
+                    "nuvio_catalog",
+                    kwargs={
+                        "token": self.user.token,
+                        "media_type": "movie",
+                        "catalog_id": f"mt-list-{self.watchlist.id}-movie",
+                    },
+                ),
+            )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["metas"][0]["id"], "tt0137523")
+
+    def test_catalog_metas_include_hero_fields(self):
+        CustomListItem.objects.create(custom_list=self.watchlist, item=self.movie_item)
+        self.account.imdb_map = {"tt0137523": "550"}
+        self.account.save(update_fields=["imdb_map"])
+        display = {
+            "name": "Fight Club",
+            "poster": "https://image.tmdb.org/t/p/w500/poster.jpg",
+            "background": "https://image.tmdb.org/t/p/w1280/back.jpg",
+            "logo": "https://image.tmdb.org/t/p/w500/logo.png",
+            "description": "An insomniac office worker.",
+            "releaseInfo": "1999",
+            "released": "1999-10-15",
+            "genres": ["Drama"],
+            "runtime": "139 min",
+        }
+        with patch(
+            "integrations.nuvio_library._catalog_display_meta",
+            return_value=display,
+        ):
+            metas = nuvio_library.catalog_metas(
+                self.user,
+                f"mt-list-{self.watchlist.id}-movie",
+                "movie",
+            )
+        meta = metas[0]
+        self.assertEqual(meta["description"], "An insomniac office worker.")
+        self.assertEqual(meta["releaseInfo"], "1999")
+        self.assertEqual(meta["background"], display["background"])
+        self.assertEqual(meta["logo"], display["logo"])
+        self.assertEqual(meta["genres"], ["Drama"])
+
+    def test_display_from_tmdb_prefers_language_logo_and_year_span(self):
+        display = nuvio_library._display_from_tmdb(
+            {
+                "name": "The Streets of San Francisco",
+                "overview": "A veteran detective.",
+                "first_air_date": "1972-09-16",
+                "last_air_date": "1977-06-09",
+                "backdrop_path": "/back.jpg",
+                "poster_path": "/poster.jpg",
+                "genres": [{"name": "Drama"}, {}],
+                "episode_run_time": [49],
+                "images": {
+                    "logos": [
+                        {"iso_639_1": "en", "file_path": "/en.png", "vote_average": 9},
+                        {"iso_639_1": "hu", "file_path": "/hu.png", "vote_average": 1},
+                    ],
+                },
+            },
+            "hu",
+        )
+        self.assertEqual(display["releaseInfo"], "1972-1977")
+        self.assertEqual(display["released"], "1972-09-16")
+        self.assertEqual(display["logo"], "https://image.tmdb.org/t/p/w500/hu.png")
+        self.assertEqual(display["runtime"], "49 min")
+        self.assertEqual(display["genres"], ["Drama"])
+        self.assertIn("/w1280/back.jpg", display["background"])
 
     def test_outbound_push_uses_single_canonical_imdb_id(self):
         """Never push tt + imdb:tt + tmdb: for the same title."""

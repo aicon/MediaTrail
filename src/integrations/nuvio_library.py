@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import re
 
+from django.conf import settings
 from django.core.cache import cache
 from django.db.models import Q
 from django.utils import timezone
@@ -679,15 +680,118 @@ def catalog_metas(user, catalog_id, catalog_type, *, skip=0, limit=100):
     for item in items:
         imdb_id = resolve_imdb_id_cached(user, item.media_id, media_type)
         meta_id = imdb_id or f"tmdb:{item.media_id}"
-        metas.append(
-            {
-                "id": meta_id,
-                "type": catalog_type,
-                "name": item.title,
-                "poster": item.image or None,
+        display = _catalog_display_meta(item.media_id, media_type)
+        meta = {
+            "id": meta_id,
+            "type": catalog_type,
+            "name": display.get("name") or item.title,
+            "poster": display.get("poster") or item.image or None,
+        }
+        for key in (
+            "background",
+            "logo",
+            "description",
+            "releaseInfo",
+            "released",
+            "genres",
+            "runtime",
+        ):
+            value = display.get(key)
+            if value:
+                meta[key] = value
+        metas.append(meta)
+    return metas
+
+
+def _catalog_display_meta(media_id, media_type):
+    """Poster, backdrop, title logo, year and overview for one list item.
+
+    The Nuvio home hero reads these fields from the catalog meta. A list item
+    only stores a title and a poster, so the rest comes from TMDB and is cached.
+    """
+    cache_key = f"nuvio_catalog_meta:{media_type}:{media_id}"
+    cached = cache.get(cache_key)
+    if isinstance(cached, dict):
+        return cached
+    kind = "movie" if media_type == MediaTypes.MOVIE.value else "tv"
+    try:
+        from app.providers import tmdb
+
+        language = (getattr(settings, "TMDB_LANG", None) or "en")[:2]
+        response = services.api_request(
+            Sources.TMDB.value,
+            "GET",
+            f"{tmdb.base_url}/{kind}/{media_id}",
+            params={
+                **tmdb.base_params,
+                "append_to_response": "images",
+                "include_image_language": f"{language},en,null",
             },
         )
-    return metas
+    except Exception:
+        logger.exception("Catalog display metadata failed for %s %s", kind, media_id)
+        cache.set(cache_key, {}, 3600)
+        return {}
+    display = _display_from_tmdb(response, language)
+    cache.set(cache_key, display, 7 * 24 * 3600)
+    return display
+
+
+def _display_from_tmdb(response, language):
+    if not isinstance(response, dict):
+        return {}
+    date = response.get("release_date") or response.get("first_air_date") or ""
+    year = date[:4] if len(date) >= 4 and date[:4].isdigit() else ""
+    last = response.get("last_air_date") or ""
+    last_year = last[:4] if len(last) >= 4 and last[:4].isdigit() else ""
+    release_info = year
+    if year and last_year and last_year != year:
+        release_info = f"{year}-{last_year}"
+    genres = [
+        name
+        for genre in (response.get("genres") or [])
+        if (name := (genre or {}).get("name"))
+    ]
+    runtime_minutes = response.get("runtime")
+    if not runtime_minutes:
+        runtimes = response.get("episode_run_time") or []
+        runtime_minutes = runtimes[0] if runtimes else None
+    backdrop = response.get("backdrop_path")
+    poster = response.get("poster_path")
+    return {
+        "name": response.get("title") or response.get("name") or "",
+        "poster": f"https://image.tmdb.org/t/p/w500{poster}" if poster else "",
+        "background": f"https://image.tmdb.org/t/p/w1280{backdrop}" if backdrop else "",
+        "logo": _pick_logo((response.get("images") or {}).get("logos"), language),
+        "description": (response.get("overview") or "").strip(),
+        "releaseInfo": release_info,
+        "released": date if date else "",
+        "genres": genres,
+        "runtime": f"{int(runtime_minutes)} min" if runtime_minutes else "",
+    }
+
+
+def _pick_logo(logos, language):
+    if not logos:
+        return ""
+
+    def rank(logo):
+        lang = logo.get("iso_639_1") or ""
+        if lang == language:
+            group = 0
+        elif lang == "en":
+            group = 1
+        elif lang == "":
+            group = 2
+        else:
+            group = 3
+        return (group, -(logo.get("vote_average") or 0))
+
+    best = min(logos, key=rank)
+    path = best.get("file_path")
+    if not path:
+        return ""
+    return f"https://image.tmdb.org/t/p/w500{path}"
 
 
 def _library_payloads_for_item(user, item):
