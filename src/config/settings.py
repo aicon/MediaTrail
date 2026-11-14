@@ -375,8 +375,8 @@ AUTH_USER_MODEL = "users.User"
 FILE_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50 MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50 MB
 
-# MediaTrail versioning: 0.26.9 ships watched.json, In Progress resume, Library watchlist sync.
-VERSION = config("VERSION", default="0.26.9")
+# MediaTrail versioning: 0.26.10 is a Nuvio list catalog and home-count patch.
+VERSION = config("VERSION", default="0.26.10")
 
 
 def _public_http_url(name):
