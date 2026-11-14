@@ -16,12 +16,13 @@
           <h2 class="text-2xl font-semibold text-white">{{ section.key|media_status_readable|title }}</h2>
         </div>
       </div>
-      <div class="flex flex-wrap items-center justify-end gap-3">
+      <div class="flex shrink-0 items-center justify-end gap-2">
         {% if show_home_controls %}
           <a href="{% url 'home' %}?sort={{ current_sort }}{% if hide_unreleased %}&hide_unreleased=false{% else %}&hide_unreleased=true{% endif %}"
-             class="inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors {% if hide_unreleased %}border-indigo-500 bg-indigo-600 text-white hover:bg-indigo-700{% else %}border-gray-700 bg-[#39404b] text-gray-300 hover:bg-[#454d5a] hover:text-white{% endif %}">
+             aria-label="{% translate "Hide unreleased" %}"
+             class="group relative inline-flex shrink-0 items-center justify-center rounded-md border p-2 text-sm font-medium transition-colors {% if hide_unreleased %}border-indigo-500 bg-indigo-600 text-white hover:bg-indigo-700{% else %}border-gray-700 bg-[#39404b] text-gray-300 hover:bg-[#454d5a] hover:text-white{% endif %}">
             {% include "app/icons/eye-closed.svg" with classes="w-4 h-4" %}
-            <span>{% translate "Hide unreleased" %}</span>
+            <span class="pointer-events-none invisible absolute top-full right-0 z-20 mt-2 whitespace-nowrap rounded-md border border-gray-700 bg-[#39404b] px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg group-hover:visible group-hover:opacity-100">{% translate "Hide unreleased" %}</span>
           </a>
           <div class="relative" x-data="{ open: false }">
             <button @click="open = !open"
