@@ -281,6 +281,7 @@ class NuvioLibrarySyncTests(TestCase):
             "released": "1999-10-15",
             "genres": ["Drama"],
             "runtime": "139 min",
+            "trailerYtId": "abc123",
         }
         with patch(
             "integrations.nuvio_library._catalog_display_meta",
@@ -297,6 +298,8 @@ class NuvioLibrarySyncTests(TestCase):
         self.assertEqual(meta["background"], display["background"])
         self.assertEqual(meta["logo"], display["logo"])
         self.assertEqual(meta["genres"], ["Drama"])
+        self.assertEqual(meta["trailers"], [{"source": "abc123", "type": "Trailer"}])
+        self.assertEqual(meta["trailerStreams"], [{"ytId": "abc123"}])
 
     def test_display_from_tmdb_prefers_language_logo_and_year_span(self):
         display = nuvio_library._display_from_tmdb(
@@ -315,10 +318,38 @@ class NuvioLibrarySyncTests(TestCase):
                         {"iso_639_1": "hu", "file_path": "/hu.png", "vote_average": 1},
                     ],
                 },
+                "videos": {
+                    "results": [
+                        {
+                            "site": "YouTube",
+                            "type": "Teaser",
+                            "key": "teaser",
+                            "iso_639_1": "hu",
+                            "official": True,
+                        },
+                        {
+                            "site": "YouTube",
+                            "type": "Trailer",
+                            "key": "en-trailer",
+                            "iso_639_1": "en",
+                            "official": True,
+                            "size": 1080,
+                        },
+                        {
+                            "site": "YouTube",
+                            "type": "Trailer",
+                            "key": "hu-trailer",
+                            "iso_639_1": "hu",
+                            "official": True,
+                            "size": 720,
+                        },
+                    ],
+                },
             },
             "hu",
         )
         self.assertEqual(display["releaseInfo"], "1972-1977")
+        self.assertEqual(display["trailerYtId"], "hu-trailer")
         self.assertEqual(display["released"], "1972-09-16")
         self.assertEqual(display["logo"], "https://image.tmdb.org/t/p/w500/hu.png")
         self.assertEqual(display["runtime"], "49 min")

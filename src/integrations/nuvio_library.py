@@ -699,6 +699,10 @@ def catalog_metas(user, catalog_id, catalog_type, *, skip=0, limit=100):
             value = display.get(key)
             if value:
                 meta[key] = value
+        trailer_id = display.get("trailerYtId")
+        if trailer_id:
+            meta["trailers"] = [{"source": trailer_id, "type": "Trailer"}]
+            meta["trailerStreams"] = [{"ytId": trailer_id}]
         metas.append(meta)
     return metas
 
@@ -709,7 +713,7 @@ def _catalog_display_meta(media_id, media_type):
     The Nuvio home hero reads these fields from the catalog meta. A list item
     only stores a title and a poster, so the rest comes from TMDB and is cached.
     """
-    cache_key = f"nuvio_catalog_meta:{media_type}:{media_id}"
+    cache_key = f"nuvio_catalog_meta:v2:{media_type}:{media_id}"
     cached = cache.get(cache_key)
     if isinstance(cached, dict):
         return cached
@@ -724,7 +728,7 @@ def _catalog_display_meta(media_id, media_type):
             f"{tmdb.base_url}/{kind}/{media_id}",
             params={
                 **tmdb.base_params,
-                "append_to_response": "images",
+                "append_to_response": "images,videos",
                 "include_image_language": f"{language},en,null",
             },
         )
@@ -768,6 +772,7 @@ def _display_from_tmdb(response, language):
         "released": date if date else "",
         "genres": genres,
         "runtime": f"{int(runtime_minutes)} min" if runtime_minutes else "",
+        "trailerYtId": _pick_trailer_key(response.get("videos"), language),
     }
 
 
@@ -792,6 +797,48 @@ def _pick_logo(logos, language):
     if not path:
         return ""
     return f"https://image.tmdb.org/t/p/w500{path}"
+
+
+def _pick_trailer_key(videos, language):
+    """YouTube trailer the TV can start after the focus delay.
+
+    Home playback uses catalog trailers when TMDB enrichment trailers are off.
+    Prefer an official trailer in the account language, then English, then a teaser.
+    """
+    results = (videos or {}).get("results") if isinstance(videos, dict) else None
+    ranked = []
+    for video in results or []:
+        if (video.get("site") or "").lower() != "youtube":
+            continue
+        key = (video.get("key") or "").strip()
+        if not key:
+            continue
+        kind = (video.get("type") or "").strip().lower()
+        if kind not in {"trailer", "teaser"}:
+            continue
+        lang = (video.get("iso_639_1") or "").lower()
+        if lang == language:
+            lang_rank = 0
+        elif lang == "en":
+            lang_rank = 1
+        else:
+            lang_rank = 2
+        published = video.get("published_at") or ""
+        ranked.append(
+            (
+                0 if kind == "trailer" else 1,
+                lang_rank,
+                0 if video.get("official") else 1,
+                -(video.get("size") or 0),
+                0 if published else 1,
+                tuple(-ord(char) for char in published),
+                key,
+            ),
+        )
+    if not ranked:
+        return ""
+    ranked.sort()
+    return ranked[0][6]
 
 
 def _library_payloads_for_item(user, item):
