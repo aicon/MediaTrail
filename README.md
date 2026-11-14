@@ -146,6 +146,12 @@ Open your browser at `http://localhost:8000`.
 
 ---
 
+## Install on Android
+
+MediaTrail can be installed as a PWA; no separate Android app is required. Open your MediaTrail server over HTTPS in Chrome on Android, then select **Install app** or **Add to Home screen** from the browser menu. The installed icon opens your MediaTrail server, and updates are delivered when your server is updated.
+
+---
+
 ## MediaTrail vs. Yamtrack
 
 MediaTrail is an independent, unofficial fork and is **not affiliated with, maintained by, or endorsed by upstream Yamtrack**.

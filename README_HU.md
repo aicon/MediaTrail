@@ -146,6 +146,12 @@ Ezt követően nyisd meg a böngésződben a `http://localhost:8000` címet.
 
 ---
 
+## Androidon telepíthető
+
+A MediaTrail külön Android-alkalmazás nélkül is telepíthető PWA-ként. Nyisd meg a saját, HTTPS-es MediaTrail-szerveredet Androidon a Chrome böngészőben, majd válaszd a böngésző menüjében az **Alkalmazás telepítése** vagy **Hozzáadás a kezdőképernyőhöz** lehetőséget. A telepített ikon a saját MediaTrail-szerveredet nyitja meg; az alkalmazás frissül, amikor a szervered frissül.
+
+---
+
 ## A MediaTrail és a Yamtrack viszonya
 
 A MediaTrail egy független, nem hivatalos leágazás; **nem áll kapcsolatban az eredeti Yamtrack fejlesztőivel, és nem annak hivatalos támogatásával működik**.
