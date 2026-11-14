@@ -215,6 +215,71 @@ class HomeViewTests(TestCase):
         self.assertEqual(len(planning_movies["items"]), 1)
         self.assertEqual(planning_movies["items"][0].status, Status.PLANNING.value)
 
+    def test_home_counts_one_in_progress_season_per_show(self):
+        """Earlier seasons of the same show do not inflate the home count."""
+        later_item = Item.objects.create(
+            media_id="1668",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.SEASON.value,
+            title="Test TV Show",
+            image="http://example.com/image.jpg",
+            season_number=2,
+        )
+        later = Season.objects.create(
+            item=later_item,
+            user=self.user,
+            status=Status.IN_PROGRESS.value,
+        )
+        episode_item = Item.objects.create(
+            media_id="1668",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.EPISODE.value,
+            title="Test TV Show",
+            image="http://example.com/image.jpg",
+            season_number=2,
+            episode_number=1,
+        )
+        Episode.objects.create(
+            item=episode_item,
+            related_season=later,
+            end_date=timezone.now(),
+        )
+
+        response = self.client.get(reverse("home") + "?sort=recent")
+        in_progress = next(
+            section
+            for section in response.context["home_sections"]
+            if section["key"] == Status.IN_PROGRESS.value
+        )
+        seasons = in_progress["media_types"][MediaTypes.SEASON.value]
+        self.assertEqual(seasons["total"], 1)
+        self.assertEqual(in_progress["count"], 2)
+        self.assertEqual(seasons["items"][0].item.season_number, 2)
+
+    def test_home_skips_caught_up_in_progress_media(self):
+        """A row with no released episodes left is not an in-progress item."""
+        item = Item.objects.create(
+            media_id="caught-up",
+            source=Sources.TMDB.value,
+            media_type=MediaTypes.MOVIE.value,
+            title="Finished Movie",
+            image="http://example.com/image.jpg",
+        )
+        Movie.objects.create(
+            item=item,
+            user=self.user,
+            status=Status.IN_PROGRESS.value,
+            progress=1,
+        )
+
+        response = self.client.get(reverse("home"))
+        in_progress = next(
+            section
+            for section in response.context["home_sections"]
+            if section["key"] == Status.IN_PROGRESS.value
+        )
+        self.assertNotIn(MediaTypes.MOVIE.value, in_progress["media_types"])
+
     def test_home_view_with_sort(self):
         """Test the home view with sorting parameter."""
         response = self.client.get(reverse("home") + "?sort=completion")
