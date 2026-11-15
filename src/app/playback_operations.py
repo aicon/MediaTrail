@@ -543,6 +543,32 @@ def _apply_display_metadata(playback, item, *, force):
             item.save(update_fields=["image"])
 
 
+def localized_media_title(item):
+    """Return the title in TMDB_LANG, the same source the media page uses."""
+    title = ""
+    try:
+        if item.media_type == MediaTypes.EPISODE.value:
+            metadata = services.get_media_metadata(
+                "tv_with_seasons",
+                item.media_id,
+                item.source,
+                [item.season_number],
+            )
+            title = (metadata or {}).get("title") or ""
+        elif item.media_type == MediaTypes.MOVIE.value:
+            metadata = services.get_media_metadata(
+                MediaTypes.MOVIE.value,
+                item.media_id,
+                item.source,
+            )
+            title = (metadata or {}).get("title") or ""
+    except Exception:  # noqa: BLE001
+        logger.exception("Localized title lookup failed for %s", item.media_id)
+        title = ""
+    cleaned = title.strip()
+    return cleaned or item.title
+
+
 def _fetch_display_metadata(item):
     """Load year, poster, and real episode title from provider metadata."""
     if item.media_type == MediaTypes.MOVIE.value:

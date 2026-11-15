@@ -901,6 +901,45 @@ msgstr "Kérés tartalomtípusa: multipart/form-data"
 msgid "Events: Playback (Start, Pause, Unpause, Stop), plus Mark played and Mark unplayed"
 msgstr "Események: Lejátszás (Indítás, Szünet, Folytatás, Állj), valamint Megnézettnek jelöl és Nem látottnak jelöl"
 
+msgid "Connected Emby account:"
+msgstr "Csatlakoztatott Emby-fiók:"
+
+msgid "The webhook reports play and stop. While something is playing, MediaTrail asks Emby for the current position. An idle server is not polled."
+msgstr "A webhook jelzi a lejátszás indítását és leállítását. Amíg megy a lejátszás, a MediaTrail lekéri az Embytől az aktuális pozíciót. Üresjáratban a szervert nem kérdezi."
+
+msgid "Emby server address"
+msgstr "Emby-szerver címe"
+
+msgid "Emby user name"
+msgstr "Emby-felhasználónév"
+
+msgid "Emby API key"
+msgstr "Emby API-kulcs"
+
+msgid "Saved — leave blank to keep it"
+msgstr "Mentve — hagyd üresen, ha megtartod"
+
+msgid "Disconnect"
+msgstr "Leválasztás"
+
+msgid "Emby Now Watching disconnected"
+msgstr "Az Emby „Most nézi” kapcsolat bontva."
+
+msgid "Enter the Emby server address, user name, and API key."
+msgstr "Add meg az Emby-szerver címét, a felhasználónevet és az API-kulcsot."
+
+msgid "MediaTrail could not reach that Emby server."
+msgstr "A MediaTrail nem éri el ezt az Emby-szervert."
+
+msgid "That Emby user name did not match exactly one account."
+msgstr "Ez az Emby-felhasználónév nem pontosan egy fiókra illeszkedik."
+
+msgid "Emby Now Watching saved"
+msgstr "Az Emby „Most nézi” beállításai mentve."
+
+msgid "Device name"
+msgstr "Eszköz neve"
+
 msgid "Limit user events to: Your Emby User"
 msgstr "Felhasználói események korlátozása: a saját Emby-felhasználód"
 

@@ -75,6 +75,15 @@
           </button>
           <button type="button"
                   class="flex items-center px-4 py-2 rounded-md transition-colors text-sm cursor-pointer"
+                  :class="activeIntegration === 'emby' ? 'bg-indigo-600 text-white' : 'bg-[#39404b] text-gray-300 hover:bg-[#454d59]'"
+                  @click="activeIntegration = 'emby'"
+                  role="tab"
+                  :aria-selected="activeIntegration === 'emby'">
+            {% include "app/icons/server.svg" with classes="w-4 h-4 mr-2" %}
+            Emby
+          </button>
+          <button type="button"
+                  class="flex items-center px-4 py-2 rounded-md transition-colors text-sm cursor-pointer"
                   :class="activeIntegration === 'jellyfin' ? 'bg-indigo-600 text-white' : 'bg-[#39404b] text-gray-300 hover:bg-[#454d59]'"
                   @click="activeIntegration = 'jellyfin'"
                   role="tab"
@@ -90,15 +99,6 @@
                   :aria-selected="activeIntegration === 'plex'">
             {% include "app/icons/server.svg" with classes="w-4 h-4 mr-2" %}
             Plex
-          </button>
-          <button type="button"
-                  class="flex items-center px-4 py-2 rounded-md transition-colors text-sm cursor-pointer"
-                  :class="activeIntegration === 'emby' ? 'bg-indigo-600 text-white' : 'bg-[#39404b] text-gray-300 hover:bg-[#454d59]'"
-                  @click="activeIntegration = 'emby'"
-                  role="tab"
-                  :aria-selected="activeIntegration === 'emby'">
-            {% include "app/icons/server.svg" with classes="w-4 h-4 mr-2" %}
-            Emby
           </button>
         </div>
         <div x-cloak x-show="activeIntegration === 'nuvio'" role="tabpanel">
@@ -519,8 +519,8 @@
                            autocomplete="new-password"
                            placeholder="{% if request.user.emby_api_key %}{% translate 'Saved — leave blank to keep it' %}{% endif %}">
                   </label>
-                  {% if request.user.emby_user_id %}
-                    <p class="text-xs text-gray-400">{% translate "Connected Emby user id:" %} {{ request.user.emby_user_id }}</p>
+                  {% if request.user.emby_user_name %}
+                    <p class="text-xs text-gray-400">{% translate "Connected Emby account:" %} {{ request.user.emby_user_name }}</p>
                   {% endif %}
                   <div class="flex gap-2 pt-1">
                     <button type="submit"

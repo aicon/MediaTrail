@@ -6,6 +6,7 @@ from app.models import BasicMedia, LivePlaybackStatus, MediaTypes, Status
 from app.playback_operations import (
     is_placeholder_episode_title,
     list_live_playbacks,
+    localized_media_title,
     refresh_playback_display,
 )
 from app.templatetags.app_tags import slug
@@ -75,7 +76,7 @@ def _playback_context(playback):
     return {
         "playback": playback,
         "item": item,
-        "title": item.title,
+        "title": localized_media_title(item),
         "year": year,
         "episode_title": episode_title,
         "image": backdrop,

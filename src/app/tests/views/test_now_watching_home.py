@@ -113,6 +113,29 @@ class NowWatchingHomeTests(TestCase):
         self.assertContains(response, 'hx-trigger="every 10s"')
         self.assertContains(response, "nw-episode-title")
 
+    def test_strip_title_uses_tmdb_language(self):
+        """The strip title follows TMDB_LANG metadata, not a stored English name."""
+        self.episode.title = "Murder, She Wrote"
+        self.episode.save(update_fields=["title"])
+        with patch(
+            "app.playback_operations.services.get_media_metadata",
+            return_value={"title": "Gyilkos sorok"},
+        ):
+            upsert_live_playback(
+                user=self.user,
+                media_type=MediaTypes.TV.value,
+                source=Sources.TMDB.value,
+                media_id="1396",
+                season_number=2,
+                episode_number=21,
+                position_ms=600_000,
+                duration_ms=2_400_000,
+                status=LivePlaybackStatus.WATCHING,
+            )
+            response = self.client.get(reverse("home"))
+        self.assertContains(response, "Gyilkos sorok")
+        self.assertNotContains(response, "Murder, She Wrote")
+
     def test_placeholder_episode_title_hidden(self):
         """Generic 'N. epizód' labels are not rendered beside SxxExx."""
         upsert_live_playback(
