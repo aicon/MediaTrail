@@ -1,0 +1,2332 @@
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: MediaTrail\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Home"
+msgstr "Inicio"
+
+msgid "Create Custom"
+msgstr "Crear personalizado"
+
+msgid "Create Custom Entry"
+msgstr "Crear entrada personalizada"
+
+msgid "Add a custom media entry to your collection if it's not available in the database."
+msgstr "Añade una entrada de medios personalizada a tu colección si no está disponible en la base de datos."
+
+msgid "Statistics"
+msgstr "Estadísticas"
+
+msgid "Journal"
+msgstr "Diario"
+
+msgid "A feed of everything you've done in MediaTrail"
+msgstr "Un feed de todo lo que has hecho en MediaTrail"
+
+msgid "Tracked Activities"
+msgstr "Actividades registradas"
+
+msgid "Delete activity"
+msgstr "Eliminar actividad"
+
+msgid "Delete activity?"
+msgstr "¿Eliminar actividad?"
+
+msgid "This removes the selected activity for %(title)s from your history. This can't be undone."
+msgstr "Esto elimina la actividad seleccionada de %(title)s de tu historial. Esta acción no se puede deshacer."
+
+msgid "No tracking activity in this date range."
+msgstr "No hay actividad registrada en este rango de fechas."
+
+msgid "Watched episode %(number)s"
+msgstr "Episodio %(number)s visto"
+
+msgid "Updated episode %(number)s"
+msgstr "Episodio %(number)s actualizado"
+
+msgid "Track your media consumption habits"
+msgstr "Sigue tus hábitos de consumo de medios"
+
+msgid "Lists"
+msgstr "Listas"
+
+msgid "Organize and share your media lists"
+msgstr "Organiza y comparte tus listas de medios"
+
+msgid "New List"
+msgstr "Nueva lista"
+
+msgid "Calendar"
+msgstr "Calendario"
+
+msgid "Track upcoming releases from your list."
+msgstr "Sigue los próximos lanzamientos de tu lista."
+
+msgid "Buy me a coffee"
+msgstr "Cómprame un café"
+
+msgid "Supports the MediaTrail maintainer."
+msgstr "Apoya al desarrollador de MediaTrail."
+
+msgid "Settings"
+msgstr "Ajustes"
+
+msgid "Admin"
+msgstr "Admin"
+
+msgid "Logout"
+msgstr "Cerrar sesión"
+
+msgid "Search"
+msgstr "Buscar"
+
+msgid "is an independent, unofficial fork of"
+msgstr "es una bifurcación independiente y no oficial de"
+
+msgid "It is not affiliated with, endorsed by, or maintained by the Yamtrack project."
+msgstr "No está afiliado, respaldado ni mantenido por el proyecto Yamtrack."
+
+msgid "Source code of this version"
+msgstr "Código fuente de esta versión"
+
+msgid "Configure your account and preferences"
+msgstr "Configura tu cuenta y preferencias"
+
+msgid "Account"
+msgstr "Cuenta"
+
+msgid "Preferences"
+msgstr "Preferencias"
+
+msgid "Notifications"
+msgstr "Notificaciones"
+
+msgid "Integrations"
+msgstr "Integraciones"
+
+msgid "Import Data"
+msgstr "Importar datos"
+
+msgid "Export Data"
+msgstr "Exportar datos"
+
+msgid "Advanced"
+msgstr "Avanzado"
+
+msgid "About"
+msgstr "Acerca de"
+
+msgid "Customize the look and behavior of the application."
+msgstr "Personaliza el aspecto y el comportamiento de la aplicación."
+
+msgid "Language"
+msgstr "Idioma"
+
+msgid "Choose the language of the interface. English is used when a translation is missing."
+msgstr "Elige el idioma de la interfaz. Se utilizará inglés si falta una traducción."
+
+msgid "Hide Hover Overlay on Touch Devices"
+msgstr "Ocultar superposición al pasar el cursor en dispositivos táctiles"
+
+msgid "Hide the media card hover overlay with action buttons on touch devices for a cleaner mobile experience. On desktop, the overlay will still appear when you hover your mouse over media cards."
+msgstr "Oculta la superposición de tarjetas de medios con botones de acción en dispositivos táctiles para una experiencia móvil más limpia. En el escritorio, la superposición seguirá apareciendo al pasar el cursor sobre las tarjetas de medios."
+
+msgid "Obfuscate Unseen Episodes"
+msgstr "Ocultar episodios no vistos"
+
+msgid "When enabled, unseen episode images and descriptions will be blurred."
+msgstr "Cuando está activado, las imágenes y descripciones de los episodios no vistos se difuminarán."
+
+msgid "Bulk Completion Date"
+msgstr "Fecha de finalización en lote"
+
+msgid "When marking a TV show or season as completed, its episodes will be marked as completed with this date."
+msgstr "Al marcar una serie o temporada como completada, sus episodios se marcarán como completados con esta fecha."
+
+msgid "Show progress bar on media items"
+msgstr "Mostrar barra de progreso en elementos de medios"
+
+msgid "Display a progress bar on media items. Items which don't have max progress will be using a dotted line."
+msgstr "Muestra una barra de progreso en los elementos de medios. Los elementos que no tienen un progreso máximo usarán una línea punteada."
+
+msgid "Hide completed media in recommendations"
+msgstr "Ocultar medios completados en recomendaciones"
+
+msgid "Hide media you've already completed from the recommendations section on detail pages."
+msgstr "Oculta los medios que ya has completado de la sección de recomendaciones en las páginas de detalles."
+
+msgid "Hide zero ratings"
+msgstr "Ocultar valoraciones con cero"
+
+msgid "Hide the rating badge from media cards when the rating is zero."
+msgstr "Oculta la insignia de calificación de las tarjetas de medios cuando la calificación es cero."
+
+msgid "Date Format"
+msgstr "Formato de fecha"
+
+msgid "Choose how dates are displayed throughout the application."
+msgstr "Elige cómo se muestran las fechas en toda la aplicación."
+
+msgid "Time Format"
+msgstr "Formato de hora"
+
+msgid "Choose between 12-hour or 24-hour clock display."
+msgstr "Elige entre visualización de reloj de 12 o 24 horas."
+
+msgid "Week Start Day"
+msgstr "Primer día de la semana"
+
+msgid "Choose which day the week starts on for calendars and statistics."
+msgstr "Elige en qué día comienza la semana para calendarios y estadísticas."
+
+msgid "Watch provider region"
+msgstr "Región de proveedores de streaming"
+
+msgid "Choose the region to show watch providers for. Setting this to disabled will hide the box from the media page."
+msgstr "Elige la región para mostrar los proveedores de streaming. Desactivarlo ocultará el cuadro de la página de medios."
+
+msgid "Media Types"
+msgstr "Tipos de medios"
+
+msgid "Media Type"
+msgstr "Tipo de medio"
+
+msgid "Control which media types are visible throughout the app (sidebar, search, calendar, notifications)."
+msgstr "Controla qué tipos de medios son visibles en toda la aplicación (barra lateral, búsqueda, calendario, notificaciones)."
+
+msgid "Save Preferences"
+msgstr "Guardar preferencias"
+
+msgid "Settings updated."
+msgstr "Ajustes actualizados."
+
+msgid "Hide unreleased"
+msgstr "Ocultar no publicados"
+
+msgid "Upcoming"
+msgstr "Próximos"
+
+msgid "Recent"
+msgstr "Reciente"
+
+msgid "Completion"
+msgstr "Finalización"
+
+msgid "Episodes Left"
+msgstr "Episodios restantes"
+
+msgid "Title"
+msgstr "Título"
+
+msgid "Rating"
+msgstr "Calificación"
+
+msgid "Progress"
+msgstr "Progreso"
+
+msgid "Start Date"
+msgstr "Fecha de inicio"
+
+msgid "End Date"
+msgstr "Fecha de fin"
+
+msgid "All"
+msgstr "Todos"
+
+msgid "Completed"
+msgstr "Completado"
+
+msgid "In Progress"
+msgstr "En progreso"
+
+msgid "Planning"
+msgstr "Planificando"
+
+msgid "Paused"
+msgstr "En pausa"
+
+msgid "Dropped"
+msgstr "Abandonado"
+
+msgid "Grid"
+msgstr "Cuadrícula"
+
+msgid "Table"
+msgstr "Tabla"
+
+msgid "List"
+msgstr "Lista"
+
+msgid "Last Item Added"
+msgstr "Último elemento añadido"
+
+msgid "Name"
+msgstr "Nombre"
+
+msgid "Items Count"
+msgstr "Cantidad de elementos"
+
+msgid "Newest First"
+msgstr "Más recientes primero"
+
+msgid "Date Added"
+msgstr "Fecha de adición"
+
+msgid "Current Date"
+msgstr "Fecha actual"
+
+msgid "Release Date"
+msgstr "Fecha de lanzamiento"
+
+msgid "No Date"
+msgstr "Sin fecha"
+
+msgid "14:30 (24-hour)"
+msgstr "14:30 (24 horas)"
+
+msgid "2:30 PM (12-hour)"
+msgstr "2:30 PM (12 horas)"
+
+msgid "Monday"
+msgstr "Lunes"
+
+msgid "Sunday"
+msgstr "Domingo"
+
+msgid "TV Show"
+msgstr "Serie"
+
+msgid "TV Shows"
+msgstr "Series"
+
+msgid "TV Season"
+msgstr "Temporada"
+
+msgid "TV Seasons"
+msgstr "Temporadas"
+
+msgid "Episode"
+msgstr "Episodio"
+
+msgid "Episodes"
+msgstr "Episodios"
+
+msgid "Movie"
+msgstr "Película"
+
+msgid "Movies"
+msgstr "Películas"
+
+msgid "Anime"
+msgstr "Anime"
+
+msgid "Manga"
+msgstr "Manga"
+
+msgid "Game"
+msgstr "Juego"
+
+msgid "Games"
+msgstr "Juegos"
+
+msgid "Book"
+msgstr "Libro"
+
+msgid "Books"
+msgstr "Libros"
+
+msgid "Comic"
+msgstr "Cómic"
+
+msgid "Comics"
+msgstr "Cómics"
+
+msgid "Boardgame"
+msgstr "Juego de mesa"
+
+msgid "Boardgames"
+msgstr "Juegos de mesa"
+
+msgid "Now Watching"
+msgstr "Viendo ahora"
+
+msgid "Watched"
+msgstr "Visto"
+
+msgid "Left"
+msgstr "Restante"
+
+msgid "Dismiss Now Watching"
+msgstr "Descartar Viendo ahora"
+
+msgid "Started %(seconds)ss ago"
+msgstr "Iniciado hace %(seconds)s s"
+
+msgid "Started %(minutes)sm %(seconds)ss ago"
+msgstr "Iniciado hace %(minutes)s m %(seconds)s s"
+
+msgid "Started %(hours)sh %(minutes)sm ago"
+msgstr "Iniciado hace %(hours)s h %(minutes)s m"
+
+msgid "Nothing is actively moving right now"
+msgstr "Nada se está moviendo activamente en este momento"
+
+msgid "Your planning shelf is still empty"
+msgstr "Tu estante de planificación todavía está vacío"
+
+msgid "Start a title and mark it as in progress to see quick updates and release reminders here."
+msgstr "Inicia un título y márcalo como en progreso para ver actualizaciones rápidas y recordatorios de lanzamientos aquí."
+
+msgid "Add a few titles to planning to see them here."
+msgstr "Añade algunos títulos a la planificación para verlos aquí."
+
+msgid "Browse media"
+msgstr "Explorar medios"
+
+msgid "Load all (%(total)s)"
+msgstr "Cargar todos (%(total)s)"
+
+msgid "%(counter)s item"
+msgid_plural "%(counter)s items"
+msgstr[0] "%(counter)s elemento"
+msgstr[1] "%(counter)s elementos"
+
+msgid "Add to tracker"
+msgstr "Añadir al rastreador"
+
+msgid "Add to custom lists"
+msgstr "Añadir a listas personalizadas"
+
+msgid "View your activity history"
+msgstr "Ver tu historial de actividad"
+
+msgid "About MediaTrail"
+msgstr "Acerca de MediaTrail"
+
+msgid "Description"
+msgstr "Descripción"
+
+msgid "MediaTrail is an independent, unofficial fork of Yamtrack, a self-hosted media tracker. It is not affiliated with, endorsed by, or maintained by the Yamtrack project or its developers."
+msgstr "MediaTrail es una bifurcación independiente y no oficial de Yamtrack, un rastreador de medios autohospedado. No está afiliado, respaldado ni mantenido por el proyecto Yamtrack o sus desarrolladores."
+
+msgid "Links"
+msgstr "Enlaces"
+
+msgid "Source code"
+msgstr "Código fuente"
+
+msgid "User manual"
+msgstr "Manual de usuario"
+
+msgid "External links"
+msgstr "Enlaces externos"
+
+msgid "MediaTrail documentation"
+msgstr "Documentación de MediaTrail"
+
+msgid "Bug Reports"
+msgstr "Informes de errores"
+
+msgid "License"
+msgstr "Licencia"
+
+msgid "MediaTrail is licensed under the"
+msgstr "MediaTrail está licenciado bajo la"
+
+msgid "Attribution"
+msgstr "Atribución"
+
+msgid "Original Yamtrack project"
+msgstr "Proyecto Yamtrack original"
+
+msgid "Movie and TV streaming providers from"
+msgstr "Proveedores de streaming de películas y series de"
+
+msgid "Version:"
+msgstr "Versión:"
+
+msgctxt "present"
+msgid "watch"
+msgstr "ver"
+
+msgctxt "past"
+msgid "watched"
+msgstr "visto"
+
+msgctxt "present"
+msgid "read"
+msgstr "leer"
+
+msgctxt "past"
+msgid "read"
+msgstr "leído"
+
+msgctxt "present"
+msgid "play"
+msgstr "jugar"
+
+msgctxt "past"
+msgid "played"
+msgstr "jugado"
+
+msgid "Profile Information"
+msgstr "Información del perfil"
+
+msgid "Username"
+msgstr "Nombre de usuario"
+
+msgid "Profile visibility"
+msgstr "Visibilidad del perfil"
+
+msgid "Private profile"
+msgstr "Perfil privado"
+
+msgid "Hide your profile and media lists from anonymous visitors."
+msgstr "Oculta tu perfil y listas de medios a los visitantes anónimos."
+
+msgid "Save Changes"
+msgstr "Guardar cambios"
+
+msgid "Change Password"
+msgstr "Cambiar contraseña"
+
+msgid "Current Password"
+msgstr "Contraseña actual"
+
+msgid "New Password"
+msgstr "Nueva contraseña"
+
+msgid "Confirm New Password"
+msgstr "Confirmar nueva contraseña"
+
+msgid "Update Password"
+msgstr "Actualizar contraseña"
+
+msgid "Third-Party Connections"
+msgstr "Conexiones de terceros"
+
+msgid "Manage your connected third-party accounts for easier sign-in."
+msgstr "Gestiona tus cuentas de terceros conectadas para un inicio de sesión más sencillo."
+
+msgid "Manage Account Connections"
+msgstr "Gestionar conexiones de cuenta"
+
+msgid "Your profile has been updated!"
+msgstr "¡Tu perfil ha sido actualizado!"
+
+msgid "Your password has been updated!"
+msgstr "¡Tu contraseña ha sido actualizada!"
+
+msgid "Changing the username is not allowed for the demo account."
+msgstr "No se permite cambiar el nombre de usuario para la cuenta de demostración."
+
+msgid "Changing the password is not allowed for the demo account."
+msgstr "No se permite cambiar la contraseña para la cuenta de demostración."
+
+msgid "Configure how you want to receive notifications about your media."
+msgstr "Configura cómo deseas recibir notificaciones sobre tus medios."
+
+msgid "Apprise URLs"
+msgstr "URLs de Apprise"
+
+msgid "<a href=\"https://github.com/caronc/apprise\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">Apprise</a> is a notification service that supports <a href=\"https://github.com/caronc/apprise/wiki\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">many platforms</a>, including:"
+msgstr "<a href=\"https://github.com/caronc/apprise\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">Apprise</a> es un servicio de notificación compatible con <a href=\"https://github.com/caronc/apprise/wiki\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">muchas plataformas</a>, incluidas:"
+
+msgid "Email"
+msgstr "Correo electrónico"
+
+msgid "And many more..."
+msgstr "Y muchos más..."
+
+msgid "Enter one URL per line. Example:"
+msgstr "Introduce una URL por línea. Ejemplo:"
+
+msgid "Enter each Apprise URL on a separate line to send notifications to multiple services."
+msgstr "Introduce cada URL de Apprise en una línea separada para enviar notificaciones a varios servicios."
+
+msgid "Notification Settings"
+msgstr "Ajustes de notificaciones"
+
+msgid "Enable Daily Digest"
+msgstr "Activar resumen diario"
+
+msgid "Receive a single notification each day with all media scheduled to release that day"
+msgstr "Recibe una sola notificación al día con todos los medios programados para estrenarse ese día"
+
+msgid "Receive notifications for recently released media"
+msgstr "Recibir notificaciones de medios recién estrenados"
+
+msgid "Get notified when new episodes, chapters, or other media are released"
+msgstr "Recibe notificaciones cuando se publiquen nuevos episodios, capítulos u otros medios"
+
+msgid "Test Notifications"
+msgstr "Probar notificaciones"
+
+msgid "Save Settings"
+msgstr "Guardar ajustes"
+
+msgid "Excluded Media Items"
+msgstr "Elementos de medios excluidos"
+
+msgid "Exclude specific media items from notifications:"
+msgstr "Excluir elementos de medios específicos de las notificaciones:"
+
+msgid "Search for media to exclude..."
+msgstr "Buscar medios para excluir..."
+
+msgid "Currently Excluded:"
+msgstr "Actualmente excluidos:"
+
+msgid "No media items excluded yet"
+msgstr "Aún no se han excluido elementos de medios"
+
+msgid "Exclude"
+msgstr "Excluir"
+
+msgid "No matching items found"
+msgstr "No se encontraron elementos coincidentes"
+
+msgid "Notification settings updated successfully!"
+msgstr "¡Ajustes de notificaciones actualizados con éxito!"
+
+msgid "'%(url)s' is not a valid Apprise URL."
+msgstr "'%(url)s' no es una URL de Apprise válida."
+
+msgid "No notification URLs configured."
+msgstr "No se han configurado URLs de notificación."
+
+msgid "MediaTrail Test Notification"
+msgstr "Notificación de prueba de MediaTrail"
+
+msgid "This is a test notification from MediaTrail. If you're seeing this, your notifications are working correctly!"
+msgstr "Esta es una notificación de prueba de MediaTrail. Si estás viendo esto, ¡tus notificaciones funcionan correctamente!"
+
+msgid "Test notification sent successfully!"
+msgstr "¡Notificación de prueba enviada con éxito!"
+
+msgid "Failed to send test notification."
+msgstr "Error al enviar la notificación de prueba."
+
+msgid "Token"
+msgstr "Token"
+
+msgid "This token is used to authenticate webhook requests from your media servers."
+msgstr "Este token se utiliza para autenticar solicitudes de webhook desde tus servidores de medios."
+
+msgid "Copy"
+msgstr "Copiar"
+
+msgid "Regenerating will invalidate the previous token"
+msgstr "La regeneración invalidará el token anterior"
+
+msgid "Regenerate"
+msgstr "Regenerar"
+
+msgid "Media Servers"
+msgstr "Servidores de medios"
+
+msgid "Connect your media servers to automatically track your watching progress."
+msgstr "Conecta tus servidores de medios para seguir automáticamente tu progreso de visualización."
+
+msgid "Integration services"
+msgstr "Servicios de integración"
+
+msgid "Connect Nuvio to automatically track your watching progress."
+msgstr "Conecta Nuvio para seguir automáticamente tu progreso de visualización."
+
+msgid "Addon address"
+msgstr "Dirección del complemento"
+
+msgid "Add this address in Nuvio under Settings, Addons. It is personal to this MediaTrail account. Remove any old scrobbler or untokened MediaTrail address."
+msgstr "Añade esta dirección en Nuvio en Ajustes, Complementos. Es personal para esta cuenta de MediaTrail. Elimina cualquier dirección antigua de scrobbler o sin token de MediaTrail."
+
+msgid "Add this address in Nuvio under Settings, Addons."
+msgstr "Añade esta dirección en Nuvio en Ajustes, Complementos."
+
+msgid "Play a movie or episode. Each device gets its own Now Watching strip on the home page; you can rename the strip. A finished watch is saved when you stop at 90 percent or more."
+msgstr "Reproduce una película o episodio. Cada dispositivo obtiene su propia franja Viendo ahora en la página de inicio; puedes renombrar la franja. La visualización se guarda cuando te detienes en el 90 por ciento o más."
+
+msgid "Rename this device"
+msgstr "Renombrar este dispositivo"
+
+msgid "Connect Jellyfin to automatically track your watching progress."
+msgstr "Conecta Jellyfin para seguir automáticamente tu progreso de visualización."
+
+msgid "Webhook Events"
+msgstr "Eventos de webhook"
+
+msgid "Play and Stop events are always processed. Enable these to sync manual watched changes from the unofficial Webhooks plugin."
+msgstr "Los eventos Play y Stop siempre se procesan. Actívalos para sincronizar los cambios manuales de vistos desde el complemento no oficial de Webhooks."
+
+msgid "Process MarkPlayed events"
+msgstr "Procesar eventos MarkPlayed"
+
+msgid "Mark media as watched when it is manually marked played in Jellyfin."
+msgstr "Marcar los medios como vistos cuando se marquen manualmente como reproducidos en Jellyfin."
+
+msgid "Process MarkUnplayed events"
+msgstr "Procesar eventos MarkUnplayed"
+
+msgid "Remove watched progress when it is manually marked unplayed in Jellyfin. This event can delete media from MediaTrail."
+msgstr "Eliminar el progreso visto cuando se marque manualmente como no reproducido en Jellyfin. Este evento puede eliminar medios de MediaTrail."
+
+msgid "Official Webhook Plugin"
+msgstr "Complemento oficial de Webhook"
+
+msgid "You will need to have TMDB and TVDB as metadata providers in Jellyfin."
+msgstr "Deberás tener TMDB y TVDB como proveedores de metadatos en Jellyfin."
+
+msgid "Install the Webhook plugin from the 'Jellyfin Stable' repo via your server's Plugin Catalog."
+msgstr "Instala el complemento Webhook desde el repositorio 'Jellyfin Stable' a través del catálogo de complementos de tu servidor."
+
+msgid "Restart your server, then configure the plugin:"
+msgstr "Reinicia tu servidor y luego configura el complemento:"
+
+msgid "Click on the \"Add Generic Destination\" button to create a new webhook."
+msgstr "Haz clic en el botón \"Add Generic Destination\" para crear un nuevo webhook."
+
+msgid "Name: MediaTrail"
+msgstr "Nombre: MediaTrail"
+
+msgid "Notification Type: Playback Start and Playback Stop"
+msgstr "Tipo de notificación: Playback Start y Playback Stop"
+
+msgid "User Filter: Your Jellyfin User"
+msgstr "Filtro de usuario: Tu usuario de Jellyfin"
+
+msgid "Finally, under the \"Template\" section, paste the following code."
+msgstr "Finalmente, en la sección \"Template\", pega el siguiente código."
+
+msgid "Unofficial Webhooks Plugin"
+msgstr "Complemento no oficial de Webhooks"
+
+msgid "Add this repository <a href=\"https://raw.githubusercontent.com/shemanaev/jellyfin-plugin-repo/master/manifest.json\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">link</a> to your \"Plugins Catalog\" in Jellyfin settings."
+msgstr "Añade este <a href=\"https://raw.githubusercontent.com/shemanaev/jellyfin-plugin-repo/master/manifest.json\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">enlace</a> del repositorio a tu \"Catálogo de complementos\" en la configuración de Jellyfin."
+
+msgid "From your \"Plugins Catalog\", install the <a href=\"https://github.com/shemanaev/jellyfin-plugin-webhooks\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">Unofficial Webhooks plugin</a>."
+msgstr "Desde tu \"Catálogo de complementos\", instala el <a href=\"https://github.com/shemanaev/jellyfin-plugin-webhooks\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">complemento no oficial de Webhooks</a>."
+
+msgid "Payload format: Default"
+msgstr "Formato de payload: Por defecto"
+
+msgid "Listen to events only for: Your Jellyfin User"
+msgstr "Escuchar eventos solo para: Tu usuario de Jellyfin"
+
+msgid "Events: Play, Stop, MarkPlayed and MarkUnplayed"
+msgstr "Eventos: Play, Stop, MarkPlayed y MarkUnplayed"
+
+msgid "Connect Plex to automatically track your watching progress."
+msgstr "Conecta Plex para seguir automáticamente tu progreso de visualización."
+
+msgid "Plex Usernames"
+msgstr "Nombres de usuario de Plex"
+
+msgid "This username (or several, comma separated) will be used to filter which events are sent to your webhook."
+msgstr "Este nombre de usuario (o varios, separados por comas) se utilizará para filtrar qué eventos se envían a tu webhook."
+
+msgid "Setup Instructions"
+msgstr "Instrucciones de configuración"
+
+msgid "You will need to have a PlexPass in order to have webhooks enabled"
+msgstr "Necesitarás tener un PlexPass para habilitar los webhooks"
+
+msgid "Go to Settings > Server > Network and enable Webhooks"
+msgstr "Ve a Ajustes > Servidor > Red y activa Webhooks"
+
+msgid "In Plex settings, go to <a href=\"https://app.plex.tv/desktop/#!/settings/webhooks\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">Webhooks</a>."
+msgstr "En los ajustes de Plex, ve a <a href=\"https://app.plex.tv/desktop/#!/settings/webhooks\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:underline\">Webhooks</a>."
+
+msgid "In the Webhooks section, click on \"Add Webhook\" and enter the following URL:"
+msgstr "En la sección Webhooks, haz clic en \"Añadir webhook\" e introduce la siguiente URL:"
+
+msgid "Connect Emby to automatically track your watching progress."
+msgstr "Conecta Emby para seguir automáticamente tu progreso de visualización."
+
+msgid "In Emby, go to Settings > Notifications"
+msgstr "En Emby, ve a Ajustes > Notificaciones"
+
+msgid "In the Notifications section, click on \"Add Notification\""
+msgstr "En la sección Notificaciones, haz clic en \"Añadir notificación\""
+
+msgid "In the Notification settings:"
+msgstr "En la configuración de notificaciones:"
+
+msgid "Request content type: multipart/form-data"
+msgstr "Tipo de contenido de la solicitud: multipart/form-data"
+
+msgid "Events: Playback (Start, Pause, Unpause, Stop), plus Mark played and Mark unplayed"
+msgstr "Eventos: Reproducción (Inicio, Pausa, Reanudar, Detener), más Marcar como reproducido y Marcar como no reproducido"
+
+msgid "Connected Emby account:"
+msgstr "Cuenta de Emby conectada:"
+
+msgid "The webhook reports play and stop. While something is playing, MediaTrail asks Emby for the current position. An idle server is not polled."
+msgstr "El webhook informa de reproducción y parada. Mientras se reproduce algo, MediaTrail consulta a Emby la posición actual. No se sondea un servidor inactivo."
+
+msgid "Emby server address"
+msgstr "Dirección del servidor Emby"
+
+msgid "Emby user name"
+msgstr "Nombre de usuario de Emby"
+
+msgid "Emby API key"
+msgstr "Clave API de Emby"
+
+msgid "Saved — leave blank to keep it"
+msgstr "Guardado — dejar en blanco para conservarlo"
+
+msgid "Disconnect"
+msgstr "Desconectar"
+
+msgid "Emby Now Watching disconnected"
+msgstr "Emby Viendo ahora desconectado"
+
+msgid "Enter the Emby server address, user name, and API key."
+msgstr "Introduce la dirección del servidor Emby, el nombre de usuario y la clave API."
+
+msgid "MediaTrail could not reach that Emby server."
+msgstr "MediaTrail no pudo conectarse con ese servidor Emby."
+
+msgid "That Emby user name did not match exactly one account."
+msgstr "Ese nombre de usuario de Emby no coincidió exactamente con una cuenta."
+
+msgid "Emby Now Watching saved"
+msgstr "Emby Viendo ahora guardado"
+
+msgid "Device name"
+msgstr "Nombre del dispositivo"
+
+msgid "Limit user events to: Your Emby User"
+msgstr "Limitar eventos de usuario a: Tu usuario de Emby"
+
+msgid "\"Limit library events to\" and \"Limit devices events to\" are optional"
+msgstr "\"Limitar eventos de biblioteca a\" y \"Limitar eventos de dispositivos a\" son opcionales"
+
+msgid "Token regenerated successfully."
+msgstr "Token regenerado con éxito."
+
+msgid "Plex usernames updated successfully"
+msgstr "Nombres de usuario de Plex actualizados con éxito"
+
+msgid "Jellyfin webhook settings updated successfully"
+msgstr "Ajustes de webhook de Jellyfin actualizados con éxito"
+
+msgid "Sync events"
+msgstr "Eventos de sincronización"
+
+msgid "Player events always update Now Watching. Enable these to keep watch history in sync both ways with your linked Nuvio account. MediaTrail polls Nuvio about every 30 seconds in the background, and runs a deeper history check about every 15 minutes—no manual import needed after the first successful Nuvio import."
+msgstr "Los eventos del reproductor siempre actualizan Viendo ahora. Actívalos para mantener el historial sincronizado en ambas direcciones con tu cuenta de Nuvio vinculada. MediaTrail consulta a Nuvio cada unos 30 segundos en segundo plano, y realiza una comprobación más profunda cada 15 minutos; no se necesita importación manual después de la primera importación exitosa de Nuvio."
+
+msgid "Sync mark-watched"
+msgstr "Sincronizar marcado como visto"
+
+msgid "When media is marked watched in Nuvio or MediaTrail, apply the change on the other side."
+msgstr "Cuando los medios se marcan como vistos en Nuvio o MediaTrail, el cambio se aplica en el otro lado."
+
+msgid "Sync mark-unwatched"
+msgstr "Sincronizar marcado como no visto"
+
+msgid "When media is marked unwatched in Nuvio or MediaTrail, remove matching watch history on the other side. Import only removes watches previously synced from Nuvio, and only after a complete Nuvio history snapshot."
+msgstr "Cuando los medios se marcan como no vistos en Nuvio o MediaTrail, se elimina el historial coincidente en el otro lado. La importación solo elimina visualizaciones previamente sincronizadas de Nuvio, y solo después de una instantánea completa del historial de Nuvio."
+
+msgid "Sync Nuvio Library watchlist"
+msgstr "Sincronizar lista de seguimiento de Nuvio Library"
+
+msgid "Two-way sync between your Nuvio Library (+) and one MediaTrail list. Movies leave both sides when completed or stopped at 90%+. Series leave when they become In Progress (including mid-watch resume)."
+msgstr "Sincronización bidireccional entre tu Biblioteca de Nuvio (+) y una lista de MediaTrail. Las películas salen de ambos lados cuando se completan o se detienen al 90%+. Las series salen cuando pasan a En progreso (incluida la reanudación a mitad de visualización)."
+
+msgid "Watchlist list"
+msgstr "Lista de seguimiento"
+
+msgid "Select a list…"
+msgstr "Selecciona una lista…"
+
+msgid "Nuvio sync settings updated successfully"
+msgstr "Ajustes de sincronización de Nuvio actualizados con éxito"
+
+msgid "Back up your data or export it for use with other services."
+msgstr "Haz una copia de seguridad de tus datos o expórtalos para usarlos con otros servicios."
+
+msgid "Your export will include all your media items."
+msgstr "Tu exportación incluirá todos tus elementos de medios."
+
+msgid "Export as CSV"
+msgstr "Exportar como CSV"
+
+msgid "Clear Search Cache"
+msgstr "Borrar caché de búsqueda"
+
+msgid "MediaTrail stores your search results in a cache to speed up performance and reduce API calls."
+msgstr "MediaTrail almacena los resultados de búsqueda en una caché para acelerar el rendimiento y reducir las llamadas a la API."
+
+msgid "Normally, these cached results expire automatically after 24 hours. If your search results appear outdated, you can clear the cache manually."
+msgstr "Normalmente, estos resultados en caché caducan automáticamente después de 24 horas. Si tus resultados de búsqueda parecen desactualizados, puedes borrar la caché manualmente."
+
+msgid "Your next search may be slightly slower as fresh data is retrieved."
+msgstr "Tu próxima búsqueda puede ser un poco más lenta mientras se recuperan datos nuevos."
+
+msgid "Successfully cleared %(count)s search entry"
+msgid_plural "Successfully cleared %(count)s search entries"
+msgstr[0] "Se ha borrado con éxito %(count)s entrada de búsqueda"
+msgstr[1] "Se han borrado con éxito %(count)s entradas de búsqueda"
+
+msgid "This section is view-only for demo accounts."
+msgstr "Esta sección es de solo lectura para cuentas de demostración."
+
+msgid "Import Settings"
+msgstr "Ajustes de importación"
+
+msgid "Configure your import preferences."
+msgstr "Configura tus preferencias de importación."
+
+msgid "Import Frequency"
+msgstr "Frecuencia de importación"
+
+msgid "One Time Import"
+msgstr "Importación única"
+
+msgid "Every hour"
+msgstr "Cada hora"
+
+msgid "Every %(count)s hour"
+msgid_plural "Every %(count)s hours"
+msgstr[0] "Cada %(count)s hora"
+msgstr[1] "Cada %(count)s horas"
+
+msgid "Every 3 hours"
+msgstr "Cada 3 horas"
+
+msgid "Every 6 hours"
+msgstr "Cada 6 horas"
+
+msgid "Every 12 hours"
+msgstr "Cada 12 horas"
+
+msgid "Every Day"
+msgstr "Cada día"
+
+msgid "Every 2 Days"
+msgstr "Cada 2 días"
+
+msgid "Every 2 days"
+msgstr "Cada 2 días"
+
+msgid "Import Time"
+msgstr "Hora de importación"
+
+msgid "Import Mode"
+msgstr "Modo de importación"
+
+msgid "Only Sync New Items"
+msgstr "Solo sincronizar elementos nuevos"
+
+msgid "Sync New Items and Overwrite Existing"
+msgstr "Sincronizar elementos nuevos y sobrescribir existentes"
+
+msgid "Only New Items"
+msgstr "Solo elementos nuevos"
+
+msgid "Overwrite Existing"
+msgstr "Sobrescribir existentes"
+
+msgid "Import Sources"
+msgstr "Fuentes de importación"
+
+msgid "Some sources need extra setup. See the <a href=\"%(url)s\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:text-indigo-300 underline\">import guide</a>."
+msgstr "Algunas fuentes necesitan configuración adicional. Consulta la <a href=\"%(url)s\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-indigo-400 hover:text-indigo-300 underline\">guía de importación</a>."
+
+msgid "Import TV shows and movies"
+msgstr "Importar series y películas"
+
+msgid "Import private profile (requires authentication)"
+msgstr "Importar perfil privado (requiere autenticación)"
+
+msgid "Public Trakt username"
+msgstr "Nombre de usuario público de Trakt"
+
+msgid "Import"
+msgstr "Importar"
+
+msgid "Private profile (new Trakt API)"
+msgstr "Perfil privado (nueva API de Trakt)"
+
+msgid "Uses the new Trakt API (TRAKT_API_PKCE). You get a code to enter at trakt.tv/activate. A free Trakt account can connect only two applications."
+msgstr "Utiliza la nueva API de Trakt (TRAKT_API_PKCE). Obtendrás un código para ingresar en trakt.tv/activate. Una cuenta gratuita de Trakt solo puede conectar dos aplicaciones."
+
+msgid "Connect with the new Trakt API"
+msgstr "Conectar con la nueva API de Trakt"
+
+msgid "Use Connect with the new Trakt API and enter the code at trakt.tv/activate."
+msgstr "Usa Conectar con la nueva API de Trakt e introduce el código en trakt.tv/activate."
+
+msgid "Waiting for approval on Trakt."
+msgstr "Esperando aprobación en Trakt."
+
+msgid "Trakt rejected the device sign-in."
+msgstr "Trakt rechazó el inicio de sesión del dispositivo."
+
+msgid "Copied."
+msgstr "Copiado."
+
+msgid "Open <a href=\"%(verification_url)s\" target=\"_blank\" rel=\"noopener\" class=\"text-indigo-400 hover:text-indigo-300 underline\">trakt.tv/activate</a> and enter this code."
+msgstr "Abre <a href=\"%(verification_url)s\" target=\"_blank\" rel=\"noopener\" class=\"text-indigo-400 hover:text-indigo-300 underline\">trakt.tv/activate</a> e ingresa este código."
+
+msgid "A free Trakt account can connect only two applications. The code stays here until it expires."
+msgstr "Una cuenta gratuita de Trakt solo puede conectar dos aplicaciones. El código permanecerá aquí hasta que caduque."
+
+msgid "Back to import"
+msgstr "Volver a la importación"
+
+msgid "The Trakt code expired. Start again."
+msgstr "El código de Trakt ha caducado. Vuelve a empezar."
+
+msgid "After you approve on Trakt, return to this page. The connection is saved and the import uses the time you already chose."
+msgstr "Después de aprobar en Trakt, regresa a esta página. La conexión se guardará y la importación utilizará la hora que ya elegiste."
+
+msgid "Import TV shows, movies and anime"
+msgstr "Importar series, películas y anime"
+
+msgid "New connections use Simkl AUTH V2 when SIMKL_V2_ID is set. Existing AUTH V1 tokens keep working until Simkl retires V1 around April 2027; reconnect after configuring V2."
+msgstr "Las nuevas conexiones usan Simkl AUTH V2 cuando se establece SIMKL_V2_ID. Los tokens AUTH V1 existentes siguen funcionando hasta que Simkl retire V1 alrededor de abril de 2027; vuelve a conectar después de configurar V2."
+
+msgid "Simkl AUTH V1 is deprecated and planned for retirement around April 2027. Configure SIMKL_V2_ID and reconnect when ready."
+msgstr "Simkl AUTH V1 está obsoleto y su retirada está prevista para abril de 2027. Configura SIMKL_V2_ID y vuelve a conectarte cuando estés listo."
+
+msgid "Connect with Simkl & Import"
+msgstr "Conectar con Simkl e importar"
+
+msgid "Import anime and manga"
+msgstr "Importar anime y manga"
+
+msgid "MAL username"
+msgstr "Nombre de usuario de MAL"
+
+msgid "Public AniList username"
+msgstr "Nombre de usuario público de AniList"
+
+msgid "Connect with AniList & Import"
+msgstr "Conectar con AniList e importar"
+
+msgid "Kitsu user ID"
+msgstr "ID de usuario de Kitsu"
+
+msgid "Find it on your Kitsu profile URL:"
+msgstr "Encuéntralo en la URL de tu perfil de Kitsu:"
+
+msgid "View CSV format documentation"
+msgstr "Ver documentación del formato CSV"
+
+msgid "Import from a MediaTrail backup"
+msgstr "Importar desde una copia de seguridad de MediaTrail"
+
+msgid "File uploads are not available for periodic imports"
+msgstr "La carga de archivos no está disponible para importaciones periódicas"
+
+msgid "Select CSV File"
+msgstr "Seleccionar archivo CSV"
+
+msgid "Import games"
+msgstr "Importar juegos"
+
+msgid "Import games from your Steam library"
+msgstr "Importar juegos desde tu biblioteca de Steam"
+
+msgid "Steam 64-bit ID"
+msgstr "ID de Steam de 64 bits"
+
+msgid "Find it on your Steam account details page under your username."
+msgstr "Encuéntralo en la página de detalles de tu cuenta de Steam debajo de tu nombre de usuario."
+
+msgid "Your profile must be public if the API key you are using is not linked to the steamid you are requesting."
+msgstr "Tu perfil debe ser público si la clave API que estás usando no está vinculada al steamid que solicitas."
+
+msgid "Import movies and TV shows from your ratings"
+msgstr "Importar películas y series desde tus valoraciones"
+
+msgid "Import from GoodReads backup"
+msgstr "Importar desde copia de seguridad de GoodReads"
+
+msgid "Active Periodic Imports"
+msgstr "Importaciones periódicas activas"
+
+msgid "Automated imports that run on a schedule. These will continue to sync your media until disabled."
+msgstr "Importaciones automáticas que se ejecutan según una programación. Seguirán sincronizando tus medios hasta que se desactiven."
+
+msgid "Username:"
+msgstr "Nombre de usuario:"
+
+msgid "Mode:"
+msgstr "Modo:"
+
+msgid "Last Import:"
+msgstr "Última importación:"
+
+msgid "Next Import:"
+msgstr "Próxima importación:"
+
+msgid "No periodic imports configured"
+msgstr "No hay importaciones periódicas configuradas"
+
+msgid "Set up an import that repeats by the hour, every day, or every 2 days to see it here"
+msgstr "Configura una importación que se repita cada hora, todos los días o cada 2 días para verla aquí"
+
+msgid "Import History"
+msgstr "Historial de importación"
+
+msgid "Showing import activity from the last 7 days."
+msgstr "Mostrando actividad de importación de los últimos 7 días."
+
+msgid "Finished"
+msgstr "Terminado"
+
+msgid "Success"
+msgstr "Éxito"
+
+msgid "Started"
+msgstr "Iniciado"
+
+msgid "Failed"
+msgstr "Fallido"
+
+msgid "Pending"
+msgstr "Pendiente"
+
+msgid "Show failed items"
+msgstr "Mostrar elementos fallidos"
+
+msgid "Hide failed items"
+msgstr "Ocultar elementos fallidos"
+
+msgid "Show traceback"
+msgstr "Mostrar traza de error"
+
+msgid "Hide traceback"
+msgstr "Ocultar traza de error"
+
+msgid "No imports in the last 7 days"
+msgstr "No hay importaciones en los últimos 7 días"
+
+msgid "Import your media from any source to see the history here"
+msgstr "Importa tus medios desde cualquier fuente para ver el historial aquí"
+
+msgid "Import schedule deleted."
+msgstr "Programación de importación eliminada."
+
+msgid "Import schedule not found."
+msgstr "Programación de importación no encontrada."
+
+msgid "Unexpected error occurred while processing the task."
+msgstr "Ocurrió un error inesperado al procesar la tarea."
+
+msgid "This task is currently running."
+msgstr "Esta tarea se está ejecutando actualmente."
+
+msgid "This task has been queued and is waiting to run."
+msgstr "Esta tarea ha sido puesta en cola y está esperando para ejecutarse."
+
+msgid "Cron: %(expression)s"
+msgstr "Cron: %(expression)s"
+
+msgid "Disabled"
+msgstr "Desactivado"
+
+msgid "Jan 18, 2026"
+msgstr "18 ene 2026"
+
+msgid "18 Jan, 2026"
+msgstr "18 ene 2026"
+
+msgid "Import movies and episodes"
+msgstr "Importar películas y episodios"
+
+msgid "Nuvio email"
+msgstr "Correo de Nuvio"
+
+msgid "Nuvio password"
+msgstr "Contraseña de Nuvio"
+
+msgid "Saved password"
+msgstr "Contraseña guardada"
+
+msgid "Leave blank to keep the saved password."
+msgstr "Dejar en blanco para conservar la contraseña guardada."
+
+msgid "Profile"
+msgstr "Perfil"
+
+msgid "Nuvio email and password are required."
+msgstr "El correo y la contraseña de Nuvio son obligatorios."
+
+msgid "Nuvio profile must be a positive number."
+msgstr "El perfil de Nuvio debe ser un número positivo."
+
+msgid "The task to import media from Nuvio has been queued."
+msgstr "La tarea para importar medios de Nuvio se ha puesto en cola."
+
+msgid "Invalid import time."
+msgstr "Hora de importación no válida."
+
+msgid "The same import task is already scheduled."
+msgstr "La misma tarea de importación ya está programada."
+
+msgid "%(source)s import task scheduled."
+msgstr "Tarea de importación de %(source)s programada."
+
+msgid "Search %(media_type)s in your list..."
+msgstr "Buscar %(media_type)s en tu lista..."
+
+msgid "Search %(media_type)s in %(username)s's list..."
+msgstr "Buscar %(media_type)s en la lista de %(username)s..."
+
+msgid "Enter title"
+msgstr "Introduce el título"
+
+msgid "Parent TV Show"
+msgstr "Serie principal"
+
+msgid "Search for a TV show..."
+msgstr "Buscar una serie..."
+
+msgid "Season Number"
+msgstr "Número de temporada"
+
+msgid "Parent Season"
+msgstr "Temporada principal"
+
+msgid "Search for a season..."
+msgstr "Buscar una temporada..."
+
+msgid "Episode Number"
+msgstr "Número de episodio"
+
+msgid "Image URL"
+msgstr "URL de imagen"
+
+msgid "Enter image URL"
+msgstr "Introduce la URL de la imagen"
+
+msgid "Score"
+msgstr "Puntuación"
+
+msgid "Status"
+msgstr "Estado"
+
+msgid "Notes"
+msgstr "Notas"
+
+msgid "Add any notes or comments..."
+msgstr "Añade notas o comentarios..."
+
+msgid "Create Entry"
+msgstr "Crear entrada"
+
+msgid "Progress (Episodes)"
+msgstr "Progreso (Episodios)"
+
+msgid "Progress (Chapters)"
+msgstr "Progreso (Capítulos)"
+
+msgid "Progress (Play Time)"
+msgstr "Progreso (Tiempo de juego)"
+
+msgid "Progress (Pages)"
+msgstr "Progreso (Páginas)"
+
+msgid "Please select a parent TV show from the dropdown"
+msgstr "Selecciona una serie principal del menú desplegable"
+
+msgid "Please select a parent Season from the dropdown"
+msgstr "Selecciona una temporada principal del menú desplegable"
+
+msgid "Predefined Ranges"
+msgstr "Rangos predefinidos"
+
+msgid "Custom Range"
+msgstr "Rango personalizado"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Apply Range"
+msgstr "Aplicar rango"
+
+msgid "Completed Items"
+msgstr "Elementos completados"
+
+msgid "Average Rating"
+msgstr "Puntuación media"
+
+msgid "% Rated"
+msgstr "% valorado"
+
+msgid "%% Rated"
+msgstr "%% valorado"
+
+msgid "Consumption"
+msgstr "Consumo"
+
+msgid "Movie watched"
+msgid_plural "Movies watched"
+msgstr[0] "Película vista"
+msgstr[1] "Películas vistas"
+
+msgid "TV episode watched"
+msgid_plural "TV episodes watched"
+msgstr[0] "Episodio de TV visto"
+msgstr[1] "Episodios de TV vistos"
+
+msgid "Anime episode watched"
+msgid_plural "Anime episodes watched"
+msgstr[0] "Episodio de anime visto"
+msgstr[1] "Episodios de anime vistos"
+
+msgid "Manga chapter read"
+msgid_plural "Manga chapters read"
+msgstr[0] "Capítulo de manga leído"
+msgstr[1] "Capítulos de manga leídos"
+
+msgid "Book page read"
+msgid_plural "Book pages read"
+msgstr[0] "Página de libro leída"
+msgstr[1] "Páginas de libro leídas"
+
+msgid "Game hour played"
+msgid_plural "Game hours played"
+msgstr[0] "Hora de juego jugada"
+msgstr[1] "Horas de juego jugadas"
+
+msgid "Comic issue read"
+msgid_plural "Comic issues read"
+msgstr[0] "Número de cómic leído"
+msgstr[1] "Números de cómic leídos"
+
+msgid "Boardgame play"
+msgid_plural "Boardgame plays"
+msgstr[0] "Partida de juego de mesa jugada"
+msgstr[1] "Partidas de juego de mesa jugadas"
+
+msgid "Number of Items"
+msgstr "Número de elementos"
+
+msgid "Average Score:"
+msgstr "Puntuación media:"
+
+msgid "item"
+msgstr "elemento"
+
+msgid "items"
+msgstr "elementos"
+
+msgid "Count:"
+msgstr "Cantidad:"
+
+msgid "Total:"
+msgstr "Total:"
+
+msgid "Most Active Day"
+msgstr "Día más activo"
+
+msgid "Current Streak"
+msgstr "Racha actual"
+
+msgid "%(counter)s day"
+msgid_plural "%(counter)s days"
+msgstr[0] "%(counter)s día"
+msgstr[1] "%(counter)s días"
+
+msgid "Longest: %(counter)s day"
+msgid_plural "Longest: %(counter)s days"
+msgstr[0] "Más larga: %(counter)s día"
+msgstr[1] "Más larga: %(counter)s días"
+
+msgid "Activity History"
+msgstr "Historial de actividad"
+
+msgid "%(date)s: %(counter)s activity"
+msgid_plural "%(date)s: %(counter)s activities"
+msgstr[0] "%(date)s: %(counter)s actividad"
+msgstr[1] "%(date)s: %(counter)s actividades"
+
+msgid "Less"
+msgstr "Menos"
+
+msgid "More"
+msgstr "Más"
+
+msgid "Media Type Distribution"
+msgstr "Distribución por tipo de medios"
+
+msgid "No media types to display"
+msgstr "No hay tipos de medios para mostrar"
+
+msgid "Add different types of media to see their distribution."
+msgstr "Añade diferentes tipos de medios para ver su distribución."
+
+msgid "Status Distribution"
+msgstr "Distribución de estados"
+
+msgid "No status data to display"
+msgstr "No hay datos de estado para mostrar"
+
+msgid "Track media items with different statuses to see their distribution."
+msgstr "Sigue elementos de medios con diferentes estados para ver su distribución."
+
+msgid "Status Distribution by Media Type"
+msgstr "Distribución de estados por tipo de medios"
+
+msgid "No data available"
+msgstr "No hay datos disponibles"
+
+msgid "Add media items with different statuses to see their distribution by type."
+msgstr "Añade elementos de medios con diferentes estados para ver su distribución por tipo."
+
+msgid "Score Distribution by Media Type"
+msgstr "Distribución de puntuaciones por tipo de medios"
+
+msgid "No ratings yet"
+msgstr "Aún no hay valoraciones"
+
+msgid "Rate your media items to see score distribution statistics."
+msgstr "Valora tus elementos de medios para ver las estadísticas de distribución de puntuaciones."
+
+msgid "Top Rated Media"
+msgstr "Medios mejor valorados"
+
+msgid "Media Timeline"
+msgstr "Línea de tiempo de medios"
+
+msgid "Your timeline is empty"
+msgstr "Tu línea de tiempo está vacía"
+
+msgid "Consume media items to see them appear on your timeline."
+msgstr "Consume elementos de medios para que aparezcan en tu línea de tiempo."
+
+msgid "Today"
+msgstr "Hoy"
+
+msgid "Yesterday"
+msgstr "Ayer"
+
+msgid "This Week"
+msgstr "Esta semana"
+
+msgid "Last 7 Days"
+msgstr "Últimos 7 días"
+
+msgid "This Month"
+msgstr "Este mes"
+
+msgid "Last 30 Days"
+msgstr "Últimos 30 días"
+
+msgid "Last 90 Days"
+msgstr "Últimos 90 días"
+
+msgid "This Year"
+msgstr "Este año"
+
+msgid "Last 6 Months"
+msgstr "Últimos 6 meses"
+
+msgid "Last 12 Months"
+msgstr "Últimos 12 meses"
+
+msgid "All Time"
+msgstr "Todo el tiempo"
+
+msgid "Search lists..."
+msgstr "Buscar listas..."
+
+msgid "No Lists Created Yet"
+msgstr "Aún no se han creado listas"
+
+msgid "Create custom lists to organize your media collection and share with friends."
+msgstr "Crea listas personalizadas para organizar tu colección de medios y compartirla con amigos."
+
+msgid "Create Your First List"
+msgstr "Crea tu primera lista"
+
+msgid "Edit List"
+msgstr "Editar lista"
+
+msgid "Create New List"
+msgstr "Crear nueva lista"
+
+msgid "Save"
+msgstr "Guardar"
+
+msgid "Delete"
+msgstr "Eliminar"
+
+msgid "Create List"
+msgstr "Crear lista"
+
+msgid "%(counter)s item"
+msgid_plural "%(counter)s items"
+msgstr[0] "%(counter)s elemento"
+msgstr[1] "%(counter)s elementos"
+
+msgid "Edit list"
+msgstr "Editar lista"
+
+msgid "All Types"
+msgstr "Todos los tipos"
+
+msgid "Search in collection..."
+msgstr "Buscar en la colección..."
+
+msgid "No items in this list yet"
+msgstr "Aún no hay elementos en esta lista"
+
+msgid "Start adding your favorite media to build your collection"
+msgstr "Comienza a añadir tus medios favoritos para crear tu colección"
+
+msgid "Browse Media"
+msgstr "Explorar medios"
+
+msgid "%(counter)s collaborator"
+msgid_plural "%(counter)s collaborators"
+msgstr[0] "%(counter)s colaborador"
+msgstr[1] "%(counter)s colaboradores"
+
+msgid "Collaborators"
+msgstr "Colaboradores"
+
+msgid "Search users to add..."
+msgstr "Buscar usuarios para añadir..."
+
+msgid "Fetch New Releases"
+msgstr "Obtener nuevos lanzamientos"
+
+msgid "Export link"
+msgstr "Enlace de exportación"
+
+msgid "This link can be used to integrate your calendar into any of your calendar applications."
+msgstr "Este enlace se puede usar para integrar tu calendario en cualquiera de tus aplicaciones de calendario."
+
+msgid "%(content)s at %(time)s"
+msgstr "%(content)s a las %(time)s"
+
+msgid "January"
+msgstr "Enero"
+
+msgid "February"
+msgstr "Febrero"
+
+msgid "March"
+msgstr "Marzo"
+
+msgid "April"
+msgstr "Abril"
+
+msgid "May"
+msgstr "Mayo"
+
+msgid "June"
+msgstr "Junio"
+
+msgid "July"
+msgstr "Julio"
+
+msgid "August"
+msgstr "Agosto"
+
+msgid "September"
+msgstr "Septiembre"
+
+msgid "October"
+msgstr "Octubre"
+
+msgid "November"
+msgstr "Noviembre"
+
+msgid "December"
+msgstr "Diciembre"
+
+msgid "Jan"
+msgstr "Ene"
+
+msgid "Feb"
+msgstr "Feb"
+
+msgid "Mar"
+msgstr "Mar"
+
+msgid "Apr"
+msgstr "Abr"
+
+msgid "Jun"
+msgstr "Jun"
+
+msgid "Jul"
+msgstr "Jul"
+
+msgid "Aug"
+msgstr "Ago"
+
+msgid "Sep"
+msgstr "Sep"
+
+msgid "Oct"
+msgstr "Oct"
+
+msgid "Nov"
+msgstr "Nov"
+
+msgid "Dec"
+msgstr "Dic"
+
+msgid "Mon"
+msgstr "Lun"
+
+msgid "Tue"
+msgstr "Mar"
+
+msgid "Wed"
+msgstr "Mié"
+
+msgid "Thu"
+msgstr "Jue"
+
+msgid "Fri"
+msgstr "Vie"
+
+msgid "Sat"
+msgstr "Sáb"
+
+msgid "Sun"
+msgstr "Dom"
+
+msgid "Tuesday"
+msgstr "Martes"
+
+msgid "Wednesday"
+msgstr "Miércoles"
+
+msgid "Thursday"
+msgstr "Jueves"
+
+msgid "Friday"
+msgstr "Viernes"
+
+msgid "Saturday"
+msgstr "Sábado"
+
+msgid "No media was imported."
+msgstr "No se importaron medios."
+
+msgid "Imported %(items)s."
+msgstr "%(items)s importados."
+
+msgid "%(earlier)s and %(last)s"
+msgstr "%(earlier)s y %(last)s"
+
+msgid "%(count)s Movie"
+msgstr "%(count)s película"
+
+msgid "%(count)s Movies"
+msgstr "%(count)s películas"
+
+msgid "%(count)s Episode"
+msgstr "%(count)s episodio"
+
+msgid "%(count)s Episodes"
+msgstr "%(count)s episodios"
+
+msgid "%(count)s TV Show"
+msgstr "%(count)s serie"
+
+msgid "%(count)s TV Shows"
+msgstr "%(count)s series"
+
+msgid "%(count)s TV Season"
+msgstr "%(count)s temporada"
+
+msgid "%(count)s TV Seasons"
+msgstr "%(count)s temporadas"
+
+msgid "%(count)s Anime"
+msgstr "%(count)s anime"
+
+msgid "%(count)s Manga"
+msgstr "%(count)s manga"
+
+msgid "%(count)s Game"
+msgstr "%(count)s juego"
+
+msgid "%(count)s Games"
+msgstr "%(count)s juegos"
+
+msgid "%(count)s Book"
+msgstr "%(count)s libro"
+
+msgid "%(count)s Books"
+msgstr "%(count)s libros"
+
+msgid "%(count)s Comic"
+msgstr "%(count)s cómic"
+
+msgid "%(count)s Comics"
+msgstr "%(count)s cómics"
+
+msgid "%(count)s Boardgame"
+msgstr "%(count)s juego de mesa"
+
+msgid "%(count)s Boardgames"
+msgstr "%(count)s juegos de mesa"
+
+msgid "Show less"
+msgstr "Mostrar menos"
+
+msgid "Read more"
+msgstr "Leer más"
+
+msgid "More tracking options"
+msgstr "Más opciones de seguimiento"
+
+msgid "Add new entry"
+msgstr "Añadir nueva entrada"
+
+msgid "%(counter)s Episode"
+msgid_plural "%(counter)s Episodes"
+msgstr[0] "%(counter)s episodio"
+msgstr[1] "%(counter)s episodios"
+
+msgid "%(source)s score"
+msgstr "Puntuación de %(source)s"
+
+msgid "%(votes)s vote"
+msgid_plural "%(votes)s votes"
+msgstr[0] "%(votes)s voto"
+msgstr[1] "%(votes)s votos"
+
+msgid "Your score"
+msgstr "Tu puntuación"
+
+msgid "Click to edit"
+msgstr "Haz clic para editar"
+
+msgid "Your History"
+msgstr "Tu historial"
+
+msgid "Started:"
+msgstr "Iniciado:"
+
+msgid "Ended:"
+msgstr "Terminado:"
+
+msgid "Progress:"
+msgstr "Progreso:"
+
+msgid "Your notes"
+msgstr "Tus notas"
+
+msgid "Actions"
+msgstr "Acciones"
+
+msgid "Add to lists"
+msgstr "Añadir a listas"
+
+msgid "Activity history"
+msgstr "Historial de actividad"
+
+msgid "Sync metadata with provider"
+msgstr "Sincronizar metadatos con el proveedor"
+
+msgid "Sync metadata"
+msgstr "Sincronizar metadatos"
+
+msgid "Details"
+msgstr "Detalles"
+
+msgid "Provider"
+msgstr "Proveedor"
+
+msgid "No details available"
+msgstr "No hay detalles disponibles"
+
+msgid "Cast"
+msgstr "Reparto"
+
+msgid "View all"
+msgstr "Ver todos"
+
+msgid "%(counter)s cast member"
+msgid_plural "%(counter)s cast members"
+msgstr[0] "%(counter)s miembro del reparto"
+msgstr[1] "%(counter)s miembros del reparto"
+
+msgid "Repeats (%(counter)s)"
+msgid_plural "Repeats (%(counter)s)"
+msgstr[0] "Repeticiones (%(counter)s)"
+msgstr[1] "Repeticiones (%(counter)s)"
+
+msgid "Edit entry"
+msgstr "Editar entrada"
+
+msgid "Started %(date)s"
+msgstr "Iniciado %(date)s"
+
+msgid "Finished %(date)s"
+msgstr "Finalizado %(date)s"
+
+msgid "Episode %(number)s"
+msgstr "Episodio %(number)s"
+
+msgid "Unknown air date"
+msgstr "Fecha de emisión desconocida"
+
+msgid "Track Episode"
+msgstr "Seguir episodio"
+
+msgid "Last watched:"
+msgstr "Visto por última vez:"
+
+msgid "No date provided"
+msgstr "No se proporcionó fecha"
+
+msgid "Watched %(counter)s time"
+msgid_plural "Watched %(counter)s times"
+msgstr[0] "Visto %(counter)s vez"
+msgstr[1] "Visto %(counter)s veces"
+
+msgid "Streaming"
+msgstr "Streaming"
+
+msgid "Watch provider region is not configured. Set a region or disable this feature in the <a href=\"%(url)s\" class=\"text-indigo-400 hover:text-indigo-300 hover:underline\">preferences</a>."
+msgstr "La región del proveedor de streaming no está configurada. Establece una región o desactiva esta función en las <a href=\"%(url)s\" class=\"text-indigo-400 hover:text-indigo-300 hover:underline\">preferencias</a>."
+
+msgid "Time to Beat"
+msgstr "Tiempo para completar"
+
+msgid "Main Story"
+msgstr "Historia principal"
+
+msgid "Main + Extra"
+msgstr "Principal + Extras"
+
+msgid "Completionist"
+msgstr "Completista"
+
+msgid "Overview"
+msgstr "Resumen"
+
+msgid "Repeats"
+msgstr "Repeticiones"
+
+msgid "Open TMDB page for %(name)s"
+msgstr "Abrir página de TMDB para %(name)s"
+
+msgid "Update"
+msgstr "Actualizar"
+
+msgid "Add"
+msgstr "Añadir"
+
+msgid "You haven't started tracking it yet."
+msgstr "Aún no has empezado a seguirlo."
+
+msgid "Instance #%(number)s"
+msgstr "Instancia #%(number)s"
+
+msgid "You haven't created any lists yet."
+msgstr "Aún no has creado ninguna lista."
+
+msgid "Remove"
+msgstr "Eliminar"
+
+msgid "Not watched yet"
+msgstr "Aún no visto"
+
+msgid "Previous Watches"
+msgstr "Visualizaciones anteriores"
+
+msgid "Watch Date"
+msgstr "Fecha de visualización"
+
+msgid "Add watched entry with current settings"
+msgstr "Añadir entrada vista con los ajustes actuales"
+
+msgid "Add watch"
+msgstr "Añadir visualización"
+
+msgid "Fills in the current date and time"
+msgstr "Rellena con la fecha y hora actuales"
+
+msgid "Fill in current time"
+msgstr "Rellenar hora actual"
+
+msgid "Fills in the date and time the episode will be finished if started now"
+msgstr "Rellena la fecha y hora en que terminará el episodio si se inicia ahora"
+
+msgid "Fill in end time"
+msgstr "Rellenar hora de finalización"
+
+msgid "Fills in the air date of the episode, if available"
+msgstr "Rellena la fecha de emisión del episodio, si está disponible"
+
+msgid "Fill in air date"
+msgstr "Rellenar fecha de emisión"
+
+msgid "Format"
+msgstr "Formato"
+
+msgid "Runtime"
+msgstr "Duración"
+
+msgid "Studios"
+msgstr "Estudios"
+
+msgid "Country"
+msgstr "País"
+
+msgid "Languages"
+msgstr "Idiomas"
+
+msgid "First air date"
+msgstr "Primera emisión"
+
+msgid "Last air date"
+msgstr "Última emisión"
+
+msgid "Seasons"
+msgstr "Temporadas"
+
+msgid "Total runtime"
+msgstr "Duración total"
+
+msgid "Physical format"
+msgstr "Formato físico"
+
+msgid "Number of pages"
+msgstr "Número de páginas"
+
+msgid "Publish date"
+msgstr "Fecha de publicación"
+
+msgid "Author"
+msgstr "Autor"
+
+msgid "Authors"
+msgstr "Autores"
+
+msgid "Publishers"
+msgstr "Editoriales"
+
+msgid "Publisher"
+msgstr "Editorial"
+
+msgid "ISBN"
+msgstr "ISBN"
+
+msgid "Year"
+msgstr "Año"
+
+msgid "Status in country of origin"
+msgstr "Estado en el país de origen"
+
+msgid "Latest chapter translated"
+msgstr "Último capítulo traducido"
+
+msgid "Players"
+msgstr "Jugadores"
+
+msgid "Play time"
+msgstr "Tiempo de juego"
+
+msgid "Minimum age"
+msgstr "Edad mínima"
+
+msgid "Designers"
+msgstr "Diseñadores"
+
+msgid "Themes"
+msgstr "Temas"
+
+msgid "Platforms"
+msgstr "Plataformas"
+
+msgid "Companies"
+msgstr "Compañías"
+
+msgid "Season"
+msgstr "Temporada"
+
+msgid "Broadcast"
+msgstr "Emisión"
+
+msgid "Source"
+msgstr "Fuente"
+
+msgid "Number of chapters"
+msgstr "Número de capítulos"
+
+msgid "Issues"
+msgstr "Números"
+
+msgid "Last issue"
+msgstr "Último número"
+
+msgid "Last issue number"
+msgstr "Número del último ejemplar"
+
+msgid "People"
+msgstr "Personas"
+
+msgid "Last updated"
+msgstr "Última actualización"
+
+msgctxt "format"
+msgid "TV"
+msgstr "TV"
+
+msgid "Unknown"
+msgstr "Desconocido"
+
+msgid "Released"
+msgstr "Publicado"
+
+msgid "Rumored"
+msgstr "Rumor"
+
+msgid "Planned"
+msgstr "Planificado"
+
+msgid "In Production"
+msgstr "En producción"
+
+msgid "Post Production"
+msgstr "Postproducción"
+
+msgid "Canceled"
+msgstr "Cancelado"
+
+msgid "Returning Series"
+msgstr "Serie en curso"
+
+msgid "Ended"
+msgstr "Finalizada"
+
+msgid "Pilot"
+msgstr "Piloto"
+
+msgid "Recommendations"
+msgstr "Recomendaciones"
+
+msgid "DLCs"
+msgstr "DLCs"
+
+msgid "Collection"
+msgstr "Colección"
+
+msgid "Other editions"
+msgstr "Otras ediciones"
+
+msgid "Related manga"
+msgstr "Manga relacionado"
+
+msgid "Related anime"
+msgstr "Anime relacionado"
+
+msgid "Parent game"
+msgstr "Juego principal"
+
+msgid "Remasters"
+msgstr "Remasterizaciones"
+
+msgid "Remakes"
+msgstr "Remakes"
+
+msgid "Expansions"
+msgstr "Expansiones"
+
+msgid "Standalone expansions"
+msgstr "Expansiones independientes"
+
+msgid "Expanded games"
+msgstr "Juegos ampliados"
+
+msgid "episode"
+msgstr "episodio"
+
+msgid "episodes"
+msgstr "episodios"
+
+msgid "chapter"
+msgstr "capítulo"
+
+msgid "chapters"
+msgstr "capítulos"
+
+msgid "page"
+msgstr "página"
+
+msgid "pages"
+msgstr "páginas"
+
+msgid "issue"
+msgstr "número"
+
+msgid "issues"
+msgstr "números"
+
+msgid "play"
+msgstr "partida"
+
+msgid "plays"
+msgstr "partidas"
+
+msgid "Search Results"
+msgstr "Resultados de búsqueda"
+
+msgid "Source:"
+msgstr "Fuente:"
+
+msgid "Grid view"
+msgstr "Vista de cuadrícula"
+
+msgid "List view"
+msgstr "Vista de lista"
+
+msgid "Page %(page)s of %(pages)s (%(total)s results)"
+msgstr "Página %(page)s de %(pages)s (%(total)s resultados)"
+
+msgid "No results found"
+msgstr "No se encontraron resultados"
+
+msgid "We couldn't find any matches for \"%(query)s\". Try checking your spelling or using different keywords."
+msgstr "No pudimos encontrar coincidencias para \"%(query)s\". Comprueba la ortografía o usa diferentes palabras clave."
+
+msgid "Marked as currently watching"
+msgstr "Marcado como viendo actualmente"
+
+msgid "Marked as currently reading"
+msgstr "Marcado como leyendo actualmente"
+
+msgid "Marked as currently playing"
+msgstr "Marcado como jugando actualmente"
+
+msgid "Marked as finished watching"
+msgstr "Marcado como terminado de ver"
+
+msgid "Marked as finished reading"
+msgstr "Marcado como terminado de leer"
+
+msgid "Marked as finished playing"
+msgstr "Marcado como terminado de jugar"
+
+msgid "Added to watching list"
+msgstr "Añadido a la lista de visualización"
+
+msgid "Added to reading list"
+msgstr "Añadido a la lista de lectura"
+
+msgid "Added to playing list"
+msgstr "Añadido a la lista de juegos"
+
+msgid "Marked as dropped"
+msgstr "Marcado como abandonado"
+
+msgid "Marked as paused watching"
+msgstr "Marcado como visualización en pausa"
+
+msgid "Marked as paused reading"
+msgstr "Marcado como lectura en pausa"
+
+msgid "Marked as paused playing"
+msgstr "Marcado como juego en pausa"
+
+msgid "Currently watching"
+msgstr "Viendo actualmente"
+
+msgid "Currently reading"
+msgstr "Leyendo actualmente"
+
+msgid "Currently playing"
+msgstr "Jugando actualmente"
+
+msgid "Finished watching"
+msgstr "Visualización terminada"
+
+msgid "Finished reading"
+msgstr "Lectura terminada"
+
+msgid "Finished playing"
+msgstr "Juego terminado"
+
+msgid "Paused watching"
+msgstr "Visualización en pausa"
+
+msgid "Paused reading"
+msgstr "Lectura en pausa"
+
+msgid "Paused playing"
+msgstr "Juego en pausa"
+
+msgid "Resumed watching"
+msgstr "Visualización reanudada"
+
+msgid "Resumed reading"
+msgstr "Lectura reanudada"
+
+msgid "Resumed playing"
+msgstr "Juego reanudado"
+
+msgid "Stopped watching"
+msgstr "Visualización detenida"
+
+msgid "Stopped reading"
+msgstr "Lectura detenida"
+
+msgid "Stopped playing"
+msgstr "Juego detenido"
+
+msgid "Changed status from %(old)s to %(new)s"
+msgstr "Estado cambiado de %(old)s a %(new)s"
+
+msgid "Rated %(score)s/10"
+msgstr "Puntuado con %(score)s/10"
+
+msgid "Changed rating from %(old)s to %(new)s"
+msgstr "Puntuación cambiada de %(old)s a %(new)s"
+
+msgid "Played for %(time)s"
+msgstr "Jugado durante %(time)s"
+
+msgid "Watched up to episode %(count)s"
+msgstr "Visto hasta el episodio %(count)s"
+
+msgid "Read up to chapter %(count)s"
+msgstr "Leído hasta el capítulo %(count)s"
+
+msgid "Read up to page %(count)s"
+msgstr "Leído hasta la página %(count)s"
+
+msgid "Read up to issue %(count)s"
+msgstr "Leído hasta el número %(count)s"
+
+msgid "Played up to play %(count)s"
+msgstr "Jugado hasta la partida %(count)s"
+
+msgid "%(verb)s up to %(unit)s %(count)s"
+msgstr "%(verb)s hasta %(unit)s %(count)s"
+
+msgid "Progress set to %(count)s page"
+msgid_plural "Progress set to %(count)s pages"
+msgstr[0] "Progreso establecido en %(count)s página"
+msgstr[1] "Progreso establecido en %(count)s páginas"
+
+msgid "Progress set to %(count)s chapter"
+msgid_plural "Progress set to %(count)s chapters"
+msgstr[0] "Progreso establecido en %(count)s capítulo"
+msgstr[1] "Progreso establecido en %(count)s capítulos"
+
+msgid "Progress set to %(count)s episode"
+msgid_plural "Progress set to %(count)s episodes"
+msgstr[0] "Progreso establecido en %(count)s episodio"
+msgstr[1] "Progreso establecido en %(count)s episodios"
+
+msgid "Progress set to %(count)s issue"
+msgid_plural "Progress set to %(count)s issues"
+msgstr[0] "Progreso establecido en %(count)s número"
+msgstr[1] "Progreso establecido en %(count)s números"
+
+msgid "Progress set to %(count)s play"
+msgid_plural "Progress set to %(count)s plays"
+msgstr[0] "Progreso establecido en %(count)s partida"
+msgstr[1] "Progreso establecido en %(count)s partidas"
+
+msgid "Added %(time)s of playtime"
+msgstr "Añadido %(time)s de tiempo de juego"
+
+msgid "Removed %(time)s of playtime"
+msgstr "Eliminado %(time)s de tiempo de juego"
+
+msgid "Started on %(date)s"
+msgstr "Iniciado el %(date)s"
+
+msgid "Finished on %(date)s"
+msgstr "Finalizado el %(date)s"
+
+msgid "Started without date"
+msgstr "Iniciado sin fecha"
+
+msgid "Finished without date"
+msgstr "Finalizado sin fecha"
+
+msgid "Removed start date"
+msgstr "Fecha de inicio eliminada"
+
+msgid "Removed end date"
+msgstr "Fecha de fin eliminada"
+
+msgid "Ended on %(date)s"
+msgstr "Finalizado el %(date)s"
+
+msgid "Start date changed to %(date)s"
+msgstr "Fecha de inicio cambiada a %(date)s"
+
+msgid "End date changed to %(date)s"
+msgstr "Fecha de fin cambiada a %(date)s"
+
+msgid "Added notes"
+msgstr "Notas añadidas"
+
+msgid "Removed notes"
+msgstr "Notas eliminadas"
+
+msgid "Updated notes"
+msgstr "Notas actualizadas"
+
+msgid "Set %(field)s to %(value)s"
+msgstr "%(field)s establecido en %(value)s"
+
+msgid "Updated %(field)s from %(old)s to %(new)s"
+msgstr "%(field)s actualizado de %(old)s a %(new)s"
+
+msgid "%(percent)s%% of activity"
+msgstr "%(percent)s%% de la actividad"
+
+msgid "had %(count)s released episode marked as watched automatically."
+msgid_plural "had %(count)s released episodes marked as watched automatically."
+msgstr[0] "se marcó automáticamente %(count)s episodio publicado como visto."
+msgstr[1] "se marcaron automáticamente %(count)s episodios publicados como vistos."
+
+msgid "was left in progress because unreleased episodes or seasons remain."
+msgstr "se dejó en progreso porque quedan episodios o temporadas sin estrenar."
+
+msgid "Season %(number)s was marked as in progress automatically."
+msgstr "La temporada %(number)s se marcó automáticamente como en progreso."
+
+msgid "remains in progress because another season is still pending or has not aired yet."
+msgstr "permanece en progreso porque otra temporada todavía está pendiente o aún no se ha emitido."
+
+msgid "was marked as completed automatically."
+msgstr "se marcó automáticamente como completado."
+
+msgid "was left in progress because unreleased episodes remain."
+msgstr "se dejó en progreso porque quedan episodios no estrenados."
+
+msgid "Grid View"
+msgstr "Vista de cuadrícula"
+
+msgid "Table View"
+msgstr "Vista de tabla"
+
+msgid "Last watched"
+msgstr "Última visualización"
+
+msgid "No %(kind)s tracked yet"
+msgstr "Aún no se ha seguido ningún %(kind)s"
+
+msgid "Start tracking your %(kind)s to keep a record of what you have finished."
+msgstr "Comienza a seguir tus %(kind)s para mantener un registro de lo que has terminado."
+
+msgid "Browse %(kind)s"
+msgstr "Explorar %(kind)s"

@@ -332,8 +332,12 @@ LOGGING = {
 LANGUAGE_CODE = "en"
 
 LANGUAGES = [
+    ("de", "Deutsch"),
     ("en", "English"),
+    ("es", "Español"),
+    ("fr", "Français"),
     ("hu", "Magyar"),
+    ("it", "Italiano"),
 ]
 
 LOCALE_PATHS = [BASE_DIR / "locale"]

@@ -1,8 +1,12 @@
 """Interface languages. English is the source language and the fallback."""
 
 LANGUAGE_CHOICES = (
+    ("de", "Deutsch"),
     ("en", "English"),
+    ("es", "Español"),
+    ("fr", "Français"),
     ("hu", "Magyar"),
+    ("it", "Italiano"),
 )
 
 LANGUAGE_CODES = frozenset(code for code, _label in LANGUAGE_CHOICES)

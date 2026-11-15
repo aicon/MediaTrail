@@ -106,8 +106,20 @@ RUN rm -rf /usr/local/lib/python*/site-packages/pip \
            /usr/local/lib/python*/site-packages/pip-*.dist-info \
            /usr/local/bin/pip /usr/local/bin/pip3 \
     && python /mediatrail/locale/compile_mo.py \
+         /mediatrail/locale/de/LC_MESSAGES/django.po \
+         /mediatrail/locale/de/LC_MESSAGES/django.mo \
+    && python /mediatrail/locale/compile_mo.py \
+         /mediatrail/locale/es/LC_MESSAGES/django.po \
+         /mediatrail/locale/es/LC_MESSAGES/django.mo \
+    && python /mediatrail/locale/compile_mo.py \
+         /mediatrail/locale/fr/LC_MESSAGES/django.po \
+         /mediatrail/locale/fr/LC_MESSAGES/django.mo \
+    && python /mediatrail/locale/compile_mo.py \
          /mediatrail/locale/hu/LC_MESSAGES/django.po \
          /mediatrail/locale/hu/LC_MESSAGES/django.mo \
+    && python /mediatrail/locale/compile_mo.py \
+         /mediatrail/locale/it/LC_MESSAGES/django.po \
+         /mediatrail/locale/it/LC_MESSAGES/django.mo \
     && python /mediatrail/scripts/verify_pillow_native.py \
     && python manage.py collectstatic --noinput
 

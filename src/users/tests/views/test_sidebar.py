@@ -57,7 +57,7 @@ class SidebarViewTests(TestCase):
 
     def test_unknown_language_is_ignored(self):
         """A language outside the supported set does not replace English."""
-        self.client.post(reverse("preferences"), {"language": "de"})
+        self.client.post(reverse("preferences"), {"language": "xx"})
         self.user.refresh_from_db()
         self.assertEqual(self.user.language, "en")
 
