@@ -104,6 +104,14 @@ def import_media(
     return format_import_message(imported_counts, warnings, removed_counts)
 
 
+@shared_task(name="Poll Emby sessions")
+def poll_emby_sessions(user_id):
+    """Refresh Emby Now Watching for one user, then reschedule if needed."""
+    from integrations.emby_live import run_poll
+
+    run_poll(user_id)
+
+
 @shared_task(name="Sync Nuvio playback")
 def sync_nuvio_playback():
     """Refresh Now Watching from each saved Nuvio account."""

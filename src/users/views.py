@@ -502,3 +502,59 @@ def clear_search_cache(request):
     )
 
     return redirect("advanced")
+
+
+@require_POST
+def update_emby_live(request):
+    """Save or clear the Emby server used for Now Watching."""
+    from integrations.emby_live import (
+        EmbyPollError,
+        clear_connection,
+        lookup_emby_user,
+        save_connection,
+        validate_server_url,
+    )
+    from integrations.imports.helpers import decrypt
+
+    if request.POST.get("action") == "clear":
+        clear_connection(request.user)
+        messages.success(request, _("Emby Now Watching disconnected"))
+        return redirect("integrations")
+
+    server_url = validate_server_url(request.POST.get("emby_server_url", ""))
+    username = (request.POST.get("emby_username") or "").strip()
+    api_key = (request.POST.get("emby_api_key") or "").strip()
+    if not api_key and request.user.emby_api_key:
+        try:
+            api_key = decrypt(request.user.emby_api_key)
+        except Exception:
+            logger.exception("Could not read the saved Emby key")
+            api_key = ""
+    if not server_url or not username or not api_key:
+        messages.error(
+            request,
+            _("Enter the Emby server address, user name, and API key."),
+        )
+        return redirect("integrations")
+    try:
+        match = lookup_emby_user(server_url, api_key, username)
+    except EmbyPollError:
+        logger.warning("Emby user lookup failed user=%s", request.user.id)
+        messages.error(request, _("MediaTrail could not reach that Emby server."))
+        return redirect("integrations")
+    if match is None:
+        messages.error(
+            request,
+            _("That Emby user name did not match exactly one account."),
+        )
+        return redirect("integrations")
+    emby_user_id, emby_user_name = match
+    save_connection(
+        request.user,
+        server_url,
+        api_key,
+        emby_user_id,
+        emby_user_name,
+    )
+    messages.success(request, _("Emby Now Watching saved"))
+    return redirect("integrations")

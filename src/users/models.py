@@ -438,6 +438,29 @@ class User(AbstractUser):
         default=False,
         help_text="Process Jellyfin MarkUnplayed webhook events",
     )
+    emby_server_url = models.CharField(
+        max_length=200,
+        blank=True,
+        default="",
+        help_text="Emby server origin used to read active sessions",
+    )
+    emby_api_key = models.TextField(
+        blank=True,
+        default="",
+        help_text="Encrypted Emby API key for session polling",
+    )
+    emby_user_id = models.CharField(
+        max_length=64,
+        blank=True,
+        default="",
+        help_text="Stable Emby user id whose sessions may drive Now Watching",
+    )
+    emby_user_name = models.CharField(
+        max_length=150,
+        blank=True,
+        default="",
+        help_text="Emby user name shown in settings; not used for authorization",
+    )
     nuvio_sync_mark_played_enabled = models.BooleanField(
         default=False,
         help_text="Sync Nuvio mark-watched changes with MediaTrail watch history",

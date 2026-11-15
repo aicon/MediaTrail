@@ -481,12 +481,63 @@
                   </li>
                       {# djlint:on #}
                       <li>{% translate "Request content type: multipart/form-data" %}</li>
-                      <li>{% translate "Events: Play and Stop" %}</li>
+                      <li>{% translate "Events: Playback (Start, Pause, Unpause, Stop), plus Mark played and Mark unplayed" %}</li>
                       <li>{% translate "Limit user events to: Your Emby User" %}</li>
                       <li>{% translate "\"Limit library events to\" and \"Limit devices events to\" are optional" %}</li>
                     </ul>
                   </li>
                 </ol>
+              </div>
+              <div class="bg-[#262a2f] p-4 rounded-md mt-4">
+                <h4 class="text-sm font-medium mb-3">{% translate "Now Watching" %}</h4>
+                <p class="text-gray-400 mb-4 text-sm">
+                  {% translate "The webhook reports play and stop. While something is playing, MediaTrail asks Emby for the current position. An idle server is not polled." %}
+                </p>
+                <form method="post" action="{% url 'update_emby_live' %}" class="space-y-3">
+                  {% csrf_token %}
+                  <label class="block text-sm text-gray-300">
+                    {% translate "Emby server address" %}
+                    <input name="emby_server_url"
+                           class="mt-1 w-full py-2 px-3 bg-[#39404b] rounded-md text-white text-sm border border-gray-600 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                           type="url"
+                           placeholder="http://emby.example:8096"
+                           value="{{ request.user.emby_server_url }}">
+                  </label>
+                  <label class="block text-sm text-gray-300">
+                    {% translate "Emby user name" %}
+                    <input name="emby_username"
+                           class="mt-1 w-full py-2 px-3 bg-[#39404b] rounded-md text-white text-sm border border-gray-600 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                           type="text"
+                           autocomplete="off"
+                           value="{{ request.user.emby_user_name }}">
+                  </label>
+                  <label class="block text-sm text-gray-300">
+                    {% translate "Emby API key" %}
+                    <input name="emby_api_key"
+                           class="mt-1 w-full py-2 px-3 bg-[#39404b] rounded-md text-white text-sm border border-gray-600 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                           type="password"
+                           autocomplete="new-password"
+                           placeholder="{% if request.user.emby_api_key %}{% translate 'Saved — leave blank to keep it' %}{% endif %}">
+                  </label>
+                  {% if request.user.emby_user_id %}
+                    <p class="text-xs text-gray-400">{% translate "Connected Emby user id:" %} {{ request.user.emby_user_id }}</p>
+                  {% endif %}
+                  <div class="flex gap-2 pt-1">
+                    <button type="submit"
+                            class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm cursor-pointer">
+                      {% include "app/icons/save.svg" with classes="w-4 h-4 mr-2" %}
+                      {% translate "Save Changes" %}
+                    </button>
+                    {% if request.user.emby_user_id %}
+                      <button type="submit"
+                              name="action"
+                              value="clear"
+                              class="px-4 py-2 bg-[#39404b] text-gray-300 rounded-md hover:bg-[#454d59] transition-colors text-sm cursor-pointer">
+                        {% translate "Disconnect" %}
+                      </button>
+                    {% endif %}
+                  </div>
+                </form>
               </div>
             </div>
           </div>

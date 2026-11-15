@@ -45,4 +45,9 @@ urlpatterns = [
         views.update_nuvio_sync_events,
         name="update_nuvio_sync_events",
     ),
+    path(
+        "update_emby_live",
+        views.update_emby_live,
+        name="update_emby_live",
+    ),
 ]

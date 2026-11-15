@@ -898,8 +898,8 @@ msgstr "Az értesítés beállításainál:"
 msgid "Request content type: multipart/form-data"
 msgstr "Kérés tartalomtípusa: multipart/form-data"
 
-msgid "Events: Play and Stop"
-msgstr "Események: Play és Stop"
+msgid "Events: Playback (Start, Pause, Unpause, Stop), plus Mark played and Mark unplayed"
+msgstr "Események: Lejátszás (Indítás, Szünet, Folytatás, Állj), valamint Megnézettnek jelöl és Nem látottnak jelöl"
 
 msgid "Limit user events to: Your Emby User"
 msgstr "Felhasználói események korlátozása: a saját Emby-felhasználód"

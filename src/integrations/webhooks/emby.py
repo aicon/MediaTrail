@@ -13,6 +13,8 @@ class EmbyEvent(StrEnum):
     """Emby webhook event names."""
 
     PLAYBACK_START = "playback.start"
+    PLAYBACK_PAUSE = "playback.pause"
+    PLAYBACK_UNPAUSE = "playback.unpause"
     PLAYBACK_STOP = "playback.stop"
 
 
@@ -27,8 +29,17 @@ class EmbyWebhookProcessor(BaseWebhookProcessor):
         )
 
         event_type = payload.get("Event")
+        if event_type in {EmbyEvent.PLAYBACK_PAUSE, EmbyEvent.PLAYBACK_UNPAUSE}:
+            self._handle_live(payload, user)
+            return
+
         if not self._is_supported_event(event_type):
             logger.debug("Ignoring Emby webhook event type: %s", event_type)
+            return
+
+        if not payload.get("Item"):
+            logger.warning("Ignoring Emby webhook call because no item was found.")
+            self._handle_live(payload, user)
             return
 
         ids = self._extract_external_ids(payload)
@@ -36,9 +47,16 @@ class EmbyWebhookProcessor(BaseWebhookProcessor):
 
         if not any(ids.values()):
             logger.warning("Ignoring Emby webhook call because no ID was found.")
+            self._handle_live(payload, user)
             return
 
         self._process_media(payload, user, ids)
+        self._handle_live(payload, user)
+
+    def _handle_live(self, payload, user):
+        from integrations.emby_live import handle_live_event
+
+        handle_live_event(user, payload)
 
     def _is_supported_event(self, event_type):
         return event_type in {EmbyEvent.PLAYBACK_START, EmbyEvent.PLAYBACK_STOP}
@@ -71,9 +89,10 @@ class EmbyWebhookProcessor(BaseWebhookProcessor):
         return payload["Item"].get("IndexNumber")
 
     def _extract_external_ids(self, payload):
-        provider_ids = payload["Item"].get("ProviderIds", {})
+        provider_ids = payload["Item"].get("ProviderIds") or {}
+        folded = {str(key).casefold(): value for key, value in provider_ids.items()}
         return {
-            "tmdb_id": provider_ids.get("Tmdb"),
-            "imdb_id": provider_ids.get("Imdb"),
-            "tvdb_id": provider_ids.get("Tvdb"),
+            "tmdb_id": folded.get("tmdb"),
+            "imdb_id": folded.get("imdb"),
+            "tvdb_id": folded.get("tvdb"),
         }
