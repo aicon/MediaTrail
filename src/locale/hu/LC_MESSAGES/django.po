@@ -2536,3 +2536,41 @@ msgstr "%(field)s: %(old)s → %(new)s"
 #, python-format
 msgid "%(percent)s%% of activity"
 msgstr "a tevékenység %(percent)s%%-a"
+
+msgid "had %(count)s released episode marked as watched automatically."
+msgid_plural "had %(count)s released episodes marked as watched automatically."
+msgstr[0] "%(count)s megjelent epizódját automatikusan megnézettnek jelölte."
+msgstr[1] "%(count)s megjelent epizódját automatikusan megnézettnek jelölte."
+
+msgid "was left in progress because unreleased episodes or seasons remain."
+msgstr "folyamatban maradt, mert van még meg nem jelent epizód vagy évad."
+
+msgid "Season %(number)s was marked as in progress automatically."
+msgstr "%(number)s. évada automatikusan folyamatban lévőnek lett jelölve."
+
+msgid "remains in progress because another season is still pending or has not aired yet."
+msgstr "folyamatban marad, mert egy másik évad még függőben van, vagy még nem került adásba."
+
+msgid "was marked as completed automatically."
+msgstr "automatikusan befejezettnek lett jelölve."
+
+msgid "was left in progress because unreleased episodes remain."
+msgstr "folyamatban maradt, mert van még meg nem jelent epizód."
+
+msgid "Grid View"
+msgstr "Rácsnézet"
+
+msgid "Table View"
+msgstr "Táblázatnézet"
+
+msgid "Last watched"
+msgstr "Utoljára megnézve"
+
+msgid "No %(kind)s tracked yet"
+msgstr "Még nincs követett %(kind)s"
+
+msgid "Start tracking your %(kind)s to keep a record of what you have finished."
+msgstr "Kezdd el követni a %(kind)s listát, hogy a befejezettek itt maradjanak."
+
+msgid "Browse %(kind)s"
+msgstr "%(kind)s böngészése"

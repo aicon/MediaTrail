@@ -127,12 +127,12 @@
           <a :href="`{% url 'medialist' target_user.username media_type %}?${search ? 'search=' + search + '&' : ''}${status !== 'all' ? 'status=' + status + '&' : ''}${sort !== 'score' ? 'sort=' + sort + '&' : ''}layout=grid`"
              class="p-2 cursor-pointer"
              :class="layout === 'grid' ? 'bg-indigo-600 text-white' : 'bg-[#39404b] hover:bg-[#454d5a]'"
-             title="Grid View"
+             title="{% translate "Grid View" %}"
              @click="layout = 'grid'">{% include "app/icons/four-square.svg" with classes="w-5 h-5" %}</a>
           <a :href="`{% url 'medialist' target_user.username media_type %}?${search ? 'search=' + search + '&' : ''}${status !== 'all' ? 'status=' + status + '&' : ''}${sort !== 'score' ? 'sort=' + sort + '&' : ''}layout=table`"
              class="p-2 cursor-pointer"
              :class="layout === 'table' ? 'bg-indigo-600 text-white' : 'bg-[#39404b] hover:bg-[#454d5a]'"
-             title="Table View"
+             title="{% translate "Table View" %}"
              @click="layout = 'table'">{% include "app/icons/table.svg" with classes="w-5 h-5" %}</a>
         </div>
       </div>
@@ -145,14 +145,14 @@
           <div class="bg-[#39404b] rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
             {% include "app/icons/edit.svg" with classes="w-8 h-8 text-gray-400" %}
           </div>
-          <h3 class="text-xl font-semibold mb-2">No {{ media_type|media_type_readable_plural }} Tracked Yet</h3>
+          <h3 class="text-xl font-semibold mb-2">{% blocktranslate with kind=media_type|media_type_readable_plural %}No {{ kind }} tracked yet{% endblocktranslate %}</h3>
           {% if request.user == target_user %}
             <p class="text-gray-400 mb-6">
-              Start tracking your {{ media_type_plural }} to keep a record of what you've {{ media_type|media_past_verb }}.
+              {% blocktranslate with kind=media_type_plural %}Start tracking your {{ kind }} to keep a record of what you have finished.{% endblocktranslate %}
             </p>
             <a href="{{ media_type|sample_search }}"
                class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
-              Browse {{ media_type|media_type_readable_plural }}
+              {% blocktranslate with kind=media_type|media_type_readable_plural %}Browse {{ kind }}{% endblocktranslate %}
             </a>
           {% endif %}
         </div>
@@ -165,13 +165,13 @@
           <thead class="text-left text-gray-400 text-sm">
             <tr>
               <th class="p-2 w-15"></th>
-              <th class="p-2 pe-8 w-2/5">Title</th>
-              <th class="p-2 text-center">Score</th>
-              {% if media_type != MediaTypes.MOVIE.value %}<th class="p-2 text-center">Progress</th>{% endif %}
-              {% if media_type == MediaTypes.TV.value %}<th class="p-2 text-center">Last Watched</th>{% endif %}
-              <th class="p-2 text-center">Status</th>
-              <th class="p-2 text-center">Start Date</th>
-              <th class="p-2 text-center">End Date</th>
+              <th class="p-2 pe-8 w-2/5">{% translate "Title" %}</th>
+              <th class="p-2 text-center">{% translate "Score" %}</th>
+              {% if media_type != MediaTypes.MOVIE.value %}<th class="p-2 text-center">{% translate "Progress" %}</th>{% endif %}
+              {% if media_type == MediaTypes.TV.value %}<th class="p-2 text-center">{% translate "Last watched" %}</th>{% endif %}
+              <th class="p-2 text-center">{% translate "Status" %}</th>
+              <th class="p-2 text-center">{% translate "Start Date" %}</th>
+              <th class="p-2 text-center">{% translate "End Date" %}</th>
             </tr>
           </thead>
           <tbody>

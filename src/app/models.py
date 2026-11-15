@@ -22,7 +22,7 @@ from django.db.models import (
 )
 from django.db.models.functions import RowNumber
 from django.utils import timezone
-from django.utils.translation import get_language
+from django.utils.translation import get_language, gettext, ngettext
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy as _lazy
 from model_utils import FieldTracker
@@ -1333,10 +1333,13 @@ class TV(Media):
 
         if episodes_to_create:
             created_episodes_count = len(episodes_to_create)
-            episode_label = "episode" if created_episodes_count == 1 else "episodes"
             self.create_user_message(
-                f"had {created_episodes_count} released {episode_label} marked "
-                "as watched automatically.",
+                ngettext(
+                    "had %(count)s released episode marked as watched automatically.",
+                    "had %(count)s released episodes marked as watched automatically.",
+                    created_episodes_count,
+                )
+                % {"count": created_episodes_count},
                 level=UserMessageLevel.INFO,
             )
 
@@ -1348,7 +1351,7 @@ class TV(Media):
                 fields=["status"],
             )
             self.create_user_message(
-                "was left in progress because unreleased episodes or seasons remain.",
+                gettext("was left in progress because unreleased episodes or seasons remain."),
                 level=UserMessageLevel.WARNING,
             )
 
@@ -1455,8 +1458,8 @@ class TV(Media):
 
         if started_season_number is not None:
             self.create_user_message(
-                f"Season {started_season_number} was marked as in progress "
-                "automatically.",
+                gettext("Season %(number)s was marked as in progress automatically.")
+                % {"number": started_season_number},
                 level=UserMessageLevel.INFO,
             )
 
@@ -1490,8 +1493,10 @@ class TV(Media):
                 fields=["status"],
             )
             self.create_user_message(
-                "remains in progress because another season is still "
-                "pending or has not aired yet.",
+                gettext(
+                    "remains in progress because another season is still "
+                    "pending or has not aired yet.",
+                ),
                 level=UserMessageLevel.INFO,
             )
 
@@ -1503,7 +1508,7 @@ class TV(Media):
                 fields=["status"],
             )
             self.create_user_message(
-                "was marked as completed automatically.",
+                gettext("was marked as completed automatically."),
                 level=UserMessageLevel.SUCCESS,
             )
 
@@ -1605,7 +1610,7 @@ class Season(Media):
             )
             self.clear_resume(persist=True)
             self.create_user_message(
-                "was marked as completed automatically.",
+                gettext("was marked as completed automatically."),
                 level=UserMessageLevel.SUCCESS,
             )
             self.related_tv._handle_completed_season(self.item.season_number)
@@ -1683,12 +1688,13 @@ class Season(Media):
                         Episode,
                     )
                     created_episodes_count = len(episodes_to_create)
-                    episode_label = (
-                        "episode" if created_episodes_count == 1 else "episodes"
-                    )
                     self.create_user_message(
-                        f"had {created_episodes_count} released {episode_label} "
-                        "marked as watched automatically.",
+                        ngettext(
+                            "had %(count)s released episode marked as watched automatically.",
+                            "had %(count)s released episodes marked as watched automatically.",
+                            created_episodes_count,
+                        )
+                        % {"count": created_episodes_count},
                         level=UserMessageLevel.INFO,
                     )
 
@@ -1704,7 +1710,7 @@ class Season(Media):
                         fields=["status"],
                     )
                     self.create_user_message(
-                        "was left in progress because unreleased episodes remain.",
+                        gettext("was left in progress because unreleased episodes remain."),
                         level=UserMessageLevel.WARNING,
                     )
 
@@ -2425,15 +2431,15 @@ class LivePlayback(models.Model):
         delta = timezone.now() - self.created_at
         seconds = max(0, int(delta.total_seconds()))
         if seconds < 60:
-            return _("Started %(seconds)ss ago") % {"seconds": seconds}
+            return gettext("Started %(seconds)ss ago") % {"seconds": seconds}
         minutes, rem_s = divmod(seconds, 60)
         if minutes < 60:
-            return _("Started %(minutes)sm %(seconds)ss ago") % {
+            return gettext("Started %(minutes)sm %(seconds)ss ago") % {
                 "minutes": minutes,
                 "seconds": rem_s,
             }
         hours, rem_m = divmod(minutes, 60)
-        return _("Started %(hours)sh %(minutes)sm ago") % {
+        return gettext("Started %(hours)sh %(minutes)sm ago") % {
             "hours": hours,
             "minutes": rem_m,
         }
