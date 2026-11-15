@@ -3,9 +3,11 @@ from unittest.mock import patch
 import requests
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
-from django.test import TestCase
+from django.test import Client, TestCase
+from django.urls import reverse
 
 from app.models import Item, LivePlayback, LivePlaybackStatus, MediaTypes, Sources
+from integrations.imports.helpers import decrypt
 from integrations.emby_live import (
     DISCOVERY_POLLS,
     EmbyPollError,
@@ -123,6 +125,27 @@ class EmbyLiveTests(TestCase):
         self.assertEqual(ids["imdb_id"], "tt0087757")
         self.assertEqual(ids["tvdb_id"], "330968")
 
+    def test_sessions_follow_stored_user_id_not_name_spelling(self):
+        same_person = _session()
+        same_person["UserName"] = "VIEWER"
+        other_person = _session(user_id="someone-else", device_id="other-pad")
+        other_person["UserName"] = "viewer"
+        playing = playing_sessions([same_person, other_person], EMBY_USER)
+        self.assertEqual([row["DeviceId"] for row in playing], [DEVICE])
+
+    def test_poll_does_not_look_up_the_user_id_again(self):
+        row = _session()
+        row["UserName"] = "Viewer"
+        with (
+            patch("integrations.emby_live.lookup_emby_user") as lookup,
+            patch("integrations.emby_live.fetch_sessions", return_value=[row]),
+        ):
+            run_poll(self.user.id)
+        lookup.assert_not_called()
+        self.assertTrue(
+            LivePlayback.objects.filter(device_id=f"emby:{DEVICE}").exists(),
+        )
+
     def test_idle_sessions_are_ignored(self):
         rows = [
             _session(playing=False, device_id="browser"),
@@ -234,3 +257,122 @@ class EmbyLiveTests(TestCase):
         state = cache.get(f"emby-live:{self.user.id}")
         self.assertIn("pad-b", state["devices"])
         self.assertEqual(cache.get(f"emby-live-want:{self.user.id}"), "1")
+
+
+class EmbyConnectionSaveTests(TestCase):
+    """UserId is resolved only when the server or the user name changes."""
+
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username="emby-save")
+        save_connection(
+            self.user,
+            "http://emby.local:8096",
+            "secret-key",
+            EMBY_USER,
+            "viewer",
+        )
+        self.client = Client()
+        self.client.force_login(self.user)
+        self.url = reverse("update_emby_live")
+
+    def _post(self, **overrides):
+        data = {
+            "emby_server_url": "http://emby.local:8096",
+            "emby_username": "viewer",
+            "emby_api_key": "",
+        }
+        data.update(overrides)
+        return self.client.post(self.url, data)
+
+    def test_unchanged_server_and_name_does_not_look_up(self):
+        with patch("integrations.emby_live.lookup_emby_user") as lookup:
+            self._post()
+        lookup.assert_not_called()
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.emby_user_id, EMBY_USER)
+        self.assertEqual(decrypt(self.user.emby_api_key), "secret-key")
+
+    def test_api_key_change_does_not_look_up(self):
+        with patch("integrations.emby_live.lookup_emby_user") as lookup:
+            self._post(emby_api_key="rotated-key")
+        lookup.assert_not_called()
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.emby_user_id, EMBY_USER)
+        self.assertEqual(decrypt(self.user.emby_api_key), "rotated-key")
+        self.assertEqual(self.user.emby_user_name, "viewer")
+
+    def test_case_and_whitespace_do_not_look_up(self):
+        with patch("integrations.emby_live.lookup_emby_user") as lookup:
+            self._post(
+                emby_server_url="  http://emby.local:8096/  ",
+                emby_username="  Viewer  ",
+            )
+        lookup.assert_not_called()
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.emby_user_id, EMBY_USER)
+        self.assertEqual(self.user.emby_user_name, "viewer")
+
+    def test_username_change_resolves_once(self):
+        with patch(
+            "integrations.emby_live.lookup_emby_user",
+            return_value=("new-user-id", "other"),
+        ) as lookup:
+            self._post(emby_username="other")
+        lookup.assert_called_once_with(
+            "http://emby.local:8096",
+            "secret-key",
+            "other",
+        )
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.emby_user_id, "new-user-id")
+        self.assertEqual(self.user.emby_user_name, "other")
+
+    def test_server_change_resolves_on_the_new_server(self):
+        with patch(
+            "integrations.emby_live.lookup_emby_user",
+            return_value=("server-user", "viewer"),
+        ) as lookup:
+            self._post(emby_server_url="http://other.local:8096")
+        lookup.assert_called_once_with(
+            "http://other.local:8096",
+            "secret-key",
+            "viewer",
+        )
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.emby_server_url, "http://other.local:8096")
+        self.assertEqual(self.user.emby_user_id, "server-user")
+
+    def test_first_save_resolves_when_no_id_is_stored(self):
+        self.user.emby_user_id = ""
+        self.user.save(update_fields=["emby_user_id"])
+        with patch(
+            "integrations.emby_live.lookup_emby_user",
+            return_value=(EMBY_USER, "viewer"),
+        ) as lookup:
+            self._post(emby_api_key="secret-key")
+        lookup.assert_called_once()
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.emby_user_id, EMBY_USER)
+
+    def test_lookup_failure_keeps_the_saved_connection(self):
+        before = {
+            "url": self.user.emby_server_url,
+            "key": self.user.emby_api_key,
+            "user_id": self.user.emby_user_id,
+            "name": self.user.emby_user_name,
+        }
+        with patch(
+            "integrations.emby_live.lookup_emby_user",
+            side_effect=EmbyPollError("down"),
+        ):
+            self._post(emby_username="missing", emby_api_key="bad-key")
+        with patch(
+            "integrations.emby_live.lookup_emby_user",
+            return_value=None,
+        ):
+            self._post(emby_server_url="http://other.local:8096")
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.emby_server_url, before["url"])
+        self.assertEqual(self.user.emby_api_key, before["key"])
+        self.assertEqual(self.user.emby_user_id, before["user_id"])
+        self.assertEqual(self.user.emby_user_name, before["name"])

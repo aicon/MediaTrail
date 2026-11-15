@@ -120,6 +120,25 @@ def clear_live_playback_prefix(user):
     ).delete()
 
 
+def emby_identity_unchanged(user, server_url, username):
+    """Return True when the saved server and user name still identify this account.
+
+    Comparison ignores surrounding spaces, a trailing slash on the server,
+    and letter case in the user name. A missing stored id is always a change.
+    """
+    if not (user.emby_user_id or "").strip():
+        return False
+    stored_url = validate_server_url(user.emby_server_url or "")
+    submitted_url = validate_server_url(server_url or "")
+    if not stored_url or not submitted_url or stored_url != submitted_url:
+        return False
+    stored_name = (user.emby_user_name or "").strip().casefold()
+    submitted_name = (username or "").strip().casefold()
+    if not stored_name or not submitted_name:
+        return False
+    return stored_name == submitted_name
+
+
 def lookup_emby_user(server_url, api_key, username):
     """Resolve a display name to exactly one Emby user id."""
     url = f"{server_url.rstrip('/')}/emby/Users"

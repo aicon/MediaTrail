@@ -510,6 +510,7 @@ def update_emby_live(request):
     from integrations.emby_live import (
         EmbyPollError,
         clear_connection,
+        emby_identity_unchanged,
         lookup_emby_user,
         save_connection,
         validate_server_url,
@@ -536,19 +537,26 @@ def update_emby_live(request):
             _("Enter the Emby server address, user name, and API key."),
         )
         return redirect("integrations")
-    try:
-        match = lookup_emby_user(server_url, api_key, username)
-    except EmbyPollError:
-        logger.warning("Emby user lookup failed user=%s", request.user.id)
-        messages.error(request, _("MediaTrail could not reach that Emby server."))
-        return redirect("integrations")
-    if match is None:
-        messages.error(
-            request,
-            _("That Emby user name did not match exactly one account."),
-        )
-        return redirect("integrations")
-    emby_user_id, emby_user_name = match
+    if emby_identity_unchanged(request.user, server_url, username):
+        emby_user_id = request.user.emby_user_id
+        emby_user_name = request.user.emby_user_name
+    else:
+        try:
+            match = lookup_emby_user(server_url, api_key, username)
+        except EmbyPollError:
+            logger.warning("Emby user lookup failed user=%s", request.user.id)
+            messages.error(
+                request,
+                _("MediaTrail could not reach that Emby server."),
+            )
+            return redirect("integrations")
+        if match is None:
+            messages.error(
+                request,
+                _("That Emby user name did not match exactly one account."),
+            )
+            return redirect("integrations")
+        emby_user_id, emby_user_name = match
     save_connection(
         request.user,
         server_url,
