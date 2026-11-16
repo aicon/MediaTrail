@@ -43,10 +43,10 @@
         </div>
       {% endif %}
 
-      <div class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 hover-tap:opacity-100{% if user.clickable_media_cards %} pointer-coarse:hidden{% endif %}">
-        <a href="{{ media.item|media_url }}" class="absolute inset-0 z-0"></a>
+      <div class="absolute inset-0 z-10 flex items-center justify-center bg-black/50 opacity-0 hover-tap:opacity-100{% if user.clickable_media_cards %} pointer-coarse:hidden{% endif %}">
+        <a href="{{ media.item|media_url }}" class="absolute inset-0"></a>
 
-        <div class="relative z-10 flex items-center justify-center space-x-2.5">
+        <div class="relative flex items-center justify-center space-x-2.5">
           <button class="cursor-pointer rounded-full bg-indigo-600 p-2.5 text-white transition-all duration-200 hover:scale-110 hover:bg-indigo-500 hover:shadow-[0_0_15px_rgba(99,102,241,0.5)]"
                   title="{% translate "Add to tracker" %}"
                   hx-get="{% media_view_url 'track_modal' media.item %}"

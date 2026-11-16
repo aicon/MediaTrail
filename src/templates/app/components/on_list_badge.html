@@ -1,7 +1,8 @@
 {% load i18n %}
 {# Same chrome as the left status chip; coral list icon only. #}
 {% if on_list or media.on_list or item.on_list %}
-  <div class="absolute top-2 right-2 z-10 bg-gray-900/90 text-white text-xs px-2 py-1 rounded-md flex items-center shadow-md"
+  {# No z-index: stay under the card hover overlay so the chip dims with the poster. #}
+  <div class="absolute top-2 right-2 bg-gray-900/90 text-white text-xs px-2 py-1 rounded-md flex items-center shadow-md"
        title="{% translate "On a custom list" %}">
     <div class="w-4 h-4 mt-on-list-badge text-orange-500">
       {% include "app/icons/states/planning.svg" %}
