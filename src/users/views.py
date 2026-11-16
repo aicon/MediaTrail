@@ -18,11 +18,17 @@ from app.models import Item, MediaTypes
 from integrations.imports import nuvio
 from app.providers import tmdb
 from users.forms import NotificationSettingsForm, PasswordChangeForm, UserUpdateForm
-from users.languages import LANGUAGE_CHOICES, LANGUAGE_CODES
+from users.languages import (
+    INTERFACE_LANGUAGE_CHOICES,
+    LANGUAGE_AUTO,
+    LANGUAGE_CODES,
+    resolve_interface_language,
+)
 from users.models import (
     WATCH_PROVIDER_REGION_UNSET,
     DateFormatChoices,
     QuickWatchDateChoices,
+    ThemeChoices,
     TimeFormatChoices,
     WeekStartDayChoices,
 )
@@ -236,7 +242,8 @@ def preferences(request):
                 "time_format_choices": TimeFormatChoices.choices,
                 "week_start_day_choices": WeekStartDayChoices.choices,
                 "watch_provider_choices": watch_provider_regions,
-                "language_choices": LANGUAGE_CHOICES,
+                "language_choices": INTERFACE_LANGUAGE_CHOICES,
+                "theme_choices": ThemeChoices.choices,
             },
         )
 
@@ -247,9 +254,13 @@ def preferences(request):
 
     # Process form submission
     language = request.POST.get("language", "")
-    if language in LANGUAGE_CODES:
+    if language == LANGUAGE_AUTO or language in LANGUAGE_CODES:
         request.user.language = language
-        translation.activate(language)
+        translation.activate(resolve_interface_language(request, language))
+
+    theme = request.POST.get("theme", "")
+    if theme in ThemeChoices.values:
+        request.user.theme = theme
 
     request.user.clickable_media_cards = "clickable_media_cards" in request.POST
     request.user.obfuscate_unseen_episodes = "obfuscate_unseen_episodes" in request.POST

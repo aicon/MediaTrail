@@ -4,7 +4,9 @@
 {% load i18n %}
 
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE|default:'en' }}" class="scheme-dark bg-[#212529]">
+<html lang="{{ LANGUAGE_CODE|default:'en' }}"
+      data-theme="{% if request.user.is_authenticated %}{{ request.user.theme }}{% else %}dark{% endif %}"
+      class="bg-[#212529]">
   <head>
     {# Required meta tags #}
     <meta charset="UTF-8">
@@ -57,7 +59,14 @@
     <meta name="msapplication-TileColor" content="#181a1b">
     <meta name="msapplication-config"
           content="{% static "favicon/browserconfig.xml" %}">
-    <meta name="theme-color" content="#181a1b">
+    {% if request.user.is_authenticated and request.user.theme == "light" %}
+      <meta name="theme-color" content="#eef1f5">
+    {% elif request.user.is_authenticated and request.user.theme == "system" %}
+      <meta name="theme-color" content="#181a1b" media="(prefers-color-scheme: dark)">
+      <meta name="theme-color" content="#eef1f5" media="(prefers-color-scheme: light)">
+    {% else %}
+      <meta name="theme-color" content="#181a1b">
+    {% endif %}
 
   </head>
 

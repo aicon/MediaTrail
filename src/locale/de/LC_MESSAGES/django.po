@@ -873,8 +873,8 @@ msgstr "Ihre nächste Suche kann etwas langsamer sein, da neue Daten abgerufen w
 
 msgid "Successfully cleared %(count)s search entry"
 msgid_plural "Successfully cleared %(count)s search entries"
-msgstr[0] "%(count)s Suchergebniseintrag erfolgreich gelöscht"
-msgstr[1] "%(count)s Suchergebniseinträge erfolgreich gelöscht"
+msgstr[0] "%(count)s Sucheintrag erfolgreich gelöscht"
+msgstr[1] "%(count)s Sucheinträge erfolgreich gelöscht"
 
 msgid "This section is view-only for demo accounts."
 msgstr "Dieser Abschnitt ist für Demokonten schreibgeschützt."
@@ -2295,8 +2295,8 @@ msgstr "%(percent)s%% der Aktivität"
 
 msgid "had %(count)s released episode marked as watched automatically."
 msgid_plural "had %(count)s released episodes marked as watched automatically."
-msgstr[0] "wurde automatisch %(count)s veröffentlichte Episode als gesehen markiert."
-msgstr[1] "wurden automatisch %(count)s veröffentlichte Episoden als gesehen markiert."
+msgstr[0] "hat automatisch %(count)s veröffentlichte Episode als gesehen markiert."
+msgstr[1] "hat automatisch %(count)s veröffentlichte Episoden als gesehen markiert."
 
 msgid "was left in progress because unreleased episodes or seasons remain."
 msgstr "blieb in Bearbeitung, da noch unveröffentlichte Episoden oder Staffeln verbleiben."
@@ -2330,3 +2330,24 @@ msgstr "Beginnen Sie mit der Erfassung Ihrer %(kind)s, um festzuhalten, was Sie 
 
 msgid "Browse %(kind)s"
 msgstr "%(kind)s durchsuchen"
+
+msgid "Theme"
+msgstr "Thema"
+
+msgid "System"
+msgstr "System"
+
+msgid "Light"
+msgstr "Hell"
+
+msgid "Dark"
+msgstr "Dunkel"
+
+msgid "Follow the device appearance, or choose a fixed light or dark theme."
+msgstr "Der Darstellung des Geräts folgen oder ein festes helles oder dunkles Thema wählen."
+
+msgid "Auto (browser language)"
+msgstr "Automatisch (Browsersprache)"
+
+msgid "Follow the browser language, or choose a fixed one. English is used when a translation is missing."
+msgstr "Der Browsersprache folgen oder eine feste Sprache wählen. Englisch wird verwendet, wenn eine Übersetzung fehlt."

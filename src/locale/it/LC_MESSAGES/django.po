@@ -360,7 +360,7 @@ msgid "Watched"
 msgstr "Visto"
 
 msgid "Left"
-msgstr "Rimanenti"
+msgstr "Restante"
 
 msgid "Dismiss Now Watching"
 msgstr "Chiudi In visione ora"
@@ -650,7 +650,7 @@ msgid "Add this address in Nuvio under Settings, Addons."
 msgstr "Aggiungi questo indirizzo in Nuvio sotto Impostazioni, Componenti aggiuntivi."
 
 msgid "Play a movie or episode. Each device gets its own Now Watching strip on the home page; you can rename the strip. A finished watch is saved when you stop at 90 percent or more."
-msgstr "Riproduci un film o un episodio. Ogni dispositivo riceve la propria striscia In visione ora nella home page; puoi rinominare la striscia. Una visualizzazione completata viene salvata quando ci si ferma al 90 percento o più."
+msgstr "Riproduci un film o un episodio. Ogni dispositivo riceve la propria striscia In visione ora nella pagina iniziale; puoi rinominare la striscia. Una visualizzazione completata viene salvata quando ci si ferma al 90 percento o più."
 
 msgid "Rename this device"
 msgstr "Rinomina questo dispositivo"
@@ -2295,8 +2295,8 @@ msgstr "%(percent)s%% dell'attività"
 
 msgid "had %(count)s released episode marked as watched automatically."
 msgid_plural "had %(count)s released episodes marked as watched automatically."
-msgstr[0] "è stato contrassegnato automaticamente %(count)s episodio rilasciato come visto."
-msgstr[1] "sono stati contrassegnati automaticamente %(count)s episodi rilasciati come visti."
+msgstr[0] "ha contrassegnato automaticamente %(count)s episodio uscito come visto."
+msgstr[1] "ha contrassegnato automaticamente %(count)s episodi usciti come visti."
 
 msgid "was left in progress because unreleased episodes or seasons remain."
 msgstr "è rimasto in corso perché rimangono episodi o stagioni non rilasciati."
@@ -2330,3 +2330,24 @@ msgstr "Inizia a monitorare i tuoi %(kind)s per tenere traccia di ciò che hai c
 
 msgid "Browse %(kind)s"
 msgstr "Sfoglia %(kind)s"
+
+msgid "Theme"
+msgstr "Tema"
+
+msgid "System"
+msgstr "Sistema"
+
+msgid "Light"
+msgstr "Chiaro"
+
+msgid "Dark"
+msgstr "Scuro"
+
+msgid "Follow the device appearance, or choose a fixed light or dark theme."
+msgstr "Segui l’aspetto del dispositivo oppure scegli un tema chiaro o scuro fisso."
+
+msgid "Auto (browser language)"
+msgstr "Automatico (lingua del browser)"
+
+msgid "Follow the browser language, or choose a fixed one. English is used when a translation is missing."
+msgstr "Segui la lingua del browser oppure scegline una fissa. Si usa l’inglese quando manca una traduzione."

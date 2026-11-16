@@ -8,7 +8,7 @@ from django_celery_results.models import TaskResult
 
 from app.models import Item, MediaTypes, Status
 from users import helpers
-from users.languages import LANGUAGE_CHOICES
+from users.languages import INTERFACE_LANGUAGE_CHOICES, LANGUAGE_AUTO
 
 EXCLUDED_SEARCH_TYPES = [MediaTypes.SEASON.value, MediaTypes.EPISODE.value]
 
@@ -117,6 +117,14 @@ class WeekStartDayChoices(models.TextChoices):
 
     MONDAY = "monday", _("Monday")
     SUNDAY = "sunday", _("Sunday")
+
+
+class ThemeChoices(models.TextChoices):
+    """Interface appearance. System follows the device color scheme."""
+
+    SYSTEM = "system", _("System")
+    LIGHT = "light", _("Light")
+    DARK = "dark", _("Dark")
 
 
 class User(AbstractUser):
@@ -307,10 +315,16 @@ class User(AbstractUser):
     )
 
     # UI preferences
+    theme = models.CharField(
+        max_length=8,
+        default=ThemeChoices.DARK,
+        choices=ThemeChoices,
+        help_text="Interface appearance. System follows the device color scheme.",
+    )
     language = models.CharField(
         max_length=8,
-        default="en",
-        choices=LANGUAGE_CHOICES,
+        default=LANGUAGE_AUTO,
+        choices=INTERFACE_LANGUAGE_CHOICES,
     )
     clickable_media_cards = models.BooleanField(
         default=False,

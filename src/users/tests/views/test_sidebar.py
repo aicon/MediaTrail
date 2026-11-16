@@ -36,6 +36,7 @@ class SidebarViewTests(TestCase):
         self.assertIn(MediaTypes.MOVIE.value, response.context["media_types"])
         self.assertNotIn(MediaTypes.EPISODE.value, response.context["media_types"])
         self.assertContains(response, 'name="language"')
+        self.assertContains(response, "Auto (browser language)")
         self.assertContains(response, "Magyar")
 
     def test_language_preference_switches_the_interface(self):
@@ -56,10 +57,33 @@ class SidebarViewTests(TestCase):
         self.assertContains(page, "Beállítások")
 
     def test_unknown_language_is_ignored(self):
-        """A language outside the supported set does not replace English."""
+        """A language outside the supported set does not replace the saved one."""
+        self.user.language = "en"
+        self.user.save()
+
         self.client.post(reverse("preferences"), {"language": "xx"})
         self.user.refresh_from_db()
         self.assertEqual(self.user.language, "en")
+
+    def test_auto_language_follows_the_browser(self):
+        """Auto uses the browser language and can be overridden by a fixed choice."""
+        self.user.language = "auto"
+        self.user.save()
+
+        hungarian = self.client.get(
+            reverse("preferences"),
+            HTTP_ACCEPT_LANGUAGE="hu",
+        )
+        self.assertContains(hungarian, "Nyelv")
+
+        self.user.language = "en"
+        self.user.save()
+        fixed = self.client.get(
+            reverse("preferences"),
+            HTTP_ACCEPT_LANGUAGE="hu",
+        )
+        self.assertContains(fixed, "Language")
+        self.assertNotContains(fixed, "Nyelv")
 
     def test_sidebar_post_update_preferences(self):
         """Test POST request to update preferences."""
@@ -222,3 +246,38 @@ class SidebarViewTests(TestCase):
 
         self.user.refresh_from_db()
         self.assertEqual(self.user.week_start_day, WeekStartDayChoices.SUNDAY)
+
+    def test_theme_preference_is_saved_and_applied(self):
+        """A saved theme is stored on the user and rendered before paint."""
+        response = self.client.post(
+            reverse("preferences"),
+            {
+                "language": "en",
+                "theme": "light",
+                "media_types_checkboxes": [MediaTypes.TV.value],
+            },
+        )
+        self.assertRedirects(response, reverse("preferences"))
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.theme, "light")
+
+        page = self.client.get(reverse("preferences"))
+        self.assertContains(page, 'data-theme="light"')
+        self.assertContains(page, 'name="theme"')
+
+    def test_invalid_theme_is_ignored(self):
+        """A theme outside the three choices does not replace the saved one."""
+        self.user.theme = "dark"
+        self.user.save()
+
+        self.client.post(
+            reverse("preferences"),
+            {
+                "language": "en",
+                "theme": "sepia",
+                "media_types_checkboxes": [MediaTypes.TV.value],
+            },
+        )
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.theme, "dark")

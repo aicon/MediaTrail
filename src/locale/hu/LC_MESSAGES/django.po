@@ -2574,3 +2574,24 @@ msgstr "Kezdd el követni a %(kind)s listát, hogy a befejezettek itt maradjanak
 
 msgid "Browse %(kind)s"
 msgstr "%(kind)s böngészése"
+
+msgid "Theme"
+msgstr "Téma"
+
+msgid "System"
+msgstr "Rendszer"
+
+msgid "Light"
+msgstr "Világos"
+
+msgid "Dark"
+msgstr "Sötét"
+
+msgid "Follow the device appearance, or choose a fixed light or dark theme."
+msgstr "Kövesse az eszköz megjelenését, vagy válasszon rögzített világos vagy sötét témát."
+
+msgid "Auto (browser language)"
+msgstr "Automatikus (böngésző nyelve)"
+
+msgid "Follow the browser language, or choose a fixed one. English is used when a translation is missing."
+msgstr "Kövesse a böngésző nyelvét, vagy válasszon egy rögzítettet. Ha egy fordítás hiányzik, angol jelenik meg."

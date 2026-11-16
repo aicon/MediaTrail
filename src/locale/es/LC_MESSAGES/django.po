@@ -246,7 +246,7 @@ msgid "In Progress"
 msgstr "En progreso"
 
 msgid "Planning"
-msgstr "Planificando"
+msgstr "Planeado"
 
 msgid "Paused"
 msgstr "En pausa"
@@ -378,7 +378,7 @@ msgid "Nothing is actively moving right now"
 msgstr "Nada se está moviendo activamente en este momento"
 
 msgid "Your planning shelf is still empty"
-msgstr "Tu estante de planificación todavía está vacío"
+msgstr "Tu lista de planeados todavía está vacía"
 
 msgid "Start a title and mark it as in progress to see quick updates and release reminders here."
 msgstr "Inicia un título y márcalo como en progreso para ver actualizaciones rápidas y recordatorios de lanzamientos aquí."
@@ -2295,23 +2295,23 @@ msgstr "%(percent)s%% de la actividad"
 
 msgid "had %(count)s released episode marked as watched automatically."
 msgid_plural "had %(count)s released episodes marked as watched automatically."
-msgstr[0] "se marcó automáticamente %(count)s episodio publicado como visto."
-msgstr[1] "se marcaron automáticamente %(count)s episodios publicados como vistos."
+msgstr[0] "marcó automáticamente %(count)s episodio publicado como visto."
+msgstr[1] "marcó automáticamente %(count)s episodios publicados como vistos."
 
 msgid "was left in progress because unreleased episodes or seasons remain."
-msgstr "se dejó en progreso porque quedan episodios o temporadas sin estrenar."
+msgstr "quedó en progreso porque quedan episodios o temporadas sin estrenar."
 
 msgid "Season %(number)s was marked as in progress automatically."
-msgstr "La temporada %(number)s se marcó automáticamente como en progreso."
+msgstr "Temporada %(number)s quedó en progreso automáticamente."
 
 msgid "remains in progress because another season is still pending or has not aired yet."
 msgstr "permanece en progreso porque otra temporada todavía está pendiente o aún no se ha emitido."
 
 msgid "was marked as completed automatically."
-msgstr "se marcó automáticamente como completado."
+msgstr "fue marcado automáticamente como completado."
 
 msgid "was left in progress because unreleased episodes remain."
-msgstr "se dejó en progreso porque quedan episodios no estrenados."
+msgstr "quedó en progreso porque quedan episodios sin estrenar."
 
 msgid "Grid View"
 msgstr "Vista de cuadrícula"
@@ -2330,3 +2330,24 @@ msgstr "Comienza a seguir tus %(kind)s para mantener un registro de lo que has t
 
 msgid "Browse %(kind)s"
 msgstr "Explorar %(kind)s"
+
+msgid "Theme"
+msgstr "Tema"
+
+msgid "System"
+msgstr "Sistema"
+
+msgid "Light"
+msgstr "Claro"
+
+msgid "Dark"
+msgstr "Oscuro"
+
+msgid "Follow the device appearance, or choose a fixed light or dark theme."
+msgstr "Sigue la apariencia del dispositivo o elige un tema claro u oscuro fijo."
+
+msgid "Auto (browser language)"
+msgstr "Automático (idioma del navegador)"
+
+msgid "Follow the browser language, or choose a fixed one. English is used when a translation is missing."
+msgstr "Sigue el idioma del navegador o elige uno fijo. Se usa el inglés cuando falta una traducción."

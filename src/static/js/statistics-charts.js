@@ -155,6 +155,47 @@ document.addEventListener("DOMContentLoaded", function () {
     tooltipEl.style.pointerEvents = "none";
   }
 
+  function chartIsLight() {
+    const mode = document.documentElement.getAttribute("data-theme");
+    if (mode === "light") return true;
+    if (mode === "dark") return false;
+    return window.matchMedia("(prefers-color-scheme: light)").matches;
+  }
+
+  function chartPalette() {
+    return chartIsLight()
+      ? { ink: "#3a4250", grid: "rgba(26, 29, 32, 0.12)" }
+      : { ink: "#D1D5DB", grid: "rgba(255, 255, 255, 0.1)" };
+  }
+
+  const charts = [];
+
+  function applyChartPalette(chart) {
+    const palette = chartPalette();
+    const plugins = chart.options.plugins || {};
+    if (plugins.datalabels) plugins.datalabels.color = palette.ink;
+    if (plugins.legend && plugins.legend.labels) {
+      plugins.legend.labels.color = palette.ink;
+    }
+    if (plugins.title) plugins.title.color = palette.ink;
+    ["x", "y"].forEach((axis) => {
+      const scale = chart.options.scales && chart.options.scales[axis];
+      if (!scale) return;
+      if (scale.ticks) scale.ticks.color = palette.ink;
+      if (scale.grid) scale.grid.color = palette.grid;
+      if (scale.title) scale.title.color = palette.ink;
+    });
+    chart.data.datasets.forEach((dataset) => {
+      if (
+        dataset.borderColor === "rgba(255, 255, 255, 0.1)" ||
+        dataset.borderColor === "rgba(26, 29, 32, 0.12)"
+      ) {
+        dataset.borderColor = palette.grid;
+      }
+    });
+    chart.update();
+  }
+
   // Common configuration for pie charts
   const pieChartConfig = {
     responsive: true,
@@ -281,11 +322,14 @@ document.addEventListener("DOMContentLoaded", function () {
   function initializeChartIfExists(elementId, chartType, data, options) {
     const element = document.getElementById(elementId);
     if (element) {
-      return new Chart(element.getContext("2d"), {
+      const chart = new Chart(element.getContext("2d"), {
         type: chartType,
         data: data,
         options: options,
       });
+      charts.push(chart);
+      applyChartPalette(chart);
+      return chart;
     }
     return null;
   }
@@ -383,4 +427,13 @@ document.addEventListener("DOMContentLoaded", function () {
       scoreChartOptions
     );
   }
+
+  window
+    .matchMedia("(prefers-color-scheme: light)")
+    .addEventListener("change", () => {
+      if (document.documentElement.getAttribute("data-theme") !== "system") {
+        return;
+      }
+      charts.forEach(applyChartPalette);
+    });
 });

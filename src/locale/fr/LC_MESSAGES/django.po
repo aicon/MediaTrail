@@ -378,13 +378,13 @@ msgid "Nothing is actively moving right now"
 msgstr "Rien ne bouge activement pour le moment"
 
 msgid "Your planning shelf is still empty"
-msgstr "Votre étagère de planification est encore vide"
+msgstr "Votre liste des prévus est encore vide"
 
 msgid "Start a title and mark it as in progress to see quick updates and release reminders here."
 msgstr "Commencez un titre et marquez-le comme en cours pour voir les mises à jour rapides et les rappels de sortie ici."
 
 msgid "Add a few titles to planning to see them here."
-msgstr "Ajoutez quelques titres à votre liste de prévisions pour les voir ici."
+msgstr "Ajoutez quelques titres à la liste des prévus pour les voir ici."
 
 msgid "Browse media"
 msgstr "Parcourir les médias"
@@ -650,7 +650,7 @@ msgid "Add this address in Nuvio under Settings, Addons."
 msgstr "Ajoutez cette adresse dans Nuvio sous Paramètres, Extensions."
 
 msgid "Play a movie or episode. Each device gets its own Now Watching strip on the home page; you can rename the strip. A finished watch is saved when you stop at 90 percent or more."
-msgstr "Lisez un film ou un épisode. Chaque appareil dispose de sa propre bande En train de regarder sur la page d'accueil ; vous pouvez renommer la bande. Un visionnage terminé est enregistré lorsque vous vous arrêtez à 90 % ou plus."
+msgstr "Regardez un film ou un épisode. Chaque appareil dispose de sa propre bande En train de regarder sur la page d'accueil ; vous pouvez renommer la bande. Un visionnage terminé est enregistré lorsque vous vous arrêtez à 90 % ou plus."
 
 msgid "Rename this device"
 msgstr "Renommer cet appareil"
@@ -896,7 +896,7 @@ msgstr "Toutes les heures"
 
 msgid "Every %(count)s hour"
 msgid_plural "Every %(count)s hours"
-msgstr[0] "Toutes les %(count)s heure"
+msgstr[0] "Chaque %(count)s heure"
 msgstr[1] "Toutes les %(count)s heures"
 
 msgid "Every 3 hours"
@@ -1786,7 +1786,7 @@ msgid "Track Episode"
 msgstr "Suivre l'épisode"
 
 msgid "Last watched:"
-msgstr "Dernière consultation :"
+msgstr "Dernier visionnage :"
 
 msgid "No date provided"
 msgstr "Aucune date fournie"
@@ -2320,7 +2320,7 @@ msgid "Table View"
 msgstr "Vue en tableau"
 
 msgid "Last watched"
-msgstr "Dernière consultation"
+msgstr "Dernier visionnage"
 
 msgid "No %(kind)s tracked yet"
 msgstr "Aucun %(kind)s suivi pour l'instant"
@@ -2330,3 +2330,24 @@ msgstr "Commencez à suivre vos %(kind)s pour garder une trace de ce que vous av
 
 msgid "Browse %(kind)s"
 msgstr "Parcourir %(kind)s"
+
+msgid "Theme"
+msgstr "Thème"
+
+msgid "System"
+msgstr "Système"
+
+msgid "Light"
+msgstr "Clair"
+
+msgid "Dark"
+msgstr "Sombre"
+
+msgid "Follow the device appearance, or choose a fixed light or dark theme."
+msgstr "Suivre l’apparence de l’appareil, ou choisir un thème clair ou sombre fixe."
+
+msgid "Auto (browser language)"
+msgstr "Automatique (langue du navigateur)"
+
+msgid "Follow the browser language, or choose a fixed one. English is used when a translation is missing."
+msgstr "Suivre la langue du navigateur, ou en choisir une fixe. L’anglais est utilisé lorsqu’une traduction manque."
