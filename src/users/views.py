@@ -7,6 +7,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.core.cache import cache
 from django.db import IntegrityError
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import translation
 from django.utils.translation import gettext as _
@@ -305,6 +306,35 @@ def preferences(request):
     messages.success(request, _("Settings updated."))
 
     return redirect("preferences")
+
+
+@require_POST
+def update_theme(request):
+    """Save only the interface theme from the header switcher."""
+    if request.user.is_demo:
+        return JsonResponse(
+            {
+                "ok": False,
+                "error": _("This section is view-only for demo accounts."),
+                "theme": request.user.theme,
+            },
+            status=403,
+        )
+
+    theme = request.POST.get("theme", "")
+    if theme not in ThemeChoices.values:
+        return JsonResponse(
+            {
+                "ok": False,
+                "error": _("Could not save the theme."),
+                "theme": request.user.theme,
+            },
+            status=400,
+        )
+
+    request.user.theme = theme
+    request.user.save(update_fields=["theme"])
+    return JsonResponse({"ok": True, "theme": theme})
 
 
 @require_GET

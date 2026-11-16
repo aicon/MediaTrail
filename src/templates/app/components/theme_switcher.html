@@ -1,0 +1,43 @@
+{% load i18n %}
+{# Three-button theme control. Saves only user.theme via update_theme. #}
+<div class="mt-theme-switch"
+     role="group"
+     aria-label="{% translate 'Theme' %}"
+     x-data="themeSwitcher({
+       theme: '{{ request.user.theme|escapejs }}',
+       url: '{% url 'update_theme' %}',
+       csrfToken: '{{ csrf_token|escapejs }}',
+       saveFailed: '{% translate "Could not save the theme."|escapejs %}'
+     })">
+  <span class="sr-only" aria-live="polite" x-text="statusMessage"></span>
+  <button type="button"
+          class="mt-theme-btn"
+          :class="{ 'is-active': theme === 'system' }"
+          :aria-pressed="theme === 'system' ? 'true' : 'false'"
+          aria-label="{% translate 'System theme' %}"
+          title="{% translate 'System theme' %}"
+          :disabled="busy"
+          @click="setTheme('system')">
+    {% include "app/icons/theme-system.svg" with classes="mt-theme-icon" %}
+  </button>
+  <button type="button"
+          class="mt-theme-btn"
+          :class="{ 'is-active': theme === 'light' }"
+          :aria-pressed="theme === 'light' ? 'true' : 'false'"
+          aria-label="{% translate 'Light theme' %}"
+          title="{% translate 'Light theme' %}"
+          :disabled="busy"
+          @click="setTheme('light')">
+    {% include "app/icons/theme-sun.svg" with classes="mt-theme-icon" %}
+  </button>
+  <button type="button"
+          class="mt-theme-btn"
+          :class="{ 'is-active': theme === 'dark' }"
+          :aria-pressed="theme === 'dark' ? 'true' : 'false'"
+          aria-label="{% translate 'Dark theme' %}"
+          title="{% translate 'Dark theme' %}"
+          :disabled="busy"
+          @click="setTheme('dark')">
+    {% include "app/icons/theme-moon.svg" with classes="mt-theme-icon" %}
+  </button>
+</div>

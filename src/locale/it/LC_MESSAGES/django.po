@@ -2351,3 +2351,15 @@ msgstr "Automatico (lingua del browser)"
 
 msgid "Follow the browser language, or choose a fixed one. English is used when a translation is missing."
 msgstr "Segui la lingua del browser oppure scegline una fissa. Si usa l’inglese quando manca una traduzione."
+
+msgid "System theme"
+msgstr "Tema di sistema"
+
+msgid "Light theme"
+msgstr "Tema chiaro"
+
+msgid "Dark theme"
+msgstr "Tema scuro"
+
+msgid "Could not save the theme."
+msgstr "Impossibile salvare il tema."

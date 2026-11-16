@@ -18,6 +18,7 @@ urlpatterns = [
     ),
     path("test_notification", views.test_notification, name="test_notification"),
     path("settings/preferences", views.preferences, name="preferences"),
+    path("settings/theme", views.update_theme, name="update_theme"),
     path("settings/integrations", views.integrations, name="integrations"),
     path("settings/import", views.import_data, name="import_data"),
     path("settings/export", views.export_data, name="export_data"),

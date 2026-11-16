@@ -14,7 +14,7 @@
 
 A MediaTrail egy önállóan üzemeltethető webes alkalmazás filmek, tévésorozatok, évadok, epizódok, animék, mangák, videojátékok, könyvek, képregények és társasjátékok egy helyen történő követésére és rendszerezésére. Gondozd a gyűjteményedet, jegyezz fel fontos dátumokat, értékeld a műveket, kövesd nyomon az előrehaladásodat, állíts össze egyéni listákat, és fedezd fel a személyes statisztikáidat.
 
-A projekt a [Yamtrack](https://github.com/FuzzyGrim/Yamtrack) független leágazásaként (forkjaként) indult útjára, olyan alapvető képességekkel gazdagodva, mint a beépített REST API, a részletes epizód-előzmények, a valós idejű lejátszáskövetés, a mélyreható Nuvio-integráció, valamint a teljes körű magyar kezelőfelület.
+A projekt a [Yamtrack](https://github.com/FuzzyGrim/Yamtrack) független leágazásaként (forkjaként) indult útjára, olyan képességekkel gazdagodva, mint a beépített REST API, a részletes epizód-előzmények, az élő Most nézem sáv, a Nuvio-szinkron, az Emby élő lejátszáskövetés, a rendszer/világos/sötét téma, valamint a többnyelvű kezelőfelület (angol, német, spanyol, francia, magyar, olasz).
 
 ---
 
@@ -29,9 +29,10 @@ A projekt a [Yamtrack](https://github.com/FuzzyGrim/Yamtrack) független leágaz
 - **Együttműködés és megosztott listák:** Bármilyen célra létrehozhatsz tematikus listákat, és a szerkesztésbe bevonhatod a szerver többi felhasználóját is.
 - **Közelgő megjelenések és naptár:** Mindig szem előtt tarthatod a várható bemutatókat a külső alkalmazásokba exportálható iCalendar (`.ics`) hivatkozás és az automatikus Apprise-értesítések (Discord, Telegram, ntfy, Slack, e-mail stb.) segítségével.
 - **Több felhasználó, teljesen elkülönülő gyűjtemények:** Minden felhasználó saját, elszeparált médiatárat kezel. A belépés történhet helyi jelszóval vagy közösségi / OIDC azonosítóval (Google, GitHub, Discord) a django-allauth modulon keresztül.
-- **Magyar és angol kezelőfelület:** A kívánt nyelvet fiókonként külön-külön megválaszthatod a Beállításokban. A TMDB-ből érkező leírások nyelve a `TMDB_LANG` környezeti változóval határozható meg.
+- **Többnyelvű kezelőfelület:** Fiókonként választható nyelv — Automatikus (böngésző), angol, német, spanyol, francia, magyar vagy olasz. A TMDB-ből érkező katalógusszövegek nyelve továbbra is a `TMDB_LANG` környezeti változót követi.
+- **Rendszer, világos és sötét téma:** Követheted az eszköz megjelenését, vagy a Beállításokban rögzíthetsz világos vagy sötét témát. A választás a fiókodhoz mentődik, és már az első kirajzolás előtt érvényesül.
 - **Előzmények importálása, Nuvio-integrációval:** Beemelheted a profilodat közvetlenül a Nuvióból (akár csak az új tételek hozzáadásával, akár a meglévők frissítésével), titkosított hitelesítő adatokkal és automatikus ütemezéssel. A szinkronizáció elérhető a Trakt, SIMKL, MyAnimeList, AniList és Kitsu rendszerekkel is. A Trakt webexport ZIP is importálható ellenőrzéssel és előnézettel. A teljes gyűjteményedet bármikor exportálhatod vagy importálhatod CSV formátumban, emellett feldolgozhatók az IMDb, Goodreads, Steam és HowLongToBeat listái is.
-- **Beépített lejátszáskövető (Scrobbler Nuvio és médiaszerverek számára):** A MediaTrail közvetlenül magában foglalja a Stremio protokollját támogató kiegészítő-végpontot, amely külső segédkonténer nélkül fogadja a lejátszási eseményeket a támogatott társalkalmazásokból. Élő „Most nézem” sávokat jelenít meg a kezdőlapon, és a megtekintés végén automatikusan rögzíti a befejezést. A Jellyfin, Plex és Emby szerverek webhookokon keresztül csatlakoztathatók.
+- **Beépített lejátszáskövető (Scrobbler Nuvio és médiaszerverek számára):** A MediaTrail közvetlenül magában foglalja a Stremio protokollját támogató kiegészítő-végpontot, amely külső segédkonténer nélkül fogadja a lejátszási eseményeket a támogatott társalkalmazásokból. Élő „Most nézem” sávokat jelenít meg a kezdőlapon, és a megtekintés végén automatikusan rögzíti a befejezést. A Jellyfin és a Plex webhookokon keresztül scrobbol. Az Emby a befejezéseket webhookkal rögzíti, és aktív lejátszás közben élő Most nézem sávot is mutat.
 - **Korszerű REST API (előzetes változat):** Teljes értékű REST API a `/api/v1/`, OpenAPI séma a `/api/schema/`, és interaktív Swagger dokumentáció a `/api/docs/` címen. Részletes útmutató: [API_HU.md](API_HU.md) ([English](API.md)).
 - **Egyetlen, önálló konténer:** Azonnal futtatható Docker Compose konfiguráció beépített Redis-kiszolgálóval. Minden adat egyetlen csatolt mappában (`db`) marad a szervereden.
 
@@ -159,7 +160,7 @@ A MediaTrail egy független, nem hivatalos leágazás; **nem áll kapcsolatban a
 ### Háttér és célkitűzések
 A MediaTrail fejlesztése a Yamtrack `dev` ágából indult a `v0.25.3` kiadást követően (konkrétan a 2026. július 12-i, fülekkel ellátott részletes adatlap állapotából), beépítve a `#1378`-as számú REST API előzetest és a `#1608`-as epizód-előzménykezelést.
 
-A MediaTrail a `0.26.9` után ismét kisebb patch-lépésekkel folytatódik, a stabilitást, az önálló üzemeltethetőséget és a saját integrációkat (Nuvio, napló, statisztikák, importeszközök) helyezve előtérbe.
+A MediaTrail a `0.26.10` után is kisebb patch-lépésekkel folytatódik, a stabilitást, az önálló üzemeltethetőséget és a saját funkciókat helyezve előtérbe: Nuvio, napló, statisztikák, importeszközök, Emby élő Most nézem, témák és többnyelvű felület.
 
 | Funkció | Eredeti Yamtrack (Stabil) | MediaTrail |
 | :--- | :---: | :---: |
@@ -167,7 +168,9 @@ A MediaTrail a `0.26.9` után ismét kisebb patch-lépésekkel folytatódik, a s
 | **Többszöri epizód-megtekintési előzmények** | Nincs | Van |
 | **Beépített Scrobbler és többeszközös „Most nézem”** | Nincs | Van |
 | **Nuvio szinkronizáció és import** | Nincs | Van |
-| **Magyar nyelvű kezelőfelület** | Nincs | Van |
+| **Emby élő Most nézem** | Nincs | Van |
+| **Rendszer / világos / sötét téma** | Nincs | Van |
+| **Többnyelvű felület** (Automatikus, angol, német, spanyol, francia, magyar, olasz) | Nincs | Van |
 | **Beépített belső Redis-kiszolgáló** | Nincs *(külön szolgáltatást igényel)* | Van *(a konténer része)* |
 | **Belső Python csomagnév** | `yamtrack` | `yamtrack` *(a kompatibilitás megőrzéséért)* |
 

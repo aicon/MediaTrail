@@ -281,3 +281,44 @@ class SidebarViewTests(TestCase):
         )
         self.user.refresh_from_db()
         self.assertEqual(self.user.theme, "dark")
+
+    def test_header_theme_endpoint_saves_only_theme(self):
+        """The header switcher endpoint updates theme without other preferences."""
+        self.user.theme = "dark"
+        self.user.language = "en"
+        self.user.clickable_media_cards = False
+        self.user.save()
+
+        response = self.client.post(
+            reverse("update_theme"),
+            {"theme": "system"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"ok": True, "theme": "system"})
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.theme, "system")
+        self.assertEqual(self.user.language, "en")
+        self.assertFalse(self.user.clickable_media_cards)
+
+        home = self.client.get(reverse("home"))
+        self.assertContains(home, 'data-theme="system"')
+        self.assertContains(home, 'aria-label="System theme"')
+        self.assertContains(home, 'aria-label="Light theme"')
+        self.assertContains(home, 'aria-label="Dark theme"')
+
+    def test_header_theme_endpoint_rejects_invalid_value(self):
+        """Invalid theme values leave the saved theme unchanged."""
+        self.user.theme = "light"
+        self.user.save()
+
+        response = self.client.post(
+            reverse("update_theme"),
+            {"theme": "sepia"},
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(response.json()["ok"])
+        self.assertEqual(response.json()["theme"], "light")
+
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.theme, "light")

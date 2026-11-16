@@ -2595,3 +2595,15 @@ msgstr "Automatikus (böngésző nyelve)"
 
 msgid "Follow the browser language, or choose a fixed one. English is used when a translation is missing."
 msgstr "Kövesse a böngésző nyelvét, vagy válasszon egy rögzítettet. Ha egy fordítás hiányzik, angol jelenik meg."
+
+msgid "System theme"
+msgstr "Rendszertéma"
+
+msgid "Light theme"
+msgstr "Világos téma"
+
+msgid "Dark theme"
+msgstr "Sötét téma"
+
+msgid "Could not save the theme."
+msgstr "A téma mentése nem sikerült."

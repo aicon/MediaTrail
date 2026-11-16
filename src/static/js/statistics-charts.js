@@ -436,4 +436,8 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       charts.forEach(applyChartPalette);
     });
+
+  window.addEventListener("mediatrail:themechange", () => {
+    charts.forEach(applyChartPalette);
+  });
 });
