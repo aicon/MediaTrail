@@ -387,8 +387,21 @@ def media_details(request, source, media_type, media_id, title):  # noqa: ARG001
             current_instance.item, media_metadata.get("image")
         )
 
-    selected_sources = _recommendation_sources_from_request(request)
+    preferred_sources = _recommendation_sources_from_request(request)
+    # First paint: TMDB only (already on the detail payload). IMDb/AI load via HTMX.
+    defer_slow_recommendations = False
+    selected_sources = preferred_sources
     if media_type in (MediaTypes.MOVIE.value, MediaTypes.TV.value):
+        if "rec_sources" not in request.GET:
+            selected_sources = recommendation_pipeline.fast_initial_sources(
+                preferred_sources
+            )
+            defer_slow_recommendations = (
+                recommendation_pipeline.needs_deferred_load(
+                    preferred_sources,
+                    selected_sources,
+                )
+            )
         recommendation_pipeline.apply_to_metadata(
             request.user,
             media_metadata,
@@ -427,7 +440,9 @@ def media_details(request, source, media_type, media_id, title):  # noqa: ARG001
         "watch_providers": watch_providers,
         "watch_provider_region": request.user.watch_provider_region,
         "recommendation_source_options": recommendation_source_rows(request.user),
-        "selected_recommendation_sources": selected_sources,
+        # Pills show the user's preferred engines even while TMDB-only is on screen.
+        "selected_recommendation_sources": preferred_sources,
+        "defer_slow_recommendations": defer_slow_recommendations,
     }
     return render(request, "app/media_details.html", context)
 
@@ -464,6 +479,7 @@ def media_recommendations_partial(request, source, media_type, media_id, title):
             "source": source,
             "media_id": media_id,
             "title": title,
+            "defer_slow_recommendations": False,
         },
     )
 

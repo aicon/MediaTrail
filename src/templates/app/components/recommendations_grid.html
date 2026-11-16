@@ -7,10 +7,11 @@
       action="javascript:void(0)"
       onsubmit="return false;"
       hx-get="{% url 'media_recommendations_partial' source=source|default:media.source media_type=media_type media_id=media_id|default:media.media_id title=title|default:media.title|slug %}"
-      hx-trigger="change"
+      hx-trigger="change{% if defer_slow_recommendations %}, load delay:150ms{% endif %}"
       hx-target="this"
-      hx-swap="outerHTML">
-  <div class="flex flex-wrap gap-2" role="group" aria-label="{% translate "Recommendation sources" %}">
+      hx-swap="outerHTML"
+      hx-indicator="#recommendations-loading">
+  <div class="flex flex-wrap items-center gap-2" role="group" aria-label="{% translate "Recommendation sources" %}">
     {# Ensures an empty selection still sends rec_sources= so prefs are not reapplied. #}
     <input type="hidden" name="rec_sources" value="">
     {% for option in recommendation_source_options %}
@@ -25,6 +26,10 @@
         </label>
       {% endif %}
     {% endfor %}
+    <span id="recommendations-loading"
+          class="htmx-indicator text-xs text-gray-400 ml-1">
+      {% translate "Loading more recommendations…" %}
+    </span>
   </div>
 
   {% if related_items %}

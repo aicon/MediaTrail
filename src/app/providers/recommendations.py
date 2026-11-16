@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from django.conf import settings
+from django.db import close_old_connections
 
 from app.models import MediaTypes, Sources
 from app.providers import gemini_recommendations, imdb_recommendations, services, tmdb
@@ -26,6 +28,11 @@ _LABEL = {
 # AI and IMDb first so cultural / more-like-this hits are not buried under TMDB.
 _MERGE_PRIORITY = (SOURCE_AI, SOURCE_IMDB, SOURCE_TMDB)
 
+# Keep cold-path latency bounded; cache makes later loads cheap.
+_MAX_IMDB_RESOLVE = 10
+_MAX_AI_RESOLVE = 8
+_RESOLVE_WORKERS = 4
+
 
 def build_recommendations(user, media_metadata: dict, media_type: str, sources=None):
     """Return deduped recommendation item dicts with a ``sources`` list."""
@@ -43,20 +50,34 @@ def build_recommendations(user, media_metadata: dict, media_type: str, sources=N
     seed_id = str(media_metadata.get("media_id") or "")
     buckets: dict[str, list[dict]] = {}
 
-    # Sequential on purpose: SQLite cache writes are not thread-safe here.
-    for key in selected:
+    def _run(key: str) -> tuple[str, list[dict]]:
+        close_old_connections()
         try:
             if key == SOURCE_TMDB:
-                buckets[key] = _from_tmdb(media_metadata)
-            elif key == SOURCE_IMDB:
-                buckets[key] = _from_imdb(media_metadata, media_type)
-            elif key == SOURCE_AI:
-                buckets[key] = _from_ai(user, media_metadata, media_type)
-            else:
-                buckets[key] = []
+                return key, _from_tmdb(media_metadata)
+            if key == SOURCE_IMDB:
+                return key, _from_imdb(media_metadata, media_type)
+            if key == SOURCE_AI:
+                return key, _from_ai(user, media_metadata, media_type)
+            return key, []
         except Exception:
             logger.exception("Recommendation source %s failed", key)
-            buckets[key] = []
+            return key, []
+        finally:
+            close_old_connections()
+
+    if len(selected) == 1:
+        key, items = _run(selected[0])
+        buckets[key] = items
+    else:
+        # Parallelize slow sources (IMDb resolve + Gemini). TMDB is already local.
+        with ThreadPoolExecutor(max_workers=min(3, len(selected))) as pool:
+            futures = [pool.submit(_run, key) for key in selected]
+            for future in as_completed(futures):
+                key, items = future.result()
+                buckets[key] = items
+
+    for key in selected:
         logger.info(
             "Recommendation source %s returned %s items for %s/%s",
             key,
@@ -80,6 +101,18 @@ def apply_to_metadata(user, media_metadata: dict, media_type: str, sources=None)
     return media_metadata
 
 
+def fast_initial_sources(preferred: list[str]) -> list[str]:
+    """Sources used for the first paint (TMDB when enabled)."""
+    if SOURCE_TMDB in preferred:
+        return [SOURCE_TMDB]
+    return list(preferred[:1]) if preferred else [SOURCE_TMDB]
+
+
+def needs_deferred_load(preferred: list[str], loaded: list[str]) -> bool:
+    """True when preferred sources include slow engines not yet loaded."""
+    return any(source in preferred and source not in loaded for source in (SOURCE_AI, SOURCE_IMDB))
+
+
 def _from_tmdb(media_metadata: dict) -> list[dict]:
     return list((media_metadata.get("related") or {}).get("recommendations") or [])
 
@@ -88,19 +121,17 @@ def _from_imdb(media_metadata: dict, media_type: str) -> list[dict]:
     external = media_metadata.get("external_ids") or {}
     imdb_id = external.get("imdb_id") or ""
     if not imdb_id:
-        # Recover from legacy external_links map if needed.
         links = media_metadata.get("external_links") or {}
         imdb_url = links.get("IMDb") or links.get("imdb") or ""
         if "/title/" in imdb_url:
             imdb_id = imdb_url.rstrip("/").split("/")[-1]
 
-    tt_ids = imdb_recommendations.more_like_this_ids(imdb_id, media_type)
-    items = []
-    for tt in tt_ids:
-        resolved = _resolve_imdb(tt, preferred_type=media_type)
-        if resolved:
-            items.append(resolved)
-    return items
+    tt_ids = imdb_recommendations.more_like_this_ids(imdb_id, media_type)[
+        :_MAX_IMDB_RESOLVE
+    ]
+    return _resolve_many(
+        [(_resolve_imdb, {"imdb_id": tt, "preferred_type": media_type}) for tt in tt_ids]
+    )
 
 
 def _from_ai(user, media_metadata: dict, media_type: str) -> list[dict]:
@@ -111,16 +142,53 @@ def _from_ai(user, media_metadata: dict, media_type: str) -> list[dict]:
         year=year,
         media_type=media_type,
         media_id=media_metadata.get("media_id"),
+    )[:_MAX_AI_RESOLVE]
+    return _resolve_many(
+        [
+            (
+                _resolve_title_year,
+                {
+                    "title": suggestion.get("title") or "",
+                    "year": suggestion.get("year"),
+                    "media_type": suggestion.get("media_type") or media_type,
+                },
+            )
+            for suggestion in suggestions
+        ]
     )
+
+
+def _resolve_many(jobs: list[tuple]) -> list[dict]:
+    """Run TMDB resolve calls in a small pool; preserve first-seen order."""
+    if not jobs:
+        return []
+    if len(jobs) == 1:
+        fn, kwargs = jobs[0]
+        item = fn(**kwargs)
+        return [item] if item else []
+
+    results = {}
+
+    def _job(index, fn, kwargs):
+        close_old_connections()
+        try:
+            return index, fn(**kwargs)
+        finally:
+            close_old_connections()
+
+    with ThreadPoolExecutor(max_workers=min(_RESOLVE_WORKERS, len(jobs))) as pool:
+        futures = [
+            pool.submit(_job, index, fn, kwargs) for index, (fn, kwargs) in enumerate(jobs)
+        ]
+        for future in as_completed(futures):
+            index, item = future.result()
+            results[index] = item
+
     items = []
-    for suggestion in suggestions:
-        resolved = _resolve_title_year(
-            suggestion.get("title") or "",
-            suggestion.get("year"),
-            suggestion.get("media_type") or media_type,
-        )
-        if resolved:
-            items.append(resolved)
+    for index in range(len(jobs)):
+        item = results.get(index)
+        if item:
+            items.append(item)
     return items
 
 
@@ -176,7 +244,6 @@ def _resolve_title_year(title: str, year, media_type: str) -> dict | None:
 
     results = response.get("results") or []
     if not results and year:
-        # Retry without year if the year-constrained search missed.
         params.pop("year", None)
         params.pop("first_air_date_year", None)
         try:
@@ -205,7 +272,7 @@ def _card_from_tmdb_result(media: dict, media_type: str) -> dict:
     }
 
 
-def _seed_year(media_metadata: dict, media_type: str):
+def _seed_year(media_metadata: dict, media_type: str):  # noqa: ARG001
     raw = media_metadata.get("start_date") or media_metadata.get("release_date") or ""
     if isinstance(raw, str) and len(raw) >= 4 and raw[:4].isdigit():
         return int(raw[:4])

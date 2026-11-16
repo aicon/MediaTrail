@@ -284,11 +284,11 @@ def _build_user_media_lookup(user, items, media_type):
     return media_lookup
 
 
-def _should_skip_completed_recommendation(user, section_name, media_item):
-    """Return True when a completed recommendation should be hidden."""
-    return (
-        user.hide_completed_recommendations
-        and section_name == "recommendations"
-        and media_item is not None
-        and media_item.status == Status.COMPLETED.value
+def _should_skip_completed_recommendation(user, section_name, media_item):  # noqa: ARG001
+    """Hide completed and in-progress titles from the Recommendations tab."""
+    if section_name != "recommendations" or media_item is None:
+        return False
+    return media_item.status in (
+        Status.COMPLETED.value,
+        Status.IN_PROGRESS.value,
     )

@@ -24,7 +24,7 @@ Egy mű adatlapját megnyitva a külső katalógus adatai és a naplózási űrl
 
 ### Külső hivatkozások és ajánlások
 
-A film- és sorozatadatlapokon a Beállításokban választhatod ki, mely külső profilhivatkozások jelenjenek meg (IMDb, Wikidata, Letterboxd, TVDB, Trakt, Port.hu). Az Ajánlások fülön a TMDB, az IMDb „More like this” és az opcionális Gemini AI találatai kombinálhatók; a rendszer egységes TMDB-kártyákká rendezi őket, és kiszűri a duplikátumokat. Az alapértelmezett motorok a Beállítások → Ajánló források alatt állíthatók; az AI-hoz Gemini API-kulcs kell a Beállítások → Integrációk → Gemini fülön. Az IMDb és AI eredmények 30 napig a tartós SQLite adatbázisban cache-elődnek.
+A film- és sorozatadatlapokon a Beállításokban választhatod ki, mely külső profilhivatkozások jelenjenek meg (IMDb, Wikidata, Letterboxd, TVDB, Trakt, Port.hu). Az Ajánlások fülön a TMDB, az IMDb „More like this” és az opcionális Gemini AI találatai kombinálhatók; a rendszer egységes TMDB-kártyákká rendezi őket, és kiszűri a duplikátumokat. Először a TMDB találatok jelennek meg, az IMDb/AI a háttérben töltődik. A már befejezett vagy Folyamatban lévő címek sosem kerülnek az ajánlások közé. Az alapértelmezett motorok a Beállítások → Ajánló források alatt állíthatók; az AI-hoz Gemini API-kulcs kell a Beállítások → Integrációk → Gemini fülön. Az IMDb és AI eredmények 30 napig a tartós SQLite adatbázisban cache-elődnek.
 
 ## Kezelőfelület és metaadatok nyelve
 

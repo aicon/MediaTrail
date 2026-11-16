@@ -2408,3 +2408,12 @@ msgstr "Nessuna raccomandazione per le fonti selezionate."
 
 msgid "AI"
 msgstr "IA"
+
+msgid "Loading more recommendations…"
+msgstr "Caricamento di altre raccomandazioni…"
+
+msgid "Recommendations skip your library"
+msgstr "Le raccomandazioni escludono la tua libreria"
+
+msgid "Titles you have already completed or marked In Progress never appear in the Recommendations tab."
+msgstr "I titoli già completati o segnati In corso non compaiono mai nella scheda Raccomandazioni."

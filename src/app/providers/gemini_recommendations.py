@@ -20,8 +20,8 @@ GEMINI_MODELS = (
     "gemini-2.0-flash",
     "gemini-1.5-flash",
 )
-_TIMEOUT = 25
-_MAX_ITEMS = 12
+_TIMEOUT = 18
+_MAX_ITEMS = 8
 
 SYSTEM_PROMPT = (
     "You recommend real movies and TV shows that match the seed title's tone, "

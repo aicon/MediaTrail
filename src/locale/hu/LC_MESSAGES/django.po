@@ -2652,3 +2652,12 @@ msgstr "Nincs ajánlás a kiválasztott forrásokhoz."
 
 msgid "AI"
 msgstr "AI"
+
+msgid "Loading more recommendations…"
+msgstr "További ajánlások betöltése…"
+
+msgid "Recommendations skip your library"
+msgstr "Az ajánlások kihagyják a gyűjteményedet"
+
+msgid "Titles you have already completed or marked In Progress never appear in the Recommendations tab."
+msgstr "A már befejezett vagy Folyamatban lévő címek soha nem jelennek meg az Ajánlások fülön."

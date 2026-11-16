@@ -262,43 +262,14 @@ class EnrichItemsWithUserDataTest(TestCase):
             "This movie doesn't exist in our database",
         )
 
-    def test_hide_completed_recommendations_enabled(self):
-        """Test that completed items are hidden when preference is enabled."""
-        self.user.hide_completed_recommendations = True
-        self.user.save()
-
-        raw_items = [
-            {
-                "media_id": "238",  # This is our completed movie
-                "source": Sources.TMDB.value,
-                "media_type": MediaTypes.MOVIE.value,
-                "title": "Test Movie",
-                "image": "http://example.com/movie.jpg",
-            },
-            {
-                "media_id": "99999",  # Not tracked
-                "source": Sources.TMDB.value,
-                "media_type": MediaTypes.MOVIE.value,
-                "title": "Unknown Movie",
-                "image": "http://example.com/unknown.jpg",
-            },
-        ]
-
-        # When section is "recommendations", completed items should be hidden
-        enriched_items = enrich_items_with_user_data(
-            self.request, raw_items, "recommendations"
-        )
-        self.assertEqual(len(enriched_items), 1)
-        self.assertEqual(enriched_items[0]["item"]["media_id"], "99999")
-
-    def test_hide_completed_recommendations_disabled(self):
-        """Test that completed items are shown when preference is disabled."""
+    def test_recommendations_always_hide_completed(self):
+        """Completed titles never appear in Recommendations, preference or not."""
         self.user.hide_completed_recommendations = False
         self.user.save()
 
         raw_items = [
             {
-                "media_id": "238",  # This is our completed movie
+                "media_id": "238",  # completed movie fixture
                 "source": Sources.TMDB.value,
                 "media_type": MediaTypes.MOVIE.value,
                 "title": "Test Movie",
@@ -313,8 +284,39 @@ class EnrichItemsWithUserDataTest(TestCase):
             },
         ]
 
-        # With preference disabled, all items should be returned
         enriched_items = enrich_items_with_user_data(
             self.request, raw_items, "recommendations"
         )
-        self.assertEqual(len(enriched_items), 2)
+        self.assertEqual(len(enriched_items), 1)
+        self.assertEqual(enriched_items[0]["item"]["media_id"], "99999")
+
+    def test_recommendations_always_hide_in_progress(self):
+        """In-progress titles never appear in Recommendations."""
+        in_progress = Movie.objects.get(
+            item__media_id="238",
+            user=self.user,
+        )
+        in_progress.status = Status.IN_PROGRESS.value
+        in_progress.save(update_fields=["status"])
+
+        raw_items = [
+            {
+                "media_id": "238",
+                "source": Sources.TMDB.value,
+                "media_type": MediaTypes.MOVIE.value,
+                "title": "Test Movie",
+                "image": "http://example.com/movie.jpg",
+            },
+            {
+                "media_id": "99999",
+                "source": Sources.TMDB.value,
+                "media_type": MediaTypes.MOVIE.value,
+                "title": "Unknown Movie",
+                "image": "http://example.com/unknown.jpg",
+            },
+        ]
+        enriched_items = enrich_items_with_user_data(
+            self.request, raw_items, "recommendations"
+        )
+        self.assertEqual(len(enriched_items), 1)
+        self.assertEqual(enriched_items[0]["item"]["media_id"], "99999")
