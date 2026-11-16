@@ -519,6 +519,7 @@ html[data-theme="light"] {
   .bg-orange-500,
   .bg-\[\#4f46e5\],
   .bg-gray-900\/90,
+  .bg-black\/80,
   .toast-error,
   .toast-warning,
   .toast-success,
@@ -526,6 +527,22 @@ html[data-theme="light"] {
 ) .text-white,
 .bg-red-600\/50.text-white\/70 {
   color: #fff;
+}
+
+/* Home poster event/resume pills stay on a dark chip; keep accent icons light too. */
+html[data-theme="light"] .bg-black\/80 .text-indigo-400 {
+  color: #a5b4fc;
+}
+html[data-theme="light"] .bg-black\/80 .text-sky-400 {
+  color: #38bdf8;
+}
+@media (prefers-color-scheme: light) {
+  html[data-theme="system"] .bg-black\/80 .text-indigo-400 {
+    color: #a5b4fc;
+  }
+  html[data-theme="system"] .bg-black\/80 .text-sky-400 {
+    color: #38bdf8;
+  }
 }
 
 .bg-gray-500 { background-color: var(--mt-btn-soft); }
