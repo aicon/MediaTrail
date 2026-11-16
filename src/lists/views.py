@@ -171,6 +171,15 @@ def list_detail(request, list_id):
     for item in items_page:
         item.media = media_by_item_id.get(item.id)
 
+    from lists.membership import attach_on_list
+
+    # Every item on this page is on at least this list; still mark media too.
+    attach_on_list(request.user, items_page.object_list)
+    attach_on_list(
+        request.user,
+        [item.media for item in items_page if getattr(item, "media", None)],
+    )
+
     # Base context for both full and partial responses
     context = {
         "custom_list": custom_list,

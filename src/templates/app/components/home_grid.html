@@ -16,6 +16,8 @@
              src="{{ IMG_NONE }}">
       </a>
 
+      {% include "app/components/on_list_badge.html" with media=media item=media.item %}
+
       {% if media.next_event and not media.next_event.is_max_datetime %}
         <div class="absolute top-2 left-1/2 flex max-w-[98%] -translate-x-1/2 items-center gap-1.5 rounded-md bg-black/80 border border-white/20 px-2 py-1.5 shadow-md whitespace-nowrap">
           {% if home_status == Status.PLANNING.value %}

@@ -245,6 +245,9 @@ def enrich_items_with_user_data(request, items, section_name):
     if items_to_refresh:
         Item.objects.bulk_update(items_to_refresh, ["image"])
 
+    from lists.membership import attach_on_list_to_enriched
+
+    attach_on_list_to_enriched(request.user, enriched_items)
     return enriched_items
 
 

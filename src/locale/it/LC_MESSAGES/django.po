@@ -2417,3 +2417,6 @@ msgstr "Le raccomandazioni escludono la tua libreria"
 
 msgid "Titles you have already completed or marked In Progress never appear in the Recommendations tab."
 msgstr "I titoli già completati o segnati In corso non compaiono mai nella scheda Raccomandazioni."
+
+msgid "On a custom list"
+msgstr "In una lista personalizzata"

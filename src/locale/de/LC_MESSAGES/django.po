@@ -2417,3 +2417,6 @@ msgstr "Empfehlungen lassen deine Bibliothek aus"
 
 msgid "Titles you have already completed or marked In Progress never appear in the Recommendations tab."
 msgstr "Titel, die du bereits abgeschlossen oder als In Bearbeitung markiert hast, erscheinen nie im Empfehlungen-Tab."
+
+msgid "On a custom list"
+msgstr "Auf einer eigenen Liste"

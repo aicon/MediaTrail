@@ -11,6 +11,7 @@
              data-src="{{ item.image }}"
              src="{{ IMG_NONE }}">
       </a>
+      {% include "app/components/on_list_badge.html" with media=media item=item on_list=on_list|default:False %}
     </div>
 
     <div class="flex-1 min-w-0">

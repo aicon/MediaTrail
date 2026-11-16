@@ -2417,3 +2417,6 @@ msgstr "Las recomendaciones omiten tu biblioteca"
 
 msgid "Titles you have already completed or marked In Progress never appear in the Recommendations tab."
 msgstr "Los títulos que ya completaste o marcaste En progreso nunca aparecen en la pestaña Recomendaciones."
+
+msgid "On a custom list"
+msgstr "En una lista personalizada"

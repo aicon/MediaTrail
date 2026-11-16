@@ -16,10 +16,11 @@
   <div x-data="{ tab: 'overview' }"
        class="mt-detail-layout">
     <div class="mt-detail-stack">
-      <div class="mt-detail-poster">
+      <div class="mt-detail-poster relative">
         <img alt="{{ media.title }}"
              class="w-full rounded-lg shadow-lg bg-[#2a2f35] object-cover"
              src="{{ media.image }}">
+        {% include "app/components/on_list_badge.html" with on_list=on_list %}
 
         <div class="mt-4 relative flex items-stretch"
              x-data="{ trackOpen: false, createOpen: false, menuOpen: false }"

@@ -2661,3 +2661,6 @@ msgstr "Az ajánlások kihagyják a gyűjteményedet"
 
 msgid "Titles you have already completed or marked In Progress never appear in the Recommendations tab."
 msgstr "A már befejezett vagy Folyamatban lévő címek soha nem jelennek meg az Ajánlások fülön."
+
+msgid "On a custom list"
+msgstr "Egyéni listán szerepel"

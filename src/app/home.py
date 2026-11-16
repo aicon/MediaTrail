@@ -151,11 +151,16 @@ def get_home_media_types(
     # otherwise the header count can never match the grid.
     page_start = items_limit if specific_media_type else 0
     page_size = None if specific_media_type else items_limit
-    return _paginate_home_media_types(
+    paginated = _paginate_home_media_types(
         media_types,
         page_size,
         page_start=page_start,
     )
+    from lists.membership import attach_on_list
+
+    for media_list in paginated.values():
+        attach_on_list(request.user, media_list.get("items") or [])
+    return paginated
 
 
 def _filter_home_media_types(media_types, predicate):

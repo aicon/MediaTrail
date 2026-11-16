@@ -296,6 +296,10 @@ def media_list(request, username, media_type):
         media_page.object_list,
         media_type,
     )
+    from lists.membership import attach_on_list
+
+    # Badge "on my lists" for the signed-in viewer, even on another profile.
+    attach_on_list(request.user, media_page.object_list)
 
     context = {
         "media_type": media_type,
@@ -409,6 +413,19 @@ def media_details(request, source, media_type, media_id, title):  # noqa: ARG001
             sources=selected_sources,
         )
 
+    from lists.membership import item_on_user_lists
+
+    detail_item = current_instance.item if current_instance is not None else None
+    if detail_item is None:
+        detail_item = Item.objects.filter(
+            media_id=media_id,
+            source=source,
+            media_type=media_type,
+            season_number__isnull=True,
+            episode_number__isnull=True,
+        ).first()
+    on_list = item_on_user_lists(request.user, detail_item)
+
     # Enrich related items with user tracking data
     if media_metadata.get("related"):
         for section_name, related_items in media_metadata["related"].items():
@@ -443,6 +460,7 @@ def media_details(request, source, media_type, media_id, title):  # noqa: ARG001
         # Pills show the user's preferred engines even while TMDB-only is on screen.
         "selected_recommendation_sources": preferred_sources,
         "defer_slow_recommendations": defer_slow_recommendations,
+        "on_list": on_list,
     }
     return render(request, "app/media_details.html", context)
 
