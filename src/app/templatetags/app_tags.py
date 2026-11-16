@@ -629,7 +629,11 @@ def media_section_count(
     if media.get("cast"):
         count += 1
     related = media.get("related") or {}
-    count += sum(1 for related_items in related.values() if related_items)
+    count += sum(
+        1
+        for name, related_items in related.items()
+        if related_items or name == "recommendations"
+    )
     if len(user_medias) > 1:
         count += 1
     if media.get("episodes"):

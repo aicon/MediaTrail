@@ -51,4 +51,9 @@ urlpatterns = [
         views.update_emby_live,
         name="update_emby_live",
     ),
+    path(
+        "update_gemini_api_key",
+        views.update_gemini_api_key,
+        name="update_gemini_api_key",
+    ),
 ]

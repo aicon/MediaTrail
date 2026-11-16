@@ -1720,7 +1720,7 @@ class MediaRecommendationsView(drf_views.APIView):
     serializer_class = MediaSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, _, media_type, source, media_id):
+    def get(self, request, media_type, source, media_id):
         """Retrieve recommendations for a specific media."""
         if not check_valid_type(media_type):
             return Response(
@@ -1745,6 +1745,18 @@ class MediaRecommendationsView(drf_views.APIView):
                     "errors": str(e),
                 },
                 status=HTTP.INTERNAL_SERVER_ERROR,
+            )
+
+        from app.providers import recommendations as recommendation_pipeline
+        from app.recommendation_sources import parse_source_keys
+
+        if media_type in ("movie", "tv"):
+            sources = parse_source_keys(request.GET.get("sources"), request.user)
+            recommendation_pipeline.apply_to_metadata(
+                request.user,
+                media_metadata,
+                media_type,
+                sources=sources,
             )
 
         recommendations = []

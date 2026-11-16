@@ -2488,3 +2488,33 @@ class DeviceDisplayName(models.Model):
     def __str__(self):
         """Return a short label for admin and logs."""
         return f"{self.user_id}:{self.device_id}={self.custom_name}"
+
+
+class RecommendationSourceCache(models.Model):
+    """Durable IMDb/AI recommendation payloads (SQLite volume survives redeploy)."""
+
+    SOURCE_IMDB = "imdb"
+    SOURCE_AI = "ai"
+
+    source = models.CharField(max_length=16)
+    media_type = models.CharField(max_length=20)
+    seed_key = models.CharField(max_length=64)
+    # 0 = shared (IMDb). AI rows use the owning user's id.
+    user_id = models.PositiveIntegerField(default=0)
+    payload = models.JSONField(default=list)
+    fetched_at = models.DateTimeField()
+    expires_at = models.DateTimeField(db_index=True)
+
+    class Meta:
+        """Meta options for the model."""
+
+        constraints = [
+            UniqueConstraint(
+                fields=["source", "media_type", "seed_key", "user_id"],
+                name="unique_recommendation_source_cache",
+            ),
+        ]
+
+    def __str__(self):
+        """Return a short cache key label."""
+        return f"{self.source}:{self.media_type}:{self.seed_key}:u{self.user_id}"

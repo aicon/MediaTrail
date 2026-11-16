@@ -20,6 +20,11 @@ from integrations.imports import nuvio
 from app.providers import tmdb
 from users.forms import NotificationSettingsForm, PasswordChangeForm, UserUpdateForm
 from app.detail_links import DETAIL_LINK_OPTIONS, detail_link_preference_rows
+from app.recommendation_sources import (
+    RECOMMENDATION_SOURCE_OPTIONS,
+    recommendation_source_rows,
+    user_has_gemini_key,
+)
 from users.languages import (
     INTERFACE_LANGUAGE_CHOICES,
     LANGUAGE_AUTO,
@@ -247,6 +252,10 @@ def preferences(request):
                 "language_choices": INTERFACE_LANGUAGE_CHOICES,
                 "theme_choices": ThemeChoices.choices,
                 "detail_link_options": detail_link_preference_rows(request.user),
+                "recommendation_source_options": recommendation_source_rows(
+                    request.user
+                ),
+                "has_gemini_key": user_has_gemini_key(request.user),
             },
         )
 
@@ -318,6 +327,22 @@ def preferences(request):
         for key, field in link_fields.items():
             if key in known_link_keys:
                 setattr(request.user, field, key in detail_links_checked)
+
+    if "recommendation_sources_form" in request.POST:
+        rec_checked = set(request.POST.getlist("recommendation_source_checkboxes"))
+        rec_fields = {
+            "tmdb": "rec_tmdb_enabled",
+            "imdb": "rec_imdb_enabled",
+            "ai": "rec_ai_enabled",
+        }
+        known_rec_keys = {key for key, _label in RECOMMENDATION_SOURCE_OPTIONS}
+        for key, field in rec_fields.items():
+            if key in known_rec_keys:
+                # AI stays off until a Gemini key is saved.
+                if key == "ai" and not user_has_gemini_key(request.user):
+                    setattr(request.user, field, False)
+                else:
+                    setattr(request.user, field, key in rec_checked)
 
     # Save changes and redirect
     request.user.save()
@@ -561,6 +586,46 @@ def clear_search_cache(request):
     )
 
     return redirect("advanced")
+
+
+@require_POST
+def update_gemini_api_key(request):
+    """Save or clear the user's Gemini API key for AI recommendations."""
+    from integrations.imports.helpers import decrypt, encrypt
+
+    if request.user.is_demo:
+        messages.error(request, _("This section is view-only for demo accounts."))
+        return redirect("integrations")
+
+    if request.POST.get("action") == "clear":
+        request.user.gemini_api_key = ""
+        request.user.rec_ai_enabled = False
+        request.user.save(update_fields=["gemini_api_key", "rec_ai_enabled"])
+        messages.success(request, _("Gemini API key removed."))
+        return redirect("/settings/integrations?tab=gemini")
+
+    api_key = (request.POST.get("gemini_api_key") or "").strip()
+    if not api_key and request.user.gemini_api_key:
+        try:
+            decrypt(request.user.gemini_api_key)
+        except Exception:
+            logger.exception("Could not read the saved Gemini key")
+            messages.error(
+                request,
+                _("Enter a Gemini API key."),
+            )
+            return redirect("/settings/integrations?tab=gemini")
+        messages.success(request, _("Gemini API key unchanged."))
+        return redirect("/settings/integrations?tab=gemini")
+
+    if not api_key:
+        messages.error(request, _("Enter a Gemini API key."))
+        return redirect("/settings/integrations?tab=gemini")
+
+    request.user.gemini_api_key = encrypt(api_key)
+    request.user.save(update_fields=["gemini_api_key"])
+    messages.success(request, _("Gemini API key saved."))
+    return redirect("/settings/integrations?tab=gemini")
 
 
 @require_POST

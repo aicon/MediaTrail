@@ -2613,3 +2613,42 @@ msgstr "Külső adatlap-linkek"
 
 msgid "Choose which external profile links appear on movie and TV detail pages."
 msgstr "Válaszd ki, mely külső adatlap-linkek jelenjenek meg a film- és sorozatadatlapokon."
+
+msgid "Recommendation sources"
+msgstr "Ajánló források"
+
+msgid "Choose which engines fill the Recommendations tab on movie and TV detail pages. Selected sources are combined and duplicates are removed."
+msgstr "Válaszd ki, mely motorok töltsék fel az Ajánlások fület a film- és sorozatadatlapokon. A kiválasztott források egyesülnek, a duplikátumok kiszűrésre kerülnek."
+
+msgid "Add a Gemini API key under Integrations to enable AI recommendations."
+msgstr "Az AI ajánlásokhoz adj meg egy Gemini API-kulcsot az Integrációk alatt."
+
+msgid "Save your own Gemini API key to unlock AI recommendations on movie and TV detail pages. The key is stored encrypted and only used for your account."
+msgstr "Saját Gemini API-kulccsal feloldhatod az AI ajánlásokat a film- és sorozatadatlapokon. A kulcs titkosítva tárolódik, és csak a te fiókodhoz tartozik."
+
+msgid "Gemini API key"
+msgstr "Gemini API-kulcs"
+
+msgid "API key"
+msgstr "API-kulcs"
+
+msgid "A Gemini API key is saved for this account."
+msgstr "Ehhez a fiókhoz már van mentett Gemini API-kulcs."
+
+msgid "Gemini API key removed."
+msgstr "A Gemini API-kulcs törölve."
+
+msgid "Gemini API key unchanged."
+msgstr "A Gemini API-kulcs változatlan."
+
+msgid "Enter a Gemini API key."
+msgstr "Add meg a Gemini API-kulcsot."
+
+msgid "Gemini API key saved."
+msgstr "A Gemini API-kulcs elmentve."
+
+msgid "No recommendations for the selected sources."
+msgstr "Nincs ajánlás a kiválasztott forrásokhoz."
+
+msgid "AI"
+msgstr "AI"

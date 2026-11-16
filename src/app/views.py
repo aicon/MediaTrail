@@ -24,6 +24,8 @@ from app import home as home_helpers
 from app import statistics as stats
 from app.episode_operations import watch_episode
 from app.forms import EpisodeForm, ManualItemForm, get_form_class
+from app.providers import recommendations as recommendation_pipeline
+from app.recommendation_sources import parse_source_keys, recommendation_source_rows
 from app.models import (
     TV,
     BasicMedia,
@@ -385,6 +387,15 @@ def media_details(request, source, media_type, media_id, title):  # noqa: ARG001
             current_instance.item, media_metadata.get("image")
         )
 
+    selected_sources = _recommendation_sources_from_request(request)
+    if media_type in (MediaTypes.MOVIE.value, MediaTypes.TV.value):
+        recommendation_pipeline.apply_to_metadata(
+            request.user,
+            media_metadata,
+            media_type,
+            sources=selected_sources,
+        )
+
     # Enrich related items with user tracking data
     if media_metadata.get("related"):
         for section_name, related_items in media_metadata["related"].items():
@@ -415,8 +426,54 @@ def media_details(request, source, media_type, media_id, title):  # noqa: ARG001
         "current_instance": current_instance,
         "watch_providers": watch_providers,
         "watch_provider_region": request.user.watch_provider_region,
+        "recommendation_source_options": recommendation_source_rows(request.user),
+        "selected_recommendation_sources": selected_sources,
     }
     return render(request, "app/media_details.html", context)
+
+
+@require_GET
+def media_recommendations_partial(request, source, media_type, media_id, title):  # noqa: ARG001
+    """HTMX partial: hybrid recommendations grid for movie/TV detail pages."""
+    if media_type not in (MediaTypes.MOVIE.value, MediaTypes.TV.value):
+        return HttpResponseBadRequest("Unsupported media type")
+
+    media_metadata = services.get_media_metadata(media_type, media_id, source)
+    selected_sources = _recommendation_sources_from_request(request)
+    recommendation_pipeline.apply_to_metadata(
+        request.user,
+        media_metadata,
+        media_type,
+        sources=selected_sources,
+    )
+    related_items = (media_metadata.get("related") or {}).get("recommendations") or []
+    enriched = helpers.enrich_items_with_user_data(
+        request,
+        related_items,
+        "recommendations",
+    )
+    return render(
+        request,
+        "app/components/recommendations_grid.html",
+        {
+            "media": media_metadata,
+            "media_type": media_type,
+            "related_items": enriched,
+            "recommendation_source_options": recommendation_source_rows(request.user),
+            "selected_recommendation_sources": selected_sources,
+            "source": source,
+            "media_id": media_id,
+            "title": title,
+        },
+    )
+
+
+def _recommendation_sources_from_request(request):
+    """Read selected recommendation engines from query params."""
+    if "rec_sources" in request.GET:
+        raw_list = [part for part in request.GET.getlist("rec_sources") if part]
+        return parse_source_keys(",".join(raw_list), request.user, allow_empty=True)
+    return parse_source_keys(None, request.user)
 
 
 @require_GET

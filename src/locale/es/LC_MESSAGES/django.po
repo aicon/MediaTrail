@@ -2369,3 +2369,42 @@ msgstr "Enlaces externos de ficha"
 
 msgid "Choose which external profile links appear on movie and TV detail pages."
 msgstr "Elige qué enlaces de perfil externos aparecen en las fichas de películas y series."
+
+msgid "Recommendation sources"
+msgstr "Fuentes de recomendaciones"
+
+msgid "Choose which engines fill the Recommendations tab on movie and TV detail pages. Selected sources are combined and duplicates are removed."
+msgstr "Elige qué motores rellenan la pestaña Recomendaciones en las fichas de películas y series. Las fuentes seleccionadas se combinan y se eliminan los duplicados."
+
+msgid "Add a Gemini API key under Integrations to enable AI recommendations."
+msgstr "Añade una clave de API de Gemini en Integraciones para activar las recomendaciones de IA."
+
+msgid "Save your own Gemini API key to unlock AI recommendations on movie and TV detail pages. The key is stored encrypted and only used for your account."
+msgstr "Guarda tu propia clave de API de Gemini para desbloquear las recomendaciones de IA en las fichas de películas y series. La clave se almacena cifrada y solo se usa en tu cuenta."
+
+msgid "Gemini API key"
+msgstr "Clave de API de Gemini"
+
+msgid "API key"
+msgstr "Clave de API"
+
+msgid "A Gemini API key is saved for this account."
+msgstr "Hay una clave de API de Gemini guardada para esta cuenta."
+
+msgid "Gemini API key removed."
+msgstr "Clave de API de Gemini eliminada."
+
+msgid "Gemini API key unchanged."
+msgstr "Clave de API de Gemini sin cambios."
+
+msgid "Enter a Gemini API key."
+msgstr "Introduce una clave de API de Gemini."
+
+msgid "Gemini API key saved."
+msgstr "Clave de API de Gemini guardada."
+
+msgid "No recommendations for the selected sources."
+msgstr "No hay recomendaciones para las fuentes seleccionadas."
+
+msgid "AI"
+msgstr "IA"

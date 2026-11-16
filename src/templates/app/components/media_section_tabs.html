@@ -19,7 +19,7 @@
 
     {% if media.related %}
       {% for name, related_items in media.related.items %}
-        {% if related_items %}
+        {% if related_items or name == "recommendations" %}
           <button @click="tab = 'related-{{ forloop.counter }}'"
                   class="pb-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors duration-200 cursor-pointer"
                   :class="tab === 'related-{{ forloop.counter }}' ? 'text-white border-indigo-500' : 'text-gray-400 border-transparent hover:text-white'">

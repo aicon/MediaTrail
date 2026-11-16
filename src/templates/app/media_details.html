@@ -433,22 +433,26 @@
         {# Related Media #}
         {% if media.related %}
           {% for name, related_items in media.related.items %}
-            {% if related_items %}
+            {% if related_items or name == "recommendations" %}
               <section class="mb-8"
                        x-show="tab === 'related-{{ forloop.counter }}'">
                 <h2 class="text-xl font-bold mb-4">
                   {{ name|related_label }}
                 </h2>
-                <div class="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-4">
-                  {% for result in related_items %}
-                    {# Set active to highlight the current movie in a collection. Avoid TV media, since seasons have same ID as the parent show #}
-                    {% if media_type == MediaTypes.MOVIE.value %}
-                      {% include "app/components/media_card.html" with item=result.item title=result.item.season_title|default:result.item.title media=result.media active=media.media_id|str_equals:result.item.media_id %}
-                    {% else %}
-                      {% include "app/components/media_card.html" with item=result.item title=result.item.season_title|default:result.item.title media=result.media %}
-                    {% endif %}
-                  {% endfor %}
-                </div>
+                {% if name == "recommendations" %}
+                  {% include "app/components/recommendations_grid.html" with related_items=related_items source=media.source media_id=media.media_id title=media.title %}
+                {% else %}
+                  <div class="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-4">
+                    {% for result in related_items %}
+                      {# Set active to highlight the current movie in a collection. Avoid TV media, since seasons have same ID as the parent show #}
+                      {% if media_type == MediaTypes.MOVIE.value %}
+                        {% include "app/components/media_card.html" with item=result.item title=result.item.season_title|default:result.item.title media=result.media active=media.media_id|str_equals:result.item.media_id %}
+                      {% else %}
+                        {% include "app/components/media_card.html" with item=result.item title=result.item.season_title|default:result.item.title media=result.media %}
+                      {% endif %}
+                    {% endfor %}
+                  </div>
+                {% endif %}
               </section>
             {% endif %}
           {% endfor %}

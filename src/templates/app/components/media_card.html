@@ -79,6 +79,12 @@
       </div>
     {% endif %}
 
+    {% if recommendation_sources %}
+      <div class="absolute bottom-2 right-2 bg-gray-900/90 text-white text-[10px] leading-tight px-1.5 py-1 rounded-md shadow-md max-w-[90%] text-right">
+        {{ recommendation_sources|join:" + " }}
+      </div>
+    {% endif %}
+
     {% with user=target_user|default:user %}
       <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover-tap:opacity-100{% if user.clickable_media_cards %} pointer-coarse:hidden{% endif %}">
         <a href="{{ item|media_url }}" class="absolute inset-0"></a>

@@ -32,6 +32,11 @@ urlpatterns = [
         name="media_details",
     ),
     path(
+        "details/<source:source>/<media_type:media_type>/<str:media_id>/<str:title>/recommendations",
+        views.media_recommendations_partial,
+        name="media_recommendations_partial",
+    ),
+    path(
         "details/<source:source>/tv/<str:media_id>/<str:title>/season/<int:season_number>",
         views.season_details,
         name="season_details",

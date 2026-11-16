@@ -335,6 +335,16 @@ class User(AbstractUser):
     link_tvdb_enabled = models.BooleanField(default=False)
     link_simkl_enabled = models.BooleanField(default=False)
     link_port_hu_enabled = models.BooleanField(default=False)
+
+    # Hybrid recommendation sources (TMDB + IMDb on by default; AI needs a key)
+    rec_tmdb_enabled = models.BooleanField(default=True)
+    rec_imdb_enabled = models.BooleanField(default=True)
+    rec_ai_enabled = models.BooleanField(default=False)
+    gemini_api_key = models.TextField(
+        blank=True,
+        default="",
+        help_text="Encrypted Gemini API key for AI recommendations",
+    )
     clickable_media_cards = models.BooleanField(
         default=False,
         help_text="Hide hover overlay on touch devices",

@@ -1,0 +1,40 @@
+{% load i18n %}
+{% load app_tags %}
+
+<div id="recommendations-panel"
+     class="space-y-4"
+     hx-get="{% url 'media_recommendations_partial' source=source|default:media.source media_type=media_type media_id=media_id|default:media.media_id title=title|default:media.title|slug %}"
+     hx-trigger="change from:find input[name='rec_sources']"
+     hx-include="closest #recommendations-panel"
+     hx-target="#recommendations-panel"
+     hx-swap="outerHTML">
+  <div class="flex flex-wrap gap-2">
+    <input type="hidden" name="rec_sources" value="">
+    {% for option in recommendation_source_options %}
+      {% if option.available %}
+        <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm cursor-pointer {% if option.key in selected_recommendation_sources %}bg-indigo-600 text-white{% else %}bg-[#39404b] text-gray-300 hover:bg-[#454d59]{% endif %}">
+          <input class="sr-only"
+                 type="checkbox"
+                 name="rec_sources"
+                 value="{{ option.key }}"
+                 {% if option.key in selected_recommendation_sources %}checked{% endif %}>
+          <span>{{ option.label }}</span>
+        </label>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  {% if related_items %}
+    <div class="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-4">
+      {% for result in related_items %}
+        {% if media_type == MediaTypes.MOVIE.value %}
+          {% include "app/components/media_card.html" with item=result.item title=result.item.season_title|default:result.item.title media=result.media active=media.media_id|str_equals:result.item.media_id recommendation_sources=result.item.sources %}
+        {% else %}
+          {% include "app/components/media_card.html" with item=result.item title=result.item.season_title|default:result.item.title media=result.media recommendation_sources=result.item.sources %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-gray-400 text-sm">{% translate "No recommendations for the selected sources." %}</p>
+  {% endif %}
+</div>

@@ -60,7 +60,7 @@
         <h2 class="text-xl font-semibold">{% translate "Media Servers" %}</h2>
       </div>
       <p class="text-gray-400 mb-5 text-sm">{% translate "Connect your media servers to automatically track your watching progress." %}</p>
-      <div x-data="{ activeIntegration: 'nuvio' }">
+      <div x-data="{ activeIntegration: (new URLSearchParams(window.location.search).get('tab') || 'nuvio') }">
         <div class="mb-4 flex gap-2 overflow-x-auto"
              role="tablist"
              aria-label="{% translate "Integration services" %}">
@@ -99,6 +99,15 @@
                   :aria-selected="activeIntegration === 'plex'">
             {% include "app/icons/server.svg" with classes="w-4 h-4 mr-2" %}
             Plex
+          </button>
+          <button type="button"
+                  class="flex items-center px-4 py-2 rounded-md transition-colors text-sm cursor-pointer"
+                  :class="activeIntegration === 'gemini' ? 'bg-indigo-600 text-white' : 'bg-[#39404b] text-gray-300 hover:bg-[#454d59]'"
+                  @click="activeIntegration = 'gemini'"
+                  role="tab"
+                  :aria-selected="activeIntegration === 'gemini'">
+            {% include "app/icons/server.svg" with classes="w-4 h-4 mr-2" %}
+            Gemini
           </button>
         </div>
         <div x-cloak x-show="activeIntegration === 'nuvio'" role="tabpanel">
@@ -529,6 +538,49 @@
                       {% translate "Save Changes" %}
                     </button>
                     {% if request.user.emby_user_id %}
+                      <button type="submit"
+                              name="action"
+                              value="clear"
+                              class="px-4 py-2 bg-[#39404b] text-gray-300 rounded-md hover:bg-[#454d59] transition-colors text-sm cursor-pointer">
+                        {% translate "Disconnect" %}
+                      </button>
+                    {% endif %}
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div x-cloak x-show="activeIntegration === 'gemini'" role="tabpanel">
+            <div class="bg-[#39404b] p-5 rounded-lg mb-6">
+              <div class="flex items-center mb-3">
+                {% include "app/icons/server.svg" with classes="w-5 h-5 text-indigo-400 mr-2" %}
+                <h3 class="text-base font-medium">Gemini</h3>
+              </div>
+              <p class="text-gray-400 mb-4 text-sm">
+                {% translate "Save your own Gemini API key to unlock AI recommendations on movie and TV detail pages. The key is stored encrypted and only used for your account." %}
+              </p>
+              <div class="bg-[#262a2f] p-4 rounded-md">
+                <h4 class="text-sm font-medium mb-3">{% translate "Gemini API key" %}</h4>
+                <form method="post" action="{% url 'update_gemini_api_key' %}" class="space-y-3">
+                  {% csrf_token %}
+                  <label class="block text-sm text-gray-300">
+                    {% translate "API key" %}
+                    <input name="gemini_api_key"
+                           class="mt-1 w-full py-2 px-3 bg-[#39404b] rounded-md text-white text-sm border border-gray-600 focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                           type="password"
+                           autocomplete="new-password"
+                           placeholder="{% if request.user.gemini_api_key %}{% translate 'Saved — leave blank to keep it' %}{% endif %}">
+                  </label>
+                  {% if request.user.gemini_api_key %}
+                    <p class="text-xs text-gray-400">{% translate "A Gemini API key is saved for this account." %}</p>
+                  {% endif %}
+                  <div class="flex gap-2 pt-1">
+                    <button type="submit"
+                            class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm cursor-pointer">
+                      {% include "app/icons/save.svg" with classes="w-4 h-4 mr-2" %}
+                      {% translate "Save Changes" %}
+                    </button>
+                    {% if request.user.gemini_api_key %}
                       <button type="submit"
                               name="action"
                               value="clear"

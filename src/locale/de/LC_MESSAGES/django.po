@@ -2369,3 +2369,42 @@ msgstr "Externe Detailseiten-Links"
 
 msgid "Choose which external profile links appear on movie and TV detail pages."
 msgstr "Wählen Sie, welche externen Profil-Links auf Film- und Serien-Detailseiten erscheinen."
+
+msgid "Recommendation sources"
+msgstr "Empfehlungsquellen"
+
+msgid "Choose which engines fill the Recommendations tab on movie and TV detail pages. Selected sources are combined and duplicates are removed."
+msgstr "Wähle, welche Engines den Empfehlungen-Tab auf Film- und Serien-Detailseiten füllen. Ausgewählte Quellen werden kombiniert und Duplikate entfernt."
+
+msgid "Add a Gemini API key under Integrations to enable AI recommendations."
+msgstr "Füge unter Integrationen einen Gemini-API-Schlüssel hinzu, um KI-Empfehlungen zu aktivieren."
+
+msgid "Save your own Gemini API key to unlock AI recommendations on movie and TV detail pages. The key is stored encrypted and only used for your account."
+msgstr "Speichere deinen eigenen Gemini-API-Schlüssel, um KI-Empfehlungen auf Film- und Serien-Detailseiten freizuschalten. Der Schlüssel wird verschlüsselt gespeichert und nur für dein Konto verwendet."
+
+msgid "Gemini API key"
+msgstr "Gemini-API-Schlüssel"
+
+msgid "API key"
+msgstr "API-Schlüssel"
+
+msgid "A Gemini API key is saved for this account."
+msgstr "Für dieses Konto ist ein Gemini-API-Schlüssel gespeichert."
+
+msgid "Gemini API key removed."
+msgstr "Gemini-API-Schlüssel entfernt."
+
+msgid "Gemini API key unchanged."
+msgstr "Gemini-API-Schlüssel unverändert."
+
+msgid "Enter a Gemini API key."
+msgstr "Gib einen Gemini-API-Schlüssel ein."
+
+msgid "Gemini API key saved."
+msgstr "Gemini-API-Schlüssel gespeichert."
+
+msgid "No recommendations for the selected sources."
+msgstr "Keine Empfehlungen für die ausgewählten Quellen."
+
+msgid "AI"
+msgstr "KI"

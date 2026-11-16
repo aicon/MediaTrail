@@ -341,6 +341,45 @@
         </div>
       </div>
 
+      <div class="border-t border-gray-600 my-5"></div>
+
+      {# Recommendation sources #}
+      <div class="mb-5">
+        <input type="hidden" name="recommendation_sources_form" value="1">
+        <div class="flex items-center mb-4">
+          {% include "app/icons/four-square.svg" with classes="w-5 h-5 text-indigo-400 mr-2" %}
+          <h3 class="text-lg font-semibold">{% translate "Recommendation sources" %}</h3>
+        </div>
+        <p class="text-gray-400 mb-4 text-sm">
+          {% translate "Choose which engines fill the Recommendations tab on movie and TV detail pages. Selected sources are combined and duplicates are removed." %}
+        </p>
+        {% if not has_gemini_key %}
+          <p class="text-gray-400 mb-4 text-sm">
+            {% translate "Add a Gemini API key under Integrations to enable AI recommendations." %}
+          </p>
+        {% endif %}
+
+        <div class="grid gap-3 md:grid-cols-3">
+          {% for option in recommendation_source_options %}
+            <div class="flex items-center justify-between p-3 bg-[#39404b] rounded-md {% if not option.available %}opacity-60{% endif %}">
+              <div class="flex items-center text-gray-200 text-sm">
+                <span>{{ option.label }}</span>
+              </div>
+              <label class="relative inline-flex items-center {% if option.available %}cursor-pointer{% else %}cursor-not-allowed{% endif %}">
+                <input class="sr-only peer"
+                       type="checkbox"
+                       name="recommendation_source_checkboxes"
+                       value="{{ option.key }}"
+                       {% if option.enabled %}checked{% endif %}
+                       {% if not option.available %}disabled{% endif %}>
+                <div class="w-9 h-5 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-px after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-indigo-600">
+                </div>
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
       <div class="mt-5 pt-4 border-gray-600">
         <button type="submit"
                 class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm cursor-pointer">

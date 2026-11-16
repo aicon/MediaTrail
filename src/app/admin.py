@@ -9,6 +9,7 @@ from app.models import (
     Episode,
     Item,
     LivePlayback,
+    RecommendationSourceCache,
     UserMessage,
 )
 
@@ -92,6 +93,22 @@ class DeviceDisplayNameAdmin(admin.ModelAdmin):
     list_display = ["user", "device_id", "custom_name", "updated_at"]
 
 
+@admin.register(RecommendationSourceCache)
+class RecommendationSourceCacheAdmin(admin.ModelAdmin):
+    """Admin for durable IMDb/AI recommendation cache rows."""
+
+    search_fields = ["seed_key", "source", "media_type"]
+    list_display = [
+        "source",
+        "media_type",
+        "seed_key",
+        "user_id",
+        "fetched_at",
+        "expires_at",
+    ]
+    list_filter = ["source", "media_type"]
+
+
 SpecialModels = [
     "Item",
     "Episode",
@@ -99,6 +116,7 @@ SpecialModels = [
     "UserMessage",
     "LivePlayback",
     "DeviceDisplayName",
+    "RecommendationSourceCache",
 ]
 for model in app_models:
     if (
