@@ -4,7 +4,7 @@
 
 A self-hosted personal media tracker and digital logbook for everything you watch, read, and play.
 
-[![Release](https://img.shields.io/badge/version-0.27.01-blue.svg)](https://github.com/aicon/MediaTrail/releases)
+[![Release](https://img.shields.io/badge/version-0.27.02-blue.svg)](https://github.com/aicon/MediaTrail/releases)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-green.svg)](LICENSE)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io%2Faicon%2Fmediatrail-blue?logo=docker)](https://github.com/aicon/MediaTrail/pkgs/container/mediatrail)
 [![Documentation](https://img.shields.io/badge/docs-mediatrail--docs-brightgreen.svg)](https://aicon.github.io/mediatrail-docs/)
@@ -163,7 +163,7 @@ MediaTrail is an independent, unofficial fork and is **not affiliated with, main
 ### Background
 MediaTrail diverged from Yamtrack `dev` after `v0.25.3` (the July 12, 2026 tabbed detail view), incorporating PR `#1378` (REST API preview) and PR `#1608` (Episode history).
 
-MediaTrail continues with small releases after `0.27.01`, prioritizing stability, self-contained deployment, and its own features: Nuvio, journal, statistics, import tools, Emby live Now Watching, selectable detail links, selectable hybrid recommendations (TMDB / IMDb / AI), custom-list badges, themes, and a multilingual UI.
+MediaTrail continues with small releases after `0.27.02`, prioritizing stability, self-contained deployment, and its own features: Nuvio, journal, statistics, import tools, Emby live Now Watching, selectable detail links, selectable hybrid recommendations (TMDB / IMDb / AI), custom-list badges, themes, and a multilingual UI.
 
 | Feature | Upstream Yamtrack (Stable) | MediaTrail |
 | :--- | :---: | :---: |

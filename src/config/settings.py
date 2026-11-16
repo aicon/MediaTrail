@@ -379,8 +379,8 @@ AUTH_USER_MODEL = "users.User"
 FILE_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50 MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50 MB
 
-# MediaTrail versioning: 0.27.01 adds themes, i18n, hybrid recommendations, and Emby Now Watching.
-VERSION = config("VERSION", default="0.27.01")
+# MediaTrail versioning: 0.27.02 hotfixes light-theme home poster event pills.
+VERSION = config("VERSION", default="0.27.02")
 
 
 def _public_http_url(name):
