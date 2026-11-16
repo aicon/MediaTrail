@@ -44,6 +44,7 @@
       csrfToken: config.csrfToken,
       saveFailed: config.saveFailed || "Could not save the theme.",
       busy: false,
+      menuOpen: false,
       statusMessage: "",
 
       init() {
@@ -51,7 +52,11 @@
       },
 
       async setTheme(next) {
-        if (this.busy || next === this.theme) {
+        if (this.busy) {
+          return;
+        }
+        if (next === this.theme) {
+          this.menuOpen = false;
           return;
         }
         const previous = this.theme;
@@ -78,6 +83,7 @@
           }
           this.theme = data.theme || next;
           applyTheme(this.theme);
+          this.menuOpen = false;
         } catch (error) {
           this.theme = previous;
           applyTheme(previous);

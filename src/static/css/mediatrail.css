@@ -400,6 +400,10 @@ html[data-theme="light"] {
   .bg-indigo-500,
   .bg-indigo-600,
   .bg-indigo-700,
+  .bg-violet-500,
+  .bg-violet-600,
+  .bg-purple-500,
+  .bg-purple-600,
   .bg-emerald-500,
   .bg-emerald-600,
   .bg-emerald-700,
@@ -426,6 +430,10 @@ html[data-theme="light"] {
   .bg-indigo-500,
   .bg-indigo-600,
   .bg-indigo-700,
+  .bg-violet-500,
+  .bg-violet-600,
+  .bg-purple-500,
+  .bg-purple-600,
   .bg-emerald-500,
   .bg-emerald-600,
   .bg-emerald-700,
@@ -548,14 +556,24 @@ html[data-theme="light"] .toast-info .text-indigo-300 { color: #a5b4fc; }
 
 /* Header theme switcher: three 48px targets, icon-only. */
 .mt-theme-switch {
+  position: relative;
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+}
+
+.mt-theme-wide {
+  display: inline-flex;
+  align-items: center;
   gap: 0.125rem;
   padding: 0.125rem;
   border: 1px solid var(--mt-line);
   border-radius: 0.65rem;
   background: var(--mt-inset-2);
+}
+
+.mt-theme-narrow {
+  display: none;
 }
 
 .mt-theme-btn {
@@ -601,4 +619,35 @@ html[data-theme="light"] .toast-info .text-indigo-300 { color: #a5b4fc; }
   width: 1.25rem;
   height: 1.25rem;
   pointer-events: none;
+}
+
+.mt-theme-menu {
+  position: fixed;
+  top: 4.25rem;
+  right: 0.5rem;
+  z-index: 45;
+  display: flex;
+  flex-direction: row;
+  gap: 0.125rem;
+  padding: 0.25rem;
+  border: 1px solid var(--mt-line);
+  border-radius: 0.65rem;
+  background: var(--mt-sidebar);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.28);
+}
+
+/* Narrow / portrait phones: one icon, expand into a panel under the header. */
+@media (max-width: 639px) {
+  .mt-theme-wide {
+    display: none;
+  }
+
+  .mt-theme-narrow {
+    display: block;
+  }
+
+  .mt-theme-narrow > .mt-theme-btn {
+    border: 1px solid var(--mt-line);
+    background: var(--mt-inset-2);
+  }
 }

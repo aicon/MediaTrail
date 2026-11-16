@@ -1,11 +1,19 @@
-const CACHE_NAME = 'yamtrack-v1';
+const CACHE_NAME = 'mediatrail-v2';
 const urlsToCache = [
-  '/',
   '/static/css/main.css',
   '/static/favicon/android-chrome-192x192.png',
   '/static/favicon/android-chrome-512x512.png',
   '/static/fonts/roboto-flex.woff2'
 ];
+
+function isManifestRequest(request) {
+  try {
+    const url = new URL(request.url);
+    return url.pathname.endsWith('.webmanifest') || url.pathname.includes('site.webmanifest');
+  } catch (error) {
+    return false;
+  }
+}
 
 // Install event
 self.addEventListener('install', (event) => {
@@ -15,10 +23,19 @@ self.addEventListener('install', (event) => {
         return cache.addAll(urlsToCache);
       })
   );
+  self.skipWaiting();
 });
 
 // Fetch event
 self.addEventListener('fetch', (event) => {
+  // Always take the live manifest so orientation and icons can update.
+  if (isManifestRequest(event.request)) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' }).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -39,6 +56,6 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
