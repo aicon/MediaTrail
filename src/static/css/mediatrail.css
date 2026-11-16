@@ -395,6 +395,9 @@ html[data-theme="light"] {
 .group:hover .group-hover\:text-white { color: var(--mt-ink); }
 .text-white\/70 { color: color-mix(in srgb, var(--mt-ink) 70%, transparent); }
 
+/* Keep white text on saturated chips/buttons. Do NOT include modal
+   backdrops (bg-black/50 etc.) in the descendant selector — that forced
+   list/modal titles like "Megnézendő" to stay white on light surfaces. */
 :is(
   .bg-indigo-400,
   .bg-indigo-500,
@@ -447,9 +450,6 @@ html[data-theme="light"] {
   .bg-orange-500,
   .bg-\[\#4f46e5\],
   .bg-gray-900\/90,
-  .bg-black\/40,
-  .bg-black\/50,
-  .bg-black\/80,
   .toast-error,
   .toast-warning,
   .toast-success,
