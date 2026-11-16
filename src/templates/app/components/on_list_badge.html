@@ -1,8 +1,8 @@
 {% load i18n %}
 {# Coral list membership badge — top-right, no bottom strip. #}
 {% if on_list or media.on_list or item.on_list %}
-  <div class="absolute top-2 right-2 z-10 bg-gray-900/90 text-[#F97316] p-1.5 rounded-md shadow-md"
+  <div class="absolute top-2 right-2 z-10 bg-gray-900/90 mt-on-list-badge text-orange-500 p-1.5 rounded-md shadow-md"
        title="{% translate "On a custom list" %}">
-    {% include "app/icons/list.svg" with classes="w-4 h-4" %}
+    {% include "app/icons/list.svg" with classes="w-4 h-4 mt-on-list-badge text-orange-500" %}
   </div>
 {% endif %}

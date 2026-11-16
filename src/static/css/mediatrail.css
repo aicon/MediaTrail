@@ -148,6 +148,19 @@
   background-color: var(--color-orange-500);
 }
 
+/* Custom-list membership badge: keep coral even when light theme remaps orange text. */
+.mt-on-list-badge {
+  color: #f97316;
+}
+html[data-theme="light"] .mt-on-list-badge {
+  color: #f97316;
+}
+@media (prefers-color-scheme: light) {
+  html[data-theme="system"] .mt-on-list-badge {
+    color: #f97316;
+  }
+}
+
 .bg-red-500 {
   background-color: var(--color-red-500);
 }

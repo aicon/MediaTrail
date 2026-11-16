@@ -24,7 +24,13 @@ Opening a title shows the catalog details and the tracking form. Status, score, 
 
 ### External links and recommendations
 
-On movie and TV detail pages, Preferences controls which external profile links appear (IMDb, Wikidata, Letterboxd, TVDB, Trakt, Port.hu). The Recommendations tab can combine TMDB, IMDb “More like this”, and optional Gemini AI suggestions into one deduplicated list of TMDB cards. The page first shows TMDB results, then loads IMDb/AI in the background. Titles you already completed or marked In Progress are never recommended. Default engines are set under Preferences → Recommendation sources; AI needs a Gemini API key under Settings → Integrations → Gemini. Results from IMDb and AI are cached in the durable SQLite database for 30 days.
+On movie and TV detail pages, Preferences controls which external profile links appear (IMDb, Wikidata, Letterboxd, TVDB, Trakt, Port.hu).
+
+The Recommendations tab is a selectable hybrid: turn on any combination of TMDB, IMDb “More like this”, and optional Gemini AI. Defaults are under Preferences → Recommendation sources; the same engines can be toggled on the page with source pills. Selected sources merge into one deduplicated list of TMDB cards, each showing which engines suggested it. The page paints TMDB first, then loads IMDb/AI in the background. Titles you already completed or marked In Progress never appear. AI needs your own Gemini API key under Settings → Integrations → Gemini (stored encrypted). IMDb and AI responses are cached in the durable SQLite database for 30 days.
+
+### Custom-list membership badge
+
+When a title is already on one of your custom lists, poster cards and detail pages show a coral list icon in the top-right corner of the poster. The planning / watchlist icon on the left is unchanged.
 
 ## Language
 

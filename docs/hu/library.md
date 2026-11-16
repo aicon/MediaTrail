@@ -24,7 +24,13 @@ Egy mű adatlapját megnyitva a külső katalógus adatai és a naplózási űrl
 
 ### Külső hivatkozások és ajánlások
 
-A film- és sorozatadatlapokon a Beállításokban választhatod ki, mely külső profilhivatkozások jelenjenek meg (IMDb, Wikidata, Letterboxd, TVDB, Trakt, Port.hu). Az Ajánlások fülön a TMDB, az IMDb „More like this” és az opcionális Gemini AI találatai kombinálhatók; a rendszer egységes TMDB-kártyákká rendezi őket, és kiszűri a duplikátumokat. Először a TMDB találatok jelennek meg, az IMDb/AI a háttérben töltődik. A már befejezett vagy Folyamatban lévő címek sosem kerülnek az ajánlások közé. Az alapértelmezett motorok a Beállítások → Ajánló források alatt állíthatók; az AI-hoz Gemini API-kulcs kell a Beállítások → Integrációk → Gemini fülön. Az IMDb és AI eredmények 30 napig a tartós SQLite adatbázisban cache-elődnek.
+A film- és sorozatadatlapokon a Beállításokban választhatod ki, mely külső profilhivatkozások jelenjenek meg (IMDb, Wikidata, Letterboxd, TVDB, Trakt, Port.hu).
+
+Az Ajánlások fül választható hibrid: tetszőleges kombinációban kapcsolhatod a TMDB, az IMDb „More like this” és az opcionális Gemini AI motorokat. Az alapértelmezés a Beállítások → Ajánló források alatt állítható; ugyanazok a motorok az adatlap forráspilljeivel is ki-be kapcsolhatók. A kiválasztott források egy deduplikált TMDB-kártyalistába rendeződnek, forrásjelvénnyel. Először a TMDB jelenik meg, az IMDb/AI a háttérben töltődik. A Befejezett és a Folyamatban lévő címek sosem kerülnek az ajánlások közé. Az AI-hoz saját Gemini API-kulcs kell a Beállítások → Integrációk → Gemini fülön (titkosítva tárolva). Az IMDb és AI válaszok 30 napig a tartós SQLite adatbázisban cache-elődnek.
+
+### Egyéni lista-jelvény
+
+Ha egy cím már szerepel valamelyik egyéni listádon, a poszterkártyákon és az adatlapokon korall színű listaikon jelenik meg a poszter jobb felső sarkában. A bal oldali tervezés / watchlist ikon változatlan.
 
 ## Kezelőfelület és metaadatok nyelve
 
