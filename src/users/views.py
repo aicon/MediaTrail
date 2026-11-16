@@ -312,7 +312,6 @@ def preferences(request):
             "letterboxd": "link_letterboxd_enabled",
             "tvdb": "link_tvdb_enabled",
             "trakt": "link_trakt_enabled",
-            "simkl": "link_simkl_enabled",
             "port_hu": "link_port_hu_enabled",
         }
         known_link_keys = {key for key, _label in DETAIL_LINK_OPTIONS}

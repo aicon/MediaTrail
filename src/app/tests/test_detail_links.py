@@ -7,15 +7,13 @@ from app.detail_links import (
     apply_user_detail_links,
     build_external_links,
     resolve_port_hu_url,
-    resolve_simkl_url,
-    resolve_trakt_url,
     visible_detail_links,
 )
 from app.models import MediaTypes
 
 
 class BuildExternalLinksTests(SimpleTestCase):
-    def test_movie_links_are_static_only(self):
+    def test_movie_links_use_imdb_and_tmdb_where_documented(self):
         links = build_external_links(
             {
                 "imdb_id": "tt0179955",
@@ -36,8 +34,7 @@ class BuildExternalLinksTests(SimpleTestCase):
             links["letterboxd"],
             "https://www.letterboxd.com/tmdb/123",
         )
-        # Trakt/Simkl/Port.hu require resolution — not built from IMDb path.
-        self.assertNotIn("trakt", links)
+        self.assertEqual(links["trakt"], "https://trakt.tv/movies/tt0179955")
         self.assertNotIn("simkl", links)
         self.assertNotIn("port_hu", links)
         self.assertNotIn("tvdb", links)
@@ -100,68 +97,6 @@ class PortHuResolutionTests(SimpleTestCase):
         self.assertIsNone(resolve_port_hu_url(""))
 
 
-class TraktResolutionTests(SimpleTestCase):
-    @patch("app.detail_links.services.api_request")
-    @patch("app.detail_links.cache")
-    def test_macskafogo_wikidata_p8013(self, mock_cache, mock_api):
-        mock_cache.get.return_value = None
-        mock_api.return_value = {
-            "claims": {
-                "P8013": [
-                    {
-                        "mainsnak": {
-                            "snaktype": "value",
-                            "datavalue": {
-                                "value": "movies/cat-city-1986",
-                                "type": "string",
-                            },
-                        }
-                    }
-                ]
-            }
-        }
-        url = resolve_trakt_url(
-            wikidata_id="Q713543",
-            imdb_id="tt0179955",
-            media_type=MediaTypes.MOVIE.value,
-        )
-        self.assertEqual(url, "https://trakt.tv/movies/cat-city-1986")
-
-
-class SimklResolutionTests(SimpleTestCase):
-    @patch("app.detail_links.services.api_request")
-    @patch("app.detail_links.cache")
-    def test_macskafogo_simkl_id_lookup(self, mock_cache, mock_api):
-        mock_cache.get.return_value = None
-        mock_api.return_value = [
-            {
-                "type": "movie",
-                "title": "Cat City",
-                "ids": {"simkl": 137096, "slug": "cat-city"},
-            }
-        ]
-        url = resolve_simkl_url(
-            "tt0179955",
-            media_type=MediaTypes.MOVIE.value,
-        )
-        self.assertEqual(url, "https://simkl.com/movies/137096/cat-city")
-        mock_api.assert_called_once()
-        args, kwargs = mock_api.call_args
-        self.assertEqual(args[2], "https://api.simkl.com/search/id")
-        self.assertEqual(kwargs["params"]["imdb"], "tt0179955")
-
-    @patch("app.detail_links.services.api_request", side_effect=RuntimeError("down"))
-    @patch("app.detail_links.cache")
-    def test_simkl_error_does_not_cache_miss(self, mock_cache, _mock_api):
-        mock_cache.get.return_value = None
-        self.assertIsNone(resolve_simkl_url("tt0179955"))
-        mock_cache.set.assert_not_called()
-
-    def test_invalid_imdb_skips_lookup(self):
-        self.assertIsNone(resolve_simkl_url("not-an-id"))
-        self.assertIsNone(resolve_simkl_url(""))
-
-
 class VisibleLinksTests(TestCase):
     def setUp(self):
         self.user = get_user_model().objects.create_user(
@@ -169,8 +104,7 @@ class VisibleLinksTests(TestCase):
             password="pass12345",
         )
 
-    @patch("app.detail_links.resolve_trakt_url", return_value="https://trakt.tv/movies/cat-city-1986")
-    def test_defaults_show_imdb_wikidata_trakt(self, _mock_trakt):
+    def test_defaults_show_imdb_wikidata_trakt(self):
         raw = build_external_links(
             {
                 "imdb_id": "tt0179955",
@@ -180,21 +114,16 @@ class VisibleLinksTests(TestCase):
             media_type=MediaTypes.MOVIE.value,
             tmdb_id=9,
         )
-        visible = visible_detail_links(
-            self.user,
-            raw,
-            wikidata_id="Q713543",
-            imdb_id="tt0179955",
-            media_type=MediaTypes.MOVIE.value,
-        )
+        visible = visible_detail_links(self.user, raw, wikidata_id="Q713543")
         self.assertEqual(
             list(visible.keys()),
             ["IMDb", "Wikidata", "Trakt"],
         )
         self.assertEqual(
             visible["Trakt"],
-            "https://trakt.tv/movies/cat-city-1986",
+            "https://trakt.tv/movies/tt0179955",
         )
+        self.assertNotIn("Simkl", visible)
 
     @patch(
         "app.detail_links.resolve_port_hu_url",
@@ -212,25 +141,7 @@ class VisibleLinksTests(TestCase):
             {"Port.hu": "https://port.hu/jump/movie-1546"},
         )
 
-    @patch(
-        "app.detail_links.resolve_simkl_url",
-        return_value="https://simkl.com/movies/137096/cat-city",
-    )
-    @patch(
-        "app.detail_links.resolve_trakt_url",
-        return_value="https://trakt.tv/movies/cat-city-1986",
-    )
-    @patch(
-        "app.detail_links.resolve_port_hu_url",
-        return_value="https://port.hu/jump/movie-1546",
-    )
-    def test_macskafogo_enabled_links(
-        self,
-        _mock_port,
-        _mock_trakt,
-        _mock_simkl,
-    ):
-        self.user.link_simkl_enabled = True
+    def test_macskafogo_trakt_tt_and_no_simkl(self):
         self.user.link_port_hu_enabled = True
         self.user.save()
         media = {
@@ -241,21 +152,20 @@ class VisibleLinksTests(TestCase):
             },
             "external_links": {},
         }
-        apply_user_detail_links(media, self.user, MediaTypes.MOVIE.value)
+        with patch(
+            "app.detail_links.resolve_port_hu_url",
+            return_value="https://port.hu/jump/movie-1546",
+        ):
+            apply_user_detail_links(media, self.user, MediaTypes.MOVIE.value)
+        self.assertEqual(
+            media["external_links"]["Trakt"],
+            "https://trakt.tv/movies/tt0179955",
+        )
         self.assertEqual(
             media["external_links"]["Port.hu"],
             "https://port.hu/jump/movie-1546",
         )
-        self.assertEqual(
-            media["external_links"]["Simkl"],
-            "https://simkl.com/movies/137096/cat-city",
-        )
-        self.assertEqual(
-            media["external_links"]["Trakt"],
-            "https://trakt.tv/movies/cat-city-1986",
-        )
-        self.assertNotIn("tt0179955", media["external_links"]["Simkl"])
-        self.assertNotIn("tt0179955", media["external_links"]["Trakt"])
+        self.assertNotIn("Simkl", media["external_links"])
 
     def test_apply_rebuilds_from_external_ids(self):
         media = {
@@ -264,15 +174,15 @@ class VisibleLinksTests(TestCase):
                 "imdb_id": "tt0179955",
                 "wikidata_id": "Q713543",
             },
-            "external_links": {"IMDb": "stale"},
+            "external_links": {"IMDb": "stale", "Simkl": "https://simkl.com/movies/x"},
         }
-        with patch(
-            "app.detail_links.resolve_trakt_url",
-            return_value="https://trakt.tv/movies/cat-city-1986",
-        ):
-            apply_user_detail_links(media, self.user, MediaTypes.MOVIE.value)
+        apply_user_detail_links(media, self.user, MediaTypes.MOVIE.value)
         self.assertEqual(
             media["external_links"]["IMDb"],
             "https://www.imdb.com/title/tt0179955/",
         )
-        self.assertIn("Trakt", media["external_links"])
+        self.assertEqual(
+            media["external_links"]["Trakt"],
+            "https://trakt.tv/movies/tt0179955",
+        )
+        self.assertNotIn("Simkl", media["external_links"])

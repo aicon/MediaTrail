@@ -327,7 +327,6 @@ class SidebarViewTests(TestCase):
         """External detail-link toggles persist without changing other prefs."""
         self.user.link_imdb_enabled = True
         self.user.link_port_hu_enabled = False
-        self.user.link_simkl_enabled = False
         self.user.save()
 
         response = self.client.post(
@@ -337,14 +336,13 @@ class SidebarViewTests(TestCase):
                 "theme": "dark",
                 "media_types_checkboxes": [MediaTypes.TV.value],
                 "detail_links_form": "1",
-                "detail_link_checkboxes": ["imdb", "port_hu", "simkl"],
+                "detail_link_checkboxes": ["imdb", "port_hu"],
             },
         )
         self.assertRedirects(response, reverse("preferences"))
         self.user.refresh_from_db()
         self.assertTrue(self.user.link_imdb_enabled)
         self.assertTrue(self.user.link_port_hu_enabled)
-        self.assertTrue(self.user.link_simkl_enabled)
         self.assertFalse(self.user.link_wikidata_enabled)
         self.assertFalse(self.user.link_trakt_enabled)
         self.assertFalse(self.user.link_letterboxd_enabled)
@@ -352,3 +350,4 @@ class SidebarViewTests(TestCase):
         page = self.client.get(reverse("preferences"))
         self.assertContains(page, "External detail links")
         self.assertContains(page, 'name="detail_link_checkboxes"')
+        self.assertNotContains(page, 'value="simkl"')
