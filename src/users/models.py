@@ -326,6 +326,15 @@ class User(AbstractUser):
         default=LANGUAGE_AUTO,
         choices=INTERFACE_LANGUAGE_CHOICES,
     )
+
+    # External detail-page links (IMDb / Wikidata / Trakt on by default)
+    link_imdb_enabled = models.BooleanField(default=True)
+    link_wikidata_enabled = models.BooleanField(default=True)
+    link_trakt_enabled = models.BooleanField(default=True)
+    link_letterboxd_enabled = models.BooleanField(default=False)
+    link_tvdb_enabled = models.BooleanField(default=False)
+    link_simkl_enabled = models.BooleanField(default=False)
+    link_port_hu_enabled = models.BooleanField(default=False)
     clickable_media_cards = models.BooleanField(
         default=False,
         help_text="Hide hover overlay on touch devices",

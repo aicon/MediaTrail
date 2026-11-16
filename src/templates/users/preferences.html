@@ -310,6 +310,37 @@
         </div>
       </div>
 
+      {# External detail links #}
+      <div class="mb-5">
+        <input type="hidden" name="detail_links_form" value="1">
+        <div class="flex items-center mb-4">
+          {% include "app/icons/external-link.svg" with classes="w-5 h-5 text-indigo-400 mr-2" %}
+          <h3 class="text-lg font-semibold">{% translate "External detail links" %}</h3>
+        </div>
+        <p class="text-gray-400 mb-4 text-sm">
+          {% translate "Choose which external profile links appear on movie and TV detail pages." %}
+        </p>
+
+        <div class="grid gap-3 md:grid-cols-3">
+          {% for option in detail_link_options %}
+            <div class="flex items-center justify-between p-3 bg-[#39404b] rounded-md">
+              <div class="flex items-center text-gray-200 text-sm">
+                <span>{{ option.label }}</span>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input class="sr-only peer"
+                       type="checkbox"
+                       name="detail_link_checkboxes"
+                       value="{{ option.key }}"
+                       {% if option.enabled %}checked{% endif %}>
+                <div class="w-9 h-5 bg-gray-600 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-px after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-indigo-600">
+                </div>
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
       <div class="mt-5 pt-4 border-gray-600">
         <button type="submit"
                 class="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors text-sm cursor-pointer">

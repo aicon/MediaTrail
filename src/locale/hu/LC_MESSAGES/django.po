@@ -2607,3 +2607,9 @@ msgstr "Sötét téma"
 
 msgid "Could not save the theme."
 msgstr "A téma mentése nem sikerült."
+
+msgid "External detail links"
+msgstr "Külső adatlap-linkek"
+
+msgid "Choose which external profile links appear on movie and TV detail pages."
+msgstr "Válaszd ki, mely külső adatlap-linkek jelenjenek meg a film- és sorozatadatlapokon."

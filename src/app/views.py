@@ -19,7 +19,7 @@ from django.utils.dateparse import parse_date
 from django.utils.timezone import datetime
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from app import config, helpers, history_processor
+from app import config, detail_links, helpers, history_processor
 from app import home as home_helpers
 from app import statistics as stats
 from app.episode_operations import watch_episode
@@ -402,6 +402,12 @@ def media_details(request, source, media_type, media_id, title):  # noqa: ARG001
     else:
         watch_providers = None
 
+    detail_links.apply_user_detail_links(
+        media_metadata,
+        request.user,
+        media_type,
+    )
+
     context = {
         "media": media_metadata,
         "media_type": media_type,
@@ -462,6 +468,12 @@ def season_details(request, source, media_id, title, season_number):  # noqa: AR
                         section_name,
                     )
                 )
+
+    detail_links.apply_user_detail_links(
+        season_metadata,
+        request.user,
+        MediaTypes.SEASON.value,
+    )
 
     context = {
         "media": season_metadata,

@@ -19,6 +19,7 @@ from app.models import Item, MediaTypes
 from integrations.imports import nuvio
 from app.providers import tmdb
 from users.forms import NotificationSettingsForm, PasswordChangeForm, UserUpdateForm
+from app.detail_links import DETAIL_LINK_OPTIONS, detail_link_preference_rows
 from users.languages import (
     INTERFACE_LANGUAGE_CHOICES,
     LANGUAGE_AUTO,
@@ -245,6 +246,7 @@ def preferences(request):
                 "watch_provider_choices": watch_provider_regions,
                 "language_choices": INTERFACE_LANGUAGE_CHOICES,
                 "theme_choices": ThemeChoices.choices,
+                "detail_link_options": detail_link_preference_rows(request.user),
             },
         )
 
@@ -300,6 +302,23 @@ def preferences(request):
             f"{media_type}_enabled",
             media_type in media_types_checked,
         )
+
+    # Only rewrite link toggles when this Preferences section was submitted.
+    if "detail_links_form" in request.POST:
+        detail_links_checked = set(request.POST.getlist("detail_link_checkboxes"))
+        link_fields = {
+            "imdb": "link_imdb_enabled",
+            "wikidata": "link_wikidata_enabled",
+            "letterboxd": "link_letterboxd_enabled",
+            "tvdb": "link_tvdb_enabled",
+            "trakt": "link_trakt_enabled",
+            "simkl": "link_simkl_enabled",
+            "port_hu": "link_port_hu_enabled",
+        }
+        known_link_keys = {key for key, _label in DETAIL_LINK_OPTIONS}
+        for key, field in link_fields.items():
+            if key in known_link_keys:
+                setattr(request.user, field, key in detail_links_checked)
 
     # Save changes and redirect
     request.user.save()

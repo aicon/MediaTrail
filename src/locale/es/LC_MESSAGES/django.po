@@ -2363,3 +2363,9 @@ msgstr "Tema oscuro"
 
 msgid "Could not save the theme."
 msgstr "No se pudo guardar el tema."
+
+msgid "External detail links"
+msgstr "Enlaces externos de ficha"
+
+msgid "Choose which external profile links appear on movie and TV detail pages."
+msgstr "Elige qué enlaces de perfil externos aparecen en las fichas de películas y series."

@@ -43,31 +43,19 @@ def handle_error(error):
     )
 
 
-def get_external_links(external_ids, tmdb_id=None):
-    """Build external links dictionary from TMDB external_ids response."""
-    links = {}
+def get_external_links(external_ids, tmdb_id=None, media_type=None):
+    """Build external links from TMDB ids. Keys are provider codes (imdb, …)."""
+    from app.detail_links import build_external_links
 
-    if external_ids.get("imdb_id"):
-        links["IMDb"] = f"https://www.imdb.com/title/{external_ids['imdb_id']}/"
-
-    if external_ids.get("tvdb_id"):
-        links["TVDB"] = (
-            f"https://www.thetvdb.com/dereferrer/series/{external_ids['tvdb_id']}"
+    if media_type is None:
+        media_type = (
+            MediaTypes.MOVIE.value if tmdb_id else MediaTypes.TV.value
         )
-
-    if external_ids.get("wikidata_id"):
-        links["Wikidata"] = (
-            f"https://www.wikidata.org/wiki/{external_ids['wikidata_id']}"
-        )
-
-    # Only passed in for movies as Letterboxd seldom supports TV
-    if tmdb_id:
-        # https://letterboxd.com/about/film-data/
-        # Letterboxd will redirect to the correct movie
-        # as they source their data from TMDB
-        links["Letterboxd"] = f"https://www.letterboxd.com/tmdb/{tmdb_id}"
-
-    return links
+    return build_external_links(
+        external_ids,
+        media_type=media_type,
+        tmdb_id=tmdb_id,
+    )
 
 
 def search(media_type, query, page):
@@ -239,8 +227,11 @@ def movie(media_id):
                     MediaTypes.MOVIE.value,
                 ),
             },
+            "external_ids": response.get("external_ids", {}) or {},
             "external_links": get_external_links(
-                response.get("external_ids", {}), media_id
+                response.get("external_ids", {}),
+                media_id,
+                MediaTypes.MOVIE.value,
             ),
             "providers": response.get("watch/providers", {}).get("results", {}),
         }
@@ -276,6 +267,7 @@ def enrich_season_with_tv_data(season_data, tv_data, media_id, season_number):
     )
     season_data["title"] = tv_data["title"]
     season_data["tvdb_id"] = tv_data["tvdb_id"]
+    season_data["external_ids"] = tv_data.get("external_ids", {})
     season_data["external_links"] = tv_data["external_links"]
     season_data["genres"] = tv_data["genres"]
     if season_data["synopsis"] == "No synopsis available.":
@@ -450,7 +442,11 @@ def process_tv(response):
             ),
         },
         "tvdb_id": response.get("external_ids", {}).get("tvdb_id"),
-        "external_links": get_external_links(response.get("external_ids", {})),
+        "external_ids": response.get("external_ids", {}) or {},
+        "external_links": get_external_links(
+            response.get("external_ids", {}),
+            media_type=MediaTypes.TV.value,
+        ),
         "last_episode_season": last_episode["season_number"] if last_episode else None,
         "next_episode_season": next_episode["season_number"] if next_episode else None,
         "providers": response.get("watch/providers", {}).get("results", {}),

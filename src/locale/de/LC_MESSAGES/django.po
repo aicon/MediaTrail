@@ -2363,3 +2363,9 @@ msgstr "Dunkles Thema"
 
 msgid "Could not save the theme."
 msgstr "Das Thema konnte nicht gespeichert werden."
+
+msgid "External detail links"
+msgstr "Externe Detailseiten-Links"
+
+msgid "Choose which external profile links appear on movie and TV detail pages."
+msgstr "Wählen Sie, welche externen Profil-Links auf Film- und Serien-Detailseiten erscheinen."
