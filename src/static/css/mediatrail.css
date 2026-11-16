@@ -233,6 +233,62 @@
   margin-top: 0.85rem;
 }
 
+/* Detail page layout.
+   Mobile DOM stays poster → main → sidebar via order + display:contents.
+   Desktop: one left stack (poster+sidebar) beside main — avoids a 2-row
+   grid where a tall Recommendations panel stretches the left column. */
+.mt-detail-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.mt-detail-stack {
+  display: contents;
+}
+.mt-detail-poster {
+  order: 1;
+  width: 100%;
+  max-width: 250px;
+  margin-inline: auto;
+}
+.mt-detail-main {
+  order: 2;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.mt-detail-sidebar {
+  order: 3;
+  width: 100%;
+  max-width: 250px;
+  margin-inline: auto;
+}
+@media (min-width: 768px) {
+  .mt-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 250px) minmax(0, 1fr);
+    grid-template-areas: "stack main";
+    column-gap: 2.5rem;
+    align-items: start;
+  }
+  .mt-detail-stack {
+    grid-area: stack;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .mt-detail-poster,
+  .mt-detail-sidebar {
+    order: initial;
+    margin-inline: 0;
+  }
+  .mt-detail-main {
+    grid-area: main;
+    order: initial;
+  }
+}
+
 /* Appearance. Dark values match the existing palette. Light and System override them. */
 html {
   --mt-page: #212529;

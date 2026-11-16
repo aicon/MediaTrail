@@ -12,11 +12,11 @@
 {% endblock title %}
 
 {% block content %}
-  <div x-data="{ tab: 'overview' }">
-    {# Top section #}
-    <div class="flex flex-col md:flex-row gap-8 md:gap-10 mb-12 md:mb-8">
-      {# Poster #}
-      <div class="w-full md:w-1/4 max-w-[250px] mx-auto md:mx-0">
+  {# Mobile: poster → main → sidebar (order). Desktop: left stack beside main. #}
+  <div x-data="{ tab: 'overview' }"
+       class="mt-detail-layout">
+    <div class="mt-detail-stack">
+      <div class="mt-detail-poster">
         <img alt="{{ media.title }}"
              class="w-full rounded-lg shadow-lg bg-[#2a2f35] object-cover"
              src="{{ media.image }}">
@@ -90,75 +90,7 @@
 
       </div>
 
-      {# Hero #}
-      <div class="md:w-3/4 flex flex-col">
-        {% if media.media_type == MediaTypes.SEASON.value %}
-          <h2 class="text-xl font-semibold cursor-pointer hover:text-indigo-500 transition-colors duration-200 mb-2 text-gray-400 text-center md:text-start">
-            <a href="{% url 'media_details' source=media.source media_type=MediaTypes.TV.value media_id=media.media_id title=media.title|slug %}">{{ media.title }}</a>
-          </h2>
-
-          <div class="flex flex-col md:flex-row gap-y-4 md:gap-y-0 items-center justify-between mb-6">
-            <h1 class="text-3xl font-bold">{{ media.season_title }}</h1>
-
-            {# Season dropdown #}
-            <div class="relative"
-                 x-data="{ open: false }"
-                 @click.away="open = false"
-                 @keydown.escape.window="open = false">
-              <button @click="open = !open"
-                      class="flex items-center space-x-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md transition-colors duration-200 cursor-pointer">
-                <span class="text-sm font-medium">{{ media.season_title }}</span>
-                <div class="w-4 h-4" :class="{ 'rotate-180': open }">{% include "app/icons/chevron-down.svg" %}</div>
-              </button>
-              <div x-show="open"
-                   x-transition:enter="transition ease-out duration-200"
-                   x-transition:enter-start="opacity-0 transform scale-95"
-                   x-transition:enter-end="opacity-100 transform scale-100"
-                   x-transition:leave="transition ease-in duration-150"
-                   x-transition:leave-start="opacity-100 transform scale-100"
-                   x-transition:leave-end="opacity-0 transform scale-95"
-                   class="absolute right-1/2 md:right-0 translate-x-1/2 md:translate-x-0 mt-2 w-64 bg-[#2a2f35] rounded-md shadow-lg overflow-hidden z-10">
-                <div class="max-h-[300px] overflow-y-auto">
-                  {% for tv_season in tv.related.seasons %}
-                    <a href="{% url 'season_details' source=media.source media_id=media.media_id title=media.title|slug season_number=tv_season.season_number %}"
-                       class="w-full px-4 py-3 flex items-center space-x-3 hover:bg-gray-700 transition-colors duration-200 cursor-pointer {% if tv_season.season_number == media.season_number %}bg-[#343a40]{% endif %}">
-                      <div class="w-8 h-8 rounded-full flex items-center justify-center bg-indigo-600 text-white">
-                        {{ tv_season.season_number }}
-                      </div>
-                      <div class="flex-1 text-left">
-                        <div class="text-sm font-medium">{{ tv_season.season_title }}</div>
-                        <div class="text-xs text-gray-400">
-                          {% blocktranslate count counter=tv_season.max_progress %}{{ counter }} Episode{% plural %}{{ counter }} Episodes{% endblocktranslate %}
-                          {% if tv_season.first_air_date %}• {{ tv_season.first_air_date }}{% endif %}
-                        </div>
-                      </div>
-                    </a>
-                  {% endfor %}
-                </div>
-              </div>
-            </div>
-          </div>
-        {% else %}
-          <h1 class="text-3xl font-bold mb-4 text-center md:text-start">{{ media.title }}</h1>
-        {% endif %}
-
-        {# Genres #}
-        <div class="flex flex-wrap gap-2 mb-4">
-          {% for genre in media.genres %}
-            <span class="px-3 py-1 bg-violet-600 text-white rounded-full text-sm">{{ genre }}</span>
-          {% endfor %}
-        </div>
-
-        {# Tabs directly under title/genres (all breakpoints; scroll if needed) #}
-        {% include "app/components/media_section_tabs.html" with extra_classes="mb-0" %}
-
-      </div>
-    </div>
-
-    {# Bottom section #}
-    <div class="flex flex-col md:flex-row gap-12 md:gap-10">
-      {# Sidebar #}
-      <div class="w-full md:w-1/4 md:max-w-[250px] mx-auto lg:mx-0">
+      <div class="mt-detail-sidebar">
         {# Your History #}
         {% if current_instance.start_date or current_instance.end_date or current_instance.notes or current_instance.progress and media.media_type != MediaTypes.MOVIE.value %}
           <h2 class="text-xl font-bold mb-4">{% translate "Your History" %}</h2>
@@ -325,9 +257,70 @@
           {% endif %}
         </div>
       </div>
+    </div>
 
-      {# Tab content #}
-      <div class="w-full md:w-3/4">
+    <div class="mt-detail-main">
+      {% if media.media_type == MediaTypes.SEASON.value %}
+        <h2 class="text-xl font-semibold cursor-pointer hover:text-indigo-500 transition-colors duration-200 mb-2 text-gray-400 text-center md:text-start">
+          <a href="{% url 'media_details' source=media.source media_type=MediaTypes.TV.value media_id=media.media_id title=media.title|slug %}">{{ media.title }}</a>
+        </h2>
+
+        <div class="flex flex-col md:flex-row gap-y-4 md:gap-y-0 items-center justify-between mb-6">
+          <h1 class="text-3xl font-bold">{{ media.season_title }}</h1>
+
+          {# Season dropdown #}
+          <div class="relative"
+               x-data="{ open: false }"
+               @click.away="open = false"
+               @keydown.escape.window="open = false">
+            <button @click="open = !open"
+                    class="flex items-center space-x-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-md transition-colors duration-200 cursor-pointer">
+              <span class="text-sm font-medium">{{ media.season_title }}</span>
+              <div class="w-4 h-4" :class="{ 'rotate-180': open }">{% include "app/icons/chevron-down.svg" %}</div>
+            </button>
+            <div x-show="open"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 transform scale-95"
+                 x-transition:enter-end="opacity-100 transform scale-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 transform scale-100"
+                 x-transition:leave-end="opacity-0 transform scale-95"
+                 class="absolute right-1/2 md:right-0 translate-x-1/2 md:translate-x-0 mt-2 w-64 bg-[#2a2f35] rounded-md shadow-lg overflow-hidden z-10">
+              <div class="max-h-[300px] overflow-y-auto">
+                {% for tv_season in tv.related.seasons %}
+                  <a href="{% url 'season_details' source=media.source media_id=media.media_id title=media.title|slug season_number=tv_season.season_number %}"
+                     class="w-full px-4 py-3 flex items-center space-x-3 hover:bg-gray-700 transition-colors duration-200 cursor-pointer {% if tv_season.season_number == media.season_number %}bg-[#343a40]{% endif %}">
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center bg-indigo-600 text-white">
+                      {{ tv_season.season_number }}
+                    </div>
+                    <div class="flex-1 text-left">
+                      <div class="text-sm font-medium">{{ tv_season.season_title }}</div>
+                      <div class="text-xs text-gray-400">
+                        {% blocktranslate count counter=tv_season.max_progress %}{{ counter }} Episode{% plural %}{{ counter }} Episodes{% endblocktranslate %}
+                        {% if tv_season.first_air_date %}• {{ tv_season.first_air_date }}{% endif %}
+                      </div>
+                    </div>
+                  </a>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <h1 class="text-3xl font-bold mb-4 text-center md:text-start">{{ media.title }}</h1>
+      {% endif %}
+
+      {# Genres #}
+      <div class="flex flex-wrap gap-2 mb-4">
+        {% for genre in media.genres %}
+          <span class="px-3 py-1 bg-violet-600 text-white rounded-full text-sm">{{ genre }}</span>
+        {% endfor %}
+      </div>
+
+      {# Tabs directly under genres #}
+      {% include "app/components/media_section_tabs.html" with extra_classes="mb-6" %}
+
+      {# Tab panels #}
         {# Overview: synopsis + TMDB/source and MediaTrail user scores only #}
         <section class="mb-8" x-show="tab === 'overview'">
           {% if media.synopsis %}
@@ -738,7 +731,8 @@
             </div>
           </section>
         {% endif %}
-      </div>
     </div>
+
+
   </div>
 {% endblock content %}
