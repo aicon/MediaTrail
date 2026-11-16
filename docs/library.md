@@ -22,6 +22,10 @@ Home **Recent** sort also uses the last resume update, so a mid-watch stop can m
 
 Opening a title shows the catalog details and the tracking form. Status, score, progress, start and end dates, and a note belong to that entry. Repeating a finished title keeps another pass in the history. A series is a parent: seasons and episodes are separate rows, so marking one episode does not rewrite the whole show.
 
+### External links and recommendations
+
+On movie and TV detail pages, Preferences controls which external profile links appear (IMDb, Wikidata, Letterboxd, TVDB, Trakt, Port.hu). The Recommendations tab can combine TMDB, IMDb “More like this”, and optional Gemini AI suggestions into one deduplicated list of TMDB cards. Default engines are set under Preferences → Recommendation sources; AI needs a Gemini API key under Settings → Integrations → Gemini. Results from IMDb and AI are cached in the durable SQLite database for 30 days.
+
 ## Language
 
 Preferences has the interface language, English or Hungarian. It is stored on the account. Catalog text from outside services can still arrive in the language those services were asked for. `TMDB_LANG` is that request language for movie and series metadata. See [Runtime](runtime.md).

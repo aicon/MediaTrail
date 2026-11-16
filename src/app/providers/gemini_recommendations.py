@@ -14,14 +14,21 @@ from integrations.imports.helpers import decrypt
 
 logger = logging.getLogger(__name__)
 
-GEMINI_MODEL = "gemini-2.0-flash"
-_TIMEOUT = 20
+# Prefer current flash models; fall back if a name is retired for an account.
+GEMINI_MODELS = (
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+)
+_TIMEOUT = 25
 _MAX_ITEMS = 12
 
 SYSTEM_PROMPT = (
-    "You recommend movies and TV shows. Prefer titles that match the seed's "
-    "tone, humor, craft, and cultural context. Lean toward titles familiar to "
-    "Hungarian audiences when they fit. Return only titles that really exist. "
+    "You recommend real movies and TV shows that match the seed title's tone, "
+    "humor, craft, era, and cultural context. When the seed is Hungarian "
+    "(especially Hungarian animation or comedy), put Hungarian classics first "
+    "(for example Vuk, Szaffi, Lúdas Matyi, Fehérlófia, Macskafogó 2 when they "
+    "fit) before international titles. Return only titles that really exist. "
     "Do not include the seed title itself."
 )
 
@@ -52,6 +59,7 @@ def recommend_titles(user, *, title: str, year, media_type: str, media_id) -> li
     """Return [{title, year, media_type}, ...] for the seed, with durable cache."""
     api_key = _user_api_key(user)
     if not api_key:
+        logger.info("Gemini skipped: no API key for user=%s", getattr(user, "id", None))
         return []
 
     seed_key = str(media_id)
@@ -61,7 +69,7 @@ def recommend_titles(user, *, title: str, year, media_type: str, media_id) -> li
         seed_key,
         user_id=user.id,
     )
-    if cached is not None:
+    if cached:
         return _normalize_items(cached, fallback_type=media_type)
 
     try:
@@ -75,13 +83,22 @@ def recommend_titles(user, *, title: str, year, media_type: str, media_id) -> li
         logger.exception("Gemini recommendations failed for %s/%s", media_type, media_id)
         return []
 
-    recommendation_cache.set_cached_payload(
-        SOURCE_AI,
-        media_type,
-        seed_key,
-        items,
-        user_id=user.id,
-    )
+    if items:
+        recommendation_cache.set_cached_payload(
+            SOURCE_AI,
+            media_type,
+            seed_key,
+            items,
+            user_id=user.id,
+        )
+        logger.info(
+            "Gemini recommendations for %s/%s: %s titles",
+            media_type,
+            media_id,
+            len(items),
+        )
+    else:
+        logger.warning("Gemini returned no titles for %s/%s", media_type, media_id)
     return items
 
 
@@ -97,25 +114,66 @@ def _user_api_key(user) -> str:
 
 
 def _call_gemini(api_key: str, *, title: str, year, media_type: str) -> list[dict]:
-    """Call Gemini generateContent with a structured JSON schema."""
+    """Try current Gemini models with schema, then without schema."""
     year_bit = f" ({year})" if year else ""
     kind = "TV show" if media_type == "tv" else "movie"
     user_prompt = (
         f"Recommend up to {_MAX_ITEMS} titles similar in spirit to the {kind} "
-        f'"{title}{year_bit}". Reply with JSON only.'
+        f'"{title}{year_bit}". Prefer Hungarian animated films and comedies when '
+        "they fit the seed. Reply with JSON only: "
+        '{"recommendations":[{"title":"...","year":1981,"media_type":"movie"}]}'
     )
+
+    last_error = None
+    for model in GEMINI_MODELS:
+        for use_schema in (True, False):
+            try:
+                items = _generate(
+                    api_key,
+                    model=model,
+                    user_prompt=user_prompt,
+                    use_schema=use_schema,
+                    fallback_type=media_type,
+                )
+            except requests.HTTPError as error:
+                last_error = error
+                status = getattr(getattr(error, "response", None), "status_code", None)
+                body = (getattr(getattr(error, "response", None), "text", None) or "")[:300]
+                logger.warning(
+                    "Gemini %s schema=%s HTTP %s: %s",
+                    model,
+                    use_schema,
+                    status,
+                    body,
+                )
+                continue
+            except Exception as error:
+                last_error = error
+                logger.warning("Gemini %s schema=%s failed: %s", model, use_schema, error)
+                continue
+            if items:
+                return items
+    if last_error:
+        logger.warning("All Gemini model attempts failed: %s", last_error)
+    return []
+
+
+def _generate(api_key, *, model, user_prompt, use_schema, fallback_type):
     url = (
         f"https://generativelanguage.googleapis.com/v1beta/models/"
-        f"{GEMINI_MODEL}:generateContent"
+        f"{model}:generateContent"
     )
+    generation = {
+        "temperature": 0.55,
+        "responseMimeType": "application/json",
+    }
+    if use_schema:
+        generation["responseSchema"] = _RESPONSE_SCHEMA
+
     body = {
         "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]},
         "contents": [{"role": "user", "parts": [{"text": user_prompt}]}],
-        "generationConfig": {
-            "temperature": 0.7,
-            "responseMimeType": "application/json",
-            "responseSchema": _RESPONSE_SCHEMA,
-        },
+        "generationConfig": generation,
     }
     response = requests.post(
         url,
@@ -125,13 +183,22 @@ def _call_gemini(api_key: str, *, title: str, year, media_type: str) -> list[dic
     )
     response.raise_for_status()
     data = response.json()
-    text = (
-        data.get("candidates", [{}])[0]
-        .get("content", {})
-        .get("parts", [{}])[0]
-        .get("text", "")
-    )
-    return _normalize_items(_parse_json_text(text), fallback_type=media_type)
+    text = _extract_text(data)
+    return _normalize_items(_parse_json_text(text), fallback_type=fallback_type)
+
+
+def _extract_text(data: dict) -> str:
+    candidates = data.get("candidates") or []
+    if not candidates:
+        logger.warning("Gemini response had no candidates: %s", str(data)[:300])
+        return ""
+    parts = ((candidates[0] or {}).get("content") or {}).get("parts") or []
+    chunks = []
+    for part in parts:
+        text = (part or {}).get("text")
+        if text:
+            chunks.append(text)
+    return "\n".join(chunks)
 
 
 def _parse_json_text(text: str):
@@ -140,7 +207,6 @@ def _parse_json_text(text: str):
     try:
         parsed = json.loads(text)
     except json.JSONDecodeError:
-        # Sometimes the model wraps JSON in fences despite schema.
         match = re.search(r"\{.*\}", text, re.DOTALL)
         if not match:
             return []

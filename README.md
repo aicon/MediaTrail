@@ -14,7 +14,7 @@ A self-hosted personal media tracker and digital logbook for everything you watc
 
 MediaTrail is an independent, self-hosted web application to track movies, TV shows, seasons, episodes, anime, manga, video games, books, comics, and board games in one place. Organize your library, log dates, assign ratings, track your progress, build custom lists, and explore your personal viewing statistics.
 
-MediaTrail originates as an independent fork of [Yamtrack](https://github.com/FuzzyGrim/Yamtrack), adding an integrated REST API, rich episode watch histories, live Now Watching, Nuvio sync, Emby live playback, system/light/dark themes, and a multilingual interface (English, Deutsch, Español, Français, Magyar, Italiano).
+MediaTrail originates as an independent fork of [Yamtrack](https://github.com/FuzzyGrim/Yamtrack), adding an integrated REST API, rich episode watch histories, live Now Watching, Nuvio sync, Emby live playback, selectable external detail links, hybrid multi-source recommendations (including AI), system/light/dark themes, and a multilingual interface (English, Deutsch, Español, Français, Magyar, Italiano).
 
 ---
 
@@ -31,6 +31,8 @@ MediaTrail originates as an independent fork of [Yamtrack](https://github.com/Fu
 - **Multi-user with separate libraries:** Each user manages an isolated library. Authenticate locally or via social/OIDC providers (Google, GitHub, Discord) through django-allauth.
 - **Multilingual interface:** Per-account UI language — Auto (browser), English, Deutsch, Español, Français, Magyar, or Italiano. Catalog metadata from TMDB still follows `TMDB_LANG`.
 - **System, light, and dark themes:** Follow the device appearance, or lock light or dark in Preferences. The choice is saved on your account and applied before the first paint.
+- **Selectable external detail links:** On movie and TV detail pages, choose which profile links appear — IMDb, Wikidata, Letterboxd, TVDB, Trakt, Port.hu — per account in Preferences.
+- **Hybrid recommendations (TMDB, IMDb, AI):** Combine recommendation engines on the Recommendations tab. Results are deduplicated into unified TMDB cards; optional Gemini AI recommendations use your own API key under Integrations.
 - **Imports, including Nuvio:** Import profiles directly from Nuvio (add missing items or update existing ones) with encrypted credentials and scheduling. Automated sync is also available for Trakt, SIMKL, MyAnimeList, AniList, and Kitsu. Import a Trakt website export ZIP with validation and preview. Export/import your full library via CSV, or bring in data from IMDb, Goodreads, Steam, and HowLongToBeat.
 - **Built-in Playback Scrobbler (Nuvio & Media Servers):** MediaTrail includes a native Stremio-protocol addon endpoint that captures playback events from companion apps without requiring a separate scrobbler container. Displays live "Now Watching" strips on your dashboard and automatically records completions. Jellyfin and Plex scrobble via webhooks. Emby can scrobble completions and also show a live Now Watching strip while playback is active.
 - **Preview REST API:** Full REST API at `/api/v1/`, OpenAPI schema at `/api/schema/`, and interactive Swagger documentation at `/api/docs/`. Written reference: [API.md](API.md) ([magyar](API_HU.md)).
@@ -160,7 +162,7 @@ MediaTrail is an independent, unofficial fork and is **not affiliated with, main
 ### Background
 MediaTrail diverged from Yamtrack `dev` after `v0.25.3` (the July 12, 2026 tabbed detail view), incorporating PR `#1378` (REST API preview) and PR `#1608` (Episode history).
 
-MediaTrail continues with small patch releases after `0.26.10`, prioritizing stability, self-contained deployment, and its own features: Nuvio, journal, statistics, import tools, Emby live Now Watching, themes, and a multilingual UI.
+MediaTrail continues with small patch releases after `0.26.10`, prioritizing stability, self-contained deployment, and its own features: Nuvio, journal, statistics, import tools, Emby live Now Watching, selectable detail links, hybrid recommendations (TMDB / IMDb / AI), themes, and a multilingual UI.
 
 | Feature | Upstream Yamtrack (Stable) | MediaTrail |
 | :--- | :---: | :---: |
@@ -169,6 +171,8 @@ MediaTrail continues with small patch releases after `0.26.10`, prioritizing sta
 | **Built-in Scrobbler & Multi-device Now Watching** | No | Yes |
 | **Nuvio Sync / Import** | No | Yes |
 | **Emby live Now Watching** | No | Yes |
+| **Selectable external detail links** (IMDb, Trakt, Port.hu, …) | No | Yes |
+| **Hybrid recommendations** (TMDB + IMDb + optional Gemini AI) | No | Yes |
 | **System / Light / Dark theme** | No | Yes |
 | **Multilingual UI** (Auto, English, Deutsch, Español, Français, Magyar, Italiano) | No | Yes |
 | **Embedded Redis Container** | No *(Requires separate Redis)* | Yes *(Included in image)* |

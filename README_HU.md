@@ -14,7 +14,7 @@
 
 A MediaTrail egy önállóan üzemeltethető webes alkalmazás filmek, tévésorozatok, évadok, epizódok, animék, mangák, videojátékok, könyvek, képregények és társasjátékok egy helyen történő követésére és rendszerezésére. Gondozd a gyűjteményedet, jegyezz fel fontos dátumokat, értékeld a műveket, kövesd nyomon az előrehaladásodat, állíts össze egyéni listákat, és fedezd fel a személyes statisztikáidat.
 
-A projekt a [Yamtrack](https://github.com/FuzzyGrim/Yamtrack) független leágazásaként (forkjaként) indult útjára, olyan képességekkel gazdagodva, mint a beépített REST API, a részletes epizód-előzmények, az élő Most nézem sáv, a Nuvio-szinkron, az Emby élő lejátszáskövetés, a rendszer/világos/sötét téma, valamint a többnyelvű kezelőfelület (angol, német, spanyol, francia, magyar, olasz).
+A projekt a [Yamtrack](https://github.com/FuzzyGrim/Yamtrack) független leágazásaként (forkjaként) indult útjára, olyan képességekkel gazdagodva, mint a beépített REST API, a részletes epizód-előzmények, az élő Most nézem sáv, a Nuvio-szinkron, az Emby élő lejátszáskövetés, a választható külső adatlap-linkek, a hibrid többforrásos ajánló (AI-val is), a rendszer/világos/sötét téma, valamint a többnyelvű kezelőfelület (angol, német, spanyol, francia, magyar, olasz).
 
 ---
 
@@ -31,6 +31,8 @@ A projekt a [Yamtrack](https://github.com/FuzzyGrim/Yamtrack) független leágaz
 - **Több felhasználó, teljesen elkülönülő gyűjtemények:** Minden felhasználó saját, elszeparált médiatárat kezel. A belépés történhet helyi jelszóval vagy közösségi / OIDC azonosítóval (Google, GitHub, Discord) a django-allauth modulon keresztül.
 - **Többnyelvű kezelőfelület:** Fiókonként választható nyelv — Automatikus (böngésző), angol, német, spanyol, francia, magyar vagy olasz. A TMDB-ből érkező katalógusszövegek nyelve továbbra is a `TMDB_LANG` környezeti változót követi.
 - **Rendszer, világos és sötét téma:** Követheted az eszköz megjelenését, vagy a Beállításokban rögzíthetsz világos vagy sötét témát. A választás a fiókodhoz mentődik, és már az első kirajzolás előtt érvényesül.
+- **Választható külső adatlap-linkek:** A film- és sorozatadatlapokon fiókonként bekapcsolhatod, mely profilhivatkozások jelenjenek meg — IMDb, Wikidata, Letterboxd, TVDB, Trakt, Port.hu — a Beállításokban.
+- **Hibrid ajánló (TMDB, IMDb, AI):** Az Ajánlások fülön több ajánlómotor eredményét kombinálhatod. A találatok egységes TMDB-kártyákká rendeződnek, a duplikátumok kiesnek; az opcionális Gemini AI ajánlásokhoz saját API-kulcs kell az Integrációk alatt.
 - **Előzmények importálása, Nuvio-integrációval:** Beemelheted a profilodat közvetlenül a Nuvióból (akár csak az új tételek hozzáadásával, akár a meglévők frissítésével), titkosított hitelesítő adatokkal és automatikus ütemezéssel. A szinkronizáció elérhető a Trakt, SIMKL, MyAnimeList, AniList és Kitsu rendszerekkel is. A Trakt webexport ZIP is importálható ellenőrzéssel és előnézettel. A teljes gyűjteményedet bármikor exportálhatod vagy importálhatod CSV formátumban, emellett feldolgozhatók az IMDb, Goodreads, Steam és HowLongToBeat listái is.
 - **Beépített lejátszáskövető (Scrobbler Nuvio és médiaszerverek számára):** A MediaTrail közvetlenül magában foglalja a Stremio protokollját támogató kiegészítő-végpontot, amely külső segédkonténer nélkül fogadja a lejátszási eseményeket a támogatott társalkalmazásokból. Élő „Most nézem” sávokat jelenít meg a kezdőlapon, és a megtekintés végén automatikusan rögzíti a befejezést. A Jellyfin és a Plex webhookokon keresztül scrobbol. Az Emby a befejezéseket webhookkal rögzíti, és aktív lejátszás közben élő Most nézem sávot is mutat.
 - **Korszerű REST API (előzetes változat):** Teljes értékű REST API a `/api/v1/`, OpenAPI séma a `/api/schema/`, és interaktív Swagger dokumentáció a `/api/docs/` címen. Részletes útmutató: [API_HU.md](API_HU.md) ([English](API.md)).
@@ -160,7 +162,7 @@ A MediaTrail egy független, nem hivatalos leágazás; **nem áll kapcsolatban a
 ### Háttér és célkitűzések
 A MediaTrail fejlesztése a Yamtrack `dev` ágából indult a `v0.25.3` kiadást követően (konkrétan a 2026. július 12-i, fülekkel ellátott részletes adatlap állapotából), beépítve a `#1378`-as számú REST API előzetest és a `#1608`-as epizód-előzménykezelést.
 
-A MediaTrail a `0.26.10` után is kisebb patch-lépésekkel folytatódik, a stabilitást, az önálló üzemeltethetőséget és a saját funkciókat helyezve előtérbe: Nuvio, napló, statisztikák, importeszközök, Emby élő Most nézem, témák és többnyelvű felület.
+A MediaTrail a `0.26.10` után is kisebb patch-lépésekkel folytatódik, a stabilitást, az önálló üzemeltethetőséget és a saját funkciókat helyezve előtérbe: Nuvio, napló, statisztikák, importeszközök, Emby élő Most nézem, választható adatlap-linkek, hibrid ajánló (TMDB / IMDb / AI), témák és többnyelvű felület.
 
 | Funkció | Eredeti Yamtrack (Stabil) | MediaTrail |
 | :--- | :---: | :---: |
@@ -169,6 +171,8 @@ A MediaTrail a `0.26.10` után is kisebb patch-lépésekkel folytatódik, a stab
 | **Beépített Scrobbler és többeszközös „Most nézem”** | Nincs | Van |
 | **Nuvio szinkronizáció és import** | Nincs | Van |
 | **Emby élő Most nézem** | Nincs | Van |
+| **Választható külső adatlap-linkek** (IMDb, Trakt, Port.hu, …) | Nincs | Van |
+| **Hibrid ajánló** (TMDB + IMDb + opcionális Gemini AI) | Nincs | Van |
 | **Rendszer / világos / sötét téma** | Nincs | Van |
 | **Többnyelvű felület** (Automatikus, angol, német, spanyol, francia, magyar, olasz) | Nincs | Van |
 | **Beépített belső Redis-kiszolgáló** | Nincs *(külön szolgáltatást igényel)* | Van *(a konténer része)* |

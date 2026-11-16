@@ -23,6 +23,9 @@ _LABEL = {
     SOURCE_AI: "AI",
 }
 
+# AI and IMDb first so cultural / more-like-this hits are not buried under TMDB.
+_MERGE_PRIORITY = (SOURCE_AI, SOURCE_IMDB, SOURCE_TMDB)
+
 
 def build_recommendations(user, media_metadata: dict, media_type: str, sources=None):
     """Return deduped recommendation item dicts with a ``sources`` list."""
@@ -54,6 +57,13 @@ def build_recommendations(user, media_metadata: dict, media_type: str, sources=N
         except Exception:
             logger.exception("Recommendation source %s failed", key)
             buckets[key] = []
+        logger.info(
+            "Recommendation source %s returned %s items for %s/%s",
+            key,
+            len(buckets.get(key) or []),
+            media_type,
+            seed_id,
+        )
 
     return _merge(buckets, exclude_media_id=seed_id, exclude_type=media_type)
 
@@ -210,7 +220,10 @@ def _seed_year(media_metadata: dict, media_type: str):
 def _merge(buckets: dict[str, list[dict]], *, exclude_media_id: str, exclude_type: str):
     merged = {}
     order = []
-    for source_key, items in buckets.items():
+    source_keys = [key for key in _MERGE_PRIORITY if key in buckets]
+    source_keys.extend(key for key in buckets if key not in source_keys)
+    for source_key in source_keys:
+        items = buckets.get(source_key) or []
         label = _LABEL.get(source_key, source_key)
         for item in items:
             media_id = str(item.get("media_id") or "")

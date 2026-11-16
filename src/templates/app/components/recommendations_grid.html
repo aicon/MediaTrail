@@ -1,18 +1,21 @@
 {% load i18n %}
 {% load app_tags %}
 
-<div id="recommendations-panel"
-     class="space-y-4"
-     hx-get="{% url 'media_recommendations_partial' source=source|default:media.source media_type=media_type media_id=media_id|default:media.media_id title=title|default:media.title|slug %}"
-     hx-trigger="change from:find input[name='rec_sources']"
-     hx-include="closest #recommendations-panel"
-     hx-target="#recommendations-panel"
-     hx-swap="outerHTML">
-  <div class="flex flex-wrap gap-2">
+{# Form root so checkbox changes reliably re-fetch via HTMX (include form fields). #}
+<form id="recommendations-panel"
+      class="space-y-4"
+      action="javascript:void(0)"
+      onsubmit="return false;"
+      hx-get="{% url 'media_recommendations_partial' source=source|default:media.source media_type=media_type media_id=media_id|default:media.media_id title=title|default:media.title|slug %}"
+      hx-trigger="change"
+      hx-target="this"
+      hx-swap="outerHTML">
+  <div class="flex flex-wrap gap-2" role="group" aria-label="{% translate "Recommendation sources" %}">
+    {# Ensures an empty selection still sends rec_sources= so prefs are not reapplied. #}
     <input type="hidden" name="rec_sources" value="">
     {% for option in recommendation_source_options %}
       {% if option.available %}
-        <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm cursor-pointer {% if option.key in selected_recommendation_sources %}bg-indigo-600 text-white{% else %}bg-[#39404b] text-gray-300 hover:bg-[#454d59]{% endif %}">
+        <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm cursor-pointer select-none {% if option.key in selected_recommendation_sources %}bg-indigo-600 text-white{% else %}bg-[#39404b] text-gray-300 hover:bg-[#454d59]{% endif %}">
           <input class="sr-only"
                  type="checkbox"
                  name="rec_sources"
@@ -37,4 +40,4 @@
   {% else %}
     <p class="text-gray-400 text-sm">{% translate "No recommendations for the selected sources." %}</p>
   {% endif %}
-</div>
+</form>

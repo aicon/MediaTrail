@@ -37,7 +37,8 @@ class RecommendationSourcesTests(TestCase):
         self.user = User.objects.create_user(username="recuser", password="pass")
 
     def test_defaults_tmdb_and_imdb(self):
-        self.assertEqual(enabled_source_keys(self.user), ["tmdb", "imdb"])
+        # Canonical UI order is AI → IMDb → TMDB; AI off without a key.
+        self.assertEqual(enabled_source_keys(self.user), ["imdb", "tmdb"])
         self.assertFalse(user_source_enabled(self.user, "ai"))
 
     def test_ai_requires_key(self):
@@ -47,10 +48,13 @@ class RecommendationSourcesTests(TestCase):
         self.user.gemini_api_key = "encrypted-value"
         self.user.save(update_fields=["gemini_api_key"])
         self.assertTrue(user_source_enabled(self.user, "ai"))
+        self.assertEqual(enabled_source_keys(self.user), ["ai", "imdb", "tmdb"])
 
-    def test_parse_sources_filters_unknown(self):
-        keys = parse_source_keys("tmdb,ai,nope", self.user)
-        self.assertEqual(keys, ["tmdb"])
+    def test_parse_sources_filters_unknown_and_keeps_ui_order(self):
+        self.user.gemini_api_key = "encrypted-value"
+        self.user.save(update_fields=["gemini_api_key"])
+        keys = parse_source_keys("tmdb,ai,nope,imdb", self.user)
+        self.assertEqual(keys, ["ai", "imdb", "tmdb"])
 
 
 class ImdbParseTests(TestCase):
@@ -62,6 +66,12 @@ class ImdbParseTests(TestCase):
 
     def test_parse_missing_blob(self):
         self.assertEqual(parse_more_like_this_html("<html></html>"), [])
+
+    def test_waf_page_is_detected(self):
+        from app.providers.imdb_recommendations import _looks_like_waf
+
+        self.assertTrue(_looks_like_waf("<html>window.awsWafCookieDomainList</html>"))
+        self.assertFalse(_looks_like_waf(IMDB_HTML))
 
 
 class RecommendationCacheTests(TestCase):
@@ -124,15 +134,37 @@ class RecommendationMergeTests(TestCase):
                     "source": "tmdb",
                 },
             ],
+            "ai": [
+                {
+                    "media_id": 3,
+                    "media_type": "movie",
+                    "title": "C",
+                    "image": None,
+                    "source": "tmdb",
+                },
+            ],
         }
         merged = recommendations._merge(
             buckets,
             exclude_media_id="99",
             exclude_type="movie",
         )
-        self.assertEqual([item["media_id"] for item in merged], [1, 2])
-        self.assertEqual(merged[0]["sources"], ["TMDB", "IMDb"])
-        self.assertEqual(merged[1]["sources"], ["IMDb"])
+        # AI / IMDb before TMDB so cultural hits surface first.
+        self.assertEqual([item["media_id"] for item in merged], [3, 1, 2])
+        self.assertEqual(merged[0]["sources"], ["AI"])
+        self.assertEqual(merged[1]["sources"], ["IMDb", "TMDB"])
+        self.assertEqual(merged[2]["sources"], ["IMDb"])
+
+    def test_empty_cache_is_treated_as_miss(self):
+        recommendation_cache.set_cached_payload(
+            "imdb",
+            "movie",
+            "tt0179955",
+            [],
+        )
+        self.assertIsNone(
+            recommendation_cache.get_cached_payload("imdb", "movie", "tt0179955")
+        )
 
     @patch("app.providers.recommendations._from_imdb", return_value=[])
     @patch("app.providers.recommendations._from_ai", return_value=[])

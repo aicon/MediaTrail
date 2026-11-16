@@ -27,6 +27,10 @@ def get_cached_payload(source: str, media_type: str, seed_key: str, user_id: int
     )
     if row is None:
         return None
+    # Empty payloads are treated as misses so a one-off scrape/API failure
+    # cannot pin an empty result for the full TTL.
+    if not row.payload:
+        return None
     return row.payload
 
 

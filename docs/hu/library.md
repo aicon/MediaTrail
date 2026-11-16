@@ -22,6 +22,10 @@ A kezdőlap **Recent** rendezése a legutóbbi folytatás-frissítést is figyel
 
 Egy mű adatlapját megnyitva a külső katalógus adatai és a naplózási űrlap jelenik meg. A bejegyzéshez rögzítheted az aktuális állapotot, a személyes értékelésedet, a megtekintés előrehaladását, a kezdeti és befejezési dátumot, valamint az egyéni megjegyzéseidet. Amennyiben egy korábban befejezett művet újra megtekintesz vagy újraolvasol, a rendszer újabb bejegyzést fűz a megtekintési előzményeidhez. A sorozatok hierarchikus felépítésűek: az évadok és az epizódok különálló tételként szerepelnek a rendszerben, így egyetlen rész megtekintésének rögzítése nem írja felül a teljes műsort.
 
+### Külső hivatkozások és ajánlások
+
+A film- és sorozatadatlapokon a Beállításokban választhatod ki, mely külső profilhivatkozások jelenjenek meg (IMDb, Wikidata, Letterboxd, TVDB, Trakt, Port.hu). Az Ajánlások fülön a TMDB, az IMDb „More like this” és az opcionális Gemini AI találatai kombinálhatók; a rendszer egységes TMDB-kártyákká rendezi őket, és kiszűri a duplikátumokat. Az alapértelmezett motorok a Beállítások → Ajánló források alatt állíthatók; az AI-hoz Gemini API-kulcs kell a Beállítások → Integrációk → Gemini fülön. Az IMDb és AI eredmények 30 napig a tartós SQLite adatbázisban cache-elődnek.
+
 ## Kezelőfelület és metaadatok nyelve
 
 A felület nyelvét (magyar vagy angol) a Beállításokban választhatod ki, ezt a rendszer a felhasználói fiókodhoz rendelve menti el. A külső katalógusokból beemelt leírások nyelve attól függ, hogy a kiszolgálót milyen nyelvi paraméterrel kérdezi le a rendszer. A filmek és sorozatok leírásának nyelvét a `TMDB_LANG` környezeti változó határozza meg (lásd a [Környezet](runtime.md) fejezetet).
