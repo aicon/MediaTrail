@@ -30,7 +30,7 @@ The Recommendations tab is a selectable hybrid: turn on any combination of TMDB,
 
 ### Custom-list membership badge
 
-When a title is already on one of your custom lists, poster cards and detail pages show a coral list icon in the top-right corner of the poster. The planning / watchlist icon on the left is unchanged.
+When a title is already on one of your custom lists, poster cards and detail pages show the same dark rounded status chip on the top-right as the left status badge, with the bookmark glyph in coral (`#f97316`). The left planning chip stays sky-colored.
 
 ## Language
 

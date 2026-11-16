@@ -33,7 +33,7 @@ MediaTrail originates as an independent fork of [Yamtrack](https://github.com/Fu
 - **System, light, and dark themes:** Follow the device appearance, or lock light or dark in Preferences. The choice is saved on your account and applied before the first paint.
 - **Selectable external detail links:** On movie and TV detail pages, choose which profile links appear — IMDb, Wikidata, Letterboxd, TVDB, Trakt, Port.hu — per account in Preferences.
 - **Selectable hybrid recommendations (TMDB, IMDb, AI):** On the Recommendations tab, pick any combination of TMDB, IMDb “More like this”, and optional Gemini AI. Defaults live under Preferences → Recommendation sources; turn engines on or off on the page with source pills. Results merge into one deduplicated TMDB card list (source badges on each card). The page paints TMDB first, then loads IMDb/AI in the background. Completed and In Progress titles never appear. Gemini uses your own encrypted API key under Integrations → Gemini. IMDb and AI responses are cached in the durable SQLite database for 30 days.
-- **Custom-list membership badge:** Poster cards and detail pages show a coral top-right list icon when a title is already on one of your custom lists, so you can spot it without opening every list.
+- **Custom-list membership badge:** Poster cards and detail pages show the same dark rounded status chip as the left status badge, with a coral bookmark icon, when a title is already on one of your custom lists.
 - **Imports, including Nuvio:** Import profiles directly from Nuvio (add missing items or update existing ones) with encrypted credentials and scheduling. Automated sync is also available for Trakt, SIMKL, MyAnimeList, AniList, and Kitsu. Import a Trakt website export ZIP with validation and preview. Export/import your full library via CSV, or bring in data from IMDb, Goodreads, Steam, and HowLongToBeat.
 - **Built-in Playback Scrobbler (Nuvio & Media Servers):** MediaTrail includes a native Stremio-protocol addon endpoint that captures playback events from companion apps without requiring a separate scrobbler container. Displays live "Now Watching" strips on your dashboard and automatically records completions. Jellyfin and Plex scrobble via webhooks. Emby can scrobble completions and also show a live Now Watching strip while playback is active.
 - **Preview REST API:** Full REST API at `/api/v1/`, OpenAPI schema at `/api/schema/`, and interactive Swagger documentation at `/api/docs/`. Written reference: [API.md](API.md) ([magyar](API_HU.md)).
@@ -177,7 +177,7 @@ MediaTrail continues with small patch releases after `0.26.10`, prioritizing sta
 | **Progressive recommendations** (TMDB first paint, IMDb/AI deferred) | No | Yes |
 | **Recommendations skip Completed / In Progress** | No | Yes |
 | **Durable IMDb / AI recommendation cache** (SQLite, 30 days) | No | Yes |
-| **Custom-list membership badge** (coral list icon on posters) | No | Yes |
+| **Custom-list membership badge** (same chip as status, coral bookmark) | No | Yes |
 | **System / Light / Dark theme** | No | Yes |
 | **Multilingual UI** (Auto, English, Deutsch, Español, Français, Magyar, Italiano) | No | Yes |
 | **Embedded Redis Container** | No *(Requires separate Redis)* | Yes *(Included in image)* |

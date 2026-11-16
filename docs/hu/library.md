@@ -30,7 +30,7 @@ Az Ajánlások fül választható hibrid: tetszőleges kombinációban kapcsolha
 
 ### Egyéni lista-jelvény
 
-Ha egy cím már szerepel valamelyik egyéni listádon, a poszterkártyákon és az adatlapokon korall színű listaikon jelenik meg a poszter jobb felső sarkában. A bal oldali tervezés / watchlist ikon változatlan.
+Ha egy cím már szerepel valamelyik egyéni listádon, a poszterkártyákon és az adatlapokon a jobb felső sarokban ugyanaz a sötét, lekerekített státusz-chip jelenik meg, mint bal oldalon, a bookmark ikon korall színben (`#f97316`). A bal oldali tervezés-chip égszínkék marad.
 
 ## Kezelőfelület és metaadatok nyelve
 
